@@ -1,0 +1,318 @@
+# Elderly Care Registration Form Redesign
+
+ปรับปรุงฟอร์มข้อมูลผู้สูงอายุให้ครอบคลุม 14 หมวดหมู่ตามมาตรฐานการรับเข้าพักดูแล
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Database Migration Required** - This change requires significant database schema updates with 50+ new fields. Any existing elderly records will need manual data migration for new fields.
+
+> [!WARNING]
+> **Breaking Change** - The new schema replaces `nationalId` with `safeId` (SIDxxx69xxx format). The field validation logic and purpose are different.
+
+---
+
+## Proposed Changes
+
+### Database Schema (Prisma)
+
+#### [MODIFY] [schema.prisma](file:///d:/Workshop/elderlycare/prisma/schema.prisma)
+
+**Add new enums:**
+```diff
++enum MaritalStatus {
++  SINGLE
++  MARRIED
++  WIDOWED
++  DIVORCED_SEPARATED
++}
++
++enum HearingStatus {
++  NORMAL
++  HARD_OF_HEARING_LEFT
++  HARD_OF_HEARING_RIGHT
++  HARD_OF_HEARING_BOTH
++  DEAF
++  HEARING_AID
++}
++
++enum VisionStatus {
++  NORMAL
++  NEARSIGHTED_FARSIGHTED
++  CATARACT_GLAUCOMA
++  GLASSES
++  CONTACT_LENS
++}
++
++enum SpeechStatus {
++  CLEAR
++  DYSARTHRIA
++  APHASIA
++  NON_VERBAL
++}
++
++enum GaitStatus {
++  INDEPENDENT
++  UNSTEADY
++  NEEDS_SUPPORT
++  NON_AMBULATORY_BEDRIDDEN
++}
++
++enum BladderControl {
++  CONTINENT
++  OCCASIONAL_INCONTINENCE
++  TOTAL_INCONTINENCE_FOLEY
++}
++
++enum BowelControl {
++  NORMAL
++  CONSTIPATION
++  DIARRHEA
++  INCONTINENCE
++}
++
++enum DiaperType {
++  NONE
++  TAPE
++  PANTS
++}
++
++enum HealthPrivilege {
++  SELF_PAY
++  SOCIAL_SECURITY
++  GOLD_CARD
++  GOVERNMENT_OFFICER
++}
++
++enum GoalOfCare {
++  REHABILITATION
++  LONG_TERM_CARE
++  PALLIATIVE
++}
++
++enum HomeType {
++  SINGLE_HOUSE
++  TOWNHOUSE
++}
+```
+
+**Update ElderlyProfile model with 70+ fields:**
+```diff
+ model ElderlyProfile {
+   id        String   @id @default(uuid())
+   
+-  // Personal Information (Fields 1-8)
+-  nationalId            String   @unique @db.VarChar(255)
++  // Header / Admission Info
++  admissionDate         DateTime
++  admissionTime         String   @db.VarChar(10)
++  safeId                String   @unique @db.VarChar(20)  // SIDxxx69xxx format
++  partnerId             String   @db.VarChar(20)          // PID001-PID999
++  
++  // Section 1: Identification & Personal Background
+   firstName             String   @db.VarChar(100)
+   lastName              String   @db.VarChar(100)
+   nickname              String?  @db.VarChar(50)
+-  dateOfBirth           DateTime
++  age                   Int
+   gender                Gender
+-  bloodType             BloodType @default(UNKNOWN)
+-  profilePhoto          String?  @db.Text
++  preferredPronouns     String?  @db.VarChar(100)
++  education             String?  @db.VarChar(100)
++  proudFormerOccupation String?  @db.VarChar(200)
++  
++  // Section 2: Marital Status & Contacts
++  maritalStatus         MaritalStatus @default(SINGLE)
++  keyCoordinatorName    String   @db.VarChar(100)
++  keyCoordinatorPhone   String   @db.VarChar(255)
++  keyCoordinatorRelation String  @db.VarChar(100)
++  legalGuardianName     String?  @db.VarChar(100)
++  legalGuardianPhone    String?  @db.VarChar(255)
++  legalGuardianRelation String?  @db.VarChar(100)
++  
++  // Section 3: Sensory & Communication
++  hearingStatus         HearingStatus @default(NORMAL)
++  visionStatus          VisionStatus  @default(NORMAL)
++  speechStatus          SpeechStatus  @default(CLEAR)
++  
++  // Section 4: Mobility & Fall Risk
++  historyOfFalls        Boolean  @default(false)
++  fallsTimeframe        String?  @db.VarChar(50)  // 6-12 months
++  fallsCause            String?  @db.Text
++  gaitStatus            GaitStatus @default(INDEPENDENT)
++  assistiveDevices      String?  @db.Text  // JSON: cane, walker, wheelchair
++  
++  // Section 5: Elimination
++  bladderControl        BladderControl @default(CONTINENT)
++  foleySize             String?  @db.VarChar(10)
++  bowelControl          BowelControl @default(NORMAL)
++  diaperType            DiaperType @default(NONE)
++  diaperSize            String?  @db.VarChar(10)
++  
++  // Section 6: Cognitive & Behavioral
++  hasConfusion          Boolean  @default(false)
++  confusionTimeframe    String?  @db.Text
++  memoryStatus          String?  @db.Text  // JSON: normal, short-term, long-term, doesnt recognize
++  behaviorStatus        String?  @db.Text  // JSON: calm, aggressive, depressed, wandering, hallucination
++  
++  // Section 7: Chief Complaint
++  reasonForAdmission    String   @db.Text
++  initialMentalState    String?  @db.Text
++  
++  // Section 8: Medical History
++  underlyingDiseases    String?  @db.Text
++  currentMedications    String?  @db.Text
++  surgicalHistory       String?  @db.Text
++  
++  // Section 9: Allergies
++  hasDrugAllergies      Boolean  @default(false)
++  drugAllergiesDetail   String?  @db.Text
++  hasFoodChemicalAllergies Boolean @default(false)
++  foodChemicalAllergiesDetail String? @db.Text
++  
++  // Section 10: Physical & Medical Devices
++  skinCondition         String?  @db.Text  // normal, dry, bruised, other
++  hasPressureUlcer      Boolean  @default(false)
++  pressureUlcerLocation String?  @db.VarChar(100)
++  pressureUlcerStage    Int?
++  medicalDevices        String?  @db.Text  // JSON: NGTube, Tracheostomy, Oxygen, other
++  
++  // Section 11: Social Support & Financial
++  primaryCaregiverName  String?  @db.VarChar(100)
++  primaryCaregiverRelation String? @db.VarChar(100)
++  healthPrivilege       HealthPrivilege @default(SELF_PAY)
++  sponsor               String?  @db.VarChar(200)
++  
++  // Section 12: Religion & Beliefs
++  religion              String?  @db.VarChar(100)
++  religiousRestrictions String?  @db.Text
++  spiritualNeeds        String?  @db.Text
++  
++  // Section 13: Goals & Expectations
++  goalOfCare            GoalOfCare @default(LONG_TERM_CARE)
++  expectationDetails    String?  @db.Text
++  
++  // Section 14: Environment & Genogram
++  homeType              HomeType?
++  bedroomLocation       String?  @db.VarChar(50)  // ground floor / upper floor
++  familyGenogram        String?  @db.Text
+   
++  // Assessor Signature
++  assessorSignature     String?  @db.VarChar(100)
++  assessmentDate        DateTime?
++  
++  // Keep existing fields for backward compatibility (marked optional)
++  nationalId            String?  @db.VarChar(255)
+-  address               String   @db.VarChar(255)
+-  subDistrict           String   @db.VarChar(100)
+-  district              String   @db.VarChar(100)
+-  province              String   @db.VarChar(100)
+-  postalCode            String   @db.VarChar(10)
++  address               String?  @db.VarChar(255)
++  subDistrict           String?  @db.VarChar(100)
++  district              String?  @db.VarChar(100)
++  province              String?  @db.VarChar(100)
++  postalCode            String?  @db.VarChar(10)
++  
++  dateOfBirth           DateTime?
++  bloodType             BloodType @default(UNKNOWN)
++  profilePhoto          String?  @db.Text
+   phoneNumber           String?  @db.VarChar(255)
+   email                 String?  @db.VarChar(255)
+-  emergencyContactName     String  @db.VarChar(100)
+-  emergencyContactPhone    String  @db.VarChar(255)
+-  emergencyContactRelation String  @db.VarChar(50)
+-  chronicDiseases       String?  @db.Text
++  emergencyContactName     String?  @db.VarChar(100)
++  emergencyContactPhone    String?  @db.VarChar(255)
++  emergencyContactRelation String?  @db.VarChar(50)
++  chronicDiseases       String?  @db.Text  
+   allergies             String?  @db.Text
+-  currentMedications    String?  @db.Text
+   specialDietaryNeeds   String?  @db.Text
++  careLevel             CareLevel @default(LEVEL_1)
+   mobilityStatus        MobilityStatus @default(INDEPENDENT)
+-  careLevel             CareLevel      @default(LEVEL_1)
+   primaryCaregiverId    String?  @db.VarChar(100)
+   registrationDate      DateTime @default(now())
+   notes                 String?  @db.Text
+   isActive              Boolean  @default(true)
+   createdAt             DateTime @default(now())
+   updatedAt             DateTime @updatedAt
+ }
+```
+
+---
+
+### Validation Schema
+
+#### [MODIFY] [validations.ts](file:///d:/Workshop/elderlycare/src/lib/validations.ts)
+
+Update `elderlyProfileSchema` with all 14 sections matching the database schema.
+
+---
+
+### Form UI
+
+#### [MODIFY] [page.tsx](file:///d:/Workshop/elderlycare/src/app/dashboard/elderly/new/page.tsx)
+
+Replace current 4-section form with new 14-section structure:
+
+1. **Header** - วันที่ลงทะเบียน, เวลา, SAFE-ID, รหัสพันธมิตร
+2. **ข้อมูลทั่วไป** - ชื่อ, อายุ, เพศ, การศึกษา, อาชีพเดิม
+3. **สถานภาพและผู้ติดต่อ** - สถานภาพสมรส, ผู้ประสานงาน, ผู้ทำสัญญา
+4. **ประสาทสัมผัส** - การได้ยิน, การมองเห็น, การสื่อสาร
+5. **การเคลื่อนไหว** - ประวัติหกล้ม, การเดิน, อุปกรณ์ช่วย
+6. **การขับถ่าย** - ปัสสาวะ, อุจจาระ, ผ้าอ้อม
+7. **สมองและพฤติกรรม** - สับสน, ความจำ, พฤติกรรม
+8. **อาการแรกรับ** - สาเหตุที่มา, สภาพจิตใจ
+9. **ประวัติเจ็บป่วย** - โรคประจำตัว, ยา, ประวัติผ่าตัด
+10. **ประวัติการแพ้** - แพ้ยา, แพ้อาหาร
+11. **สภาพร่างกาย** - ผิวหนัง, แผลกดทับ, อุปกรณ์การแพทย์
+12. **สังคมและเศรษฐกิจ** - ผู้ดูแล, สิทธิการรักษา, ผู้รับผิดชอบค่าใช้จ่าย
+13. **ศาสนา** - ศาสนา, ข้อห้าม, สิ่งยึดเหนี่ยว
+14. **ความคาดหวัง** - เป้าหมายการดูแล, รายละเอียด
+15. **สภาพแวดล้อม** - ที่พักเดิม, ผังครอบครัว
+16. **ลายเซ็นผู้ประเมิน**
+
+---
+
+### Server Actions
+
+#### [MODIFY] [elderly.actions.ts](file:///d:/Workshop/elderlycare/src/actions/elderly.actions.ts)
+
+Update [createElderlyProfile](file:///d:/Workshop/elderlycare/src/actions/elderly.actions.ts#20-63) and [updateElderlyProfile](file:///d:/Workshop/elderlycare/src/actions/elderly.actions.ts#186-229) to handle all new fields with proper encryption for:
+- `keyCoordinatorPhone`
+- `legalGuardianPhone`
+
+---
+
+## Verification Plan
+
+### Manual Verification
+
+**Step 1: Database Migration**
+```bash
+cd d:\Workshop\elderlycare
+npx prisma migrate dev --name add_comprehensive_elderly_fields
+```
+
+**Step 2: Start Development Server**
+```bash
+npm run dev
+```
+
+**Step 3: Test Form**
+1. Navigate to `http://localhost:3000/dashboard/elderly/new`
+2. Verify all 14 sections are displayed
+3. Fill out each section with test data
+4. Click "บันทึกข้อมูล"
+5. Verify redirect to elderly list
+6. Click on created record to verify data was saved correctly
+
+**Step 4: Test Print/Email (if needed)**
+- The buttons for "ปริ้นเอกสาร" and "ส่งต่อโดยอีเมล" will be added as action buttons
+
+> [!NOTE]
+> There are no existing unit tests in this project. Manual verification is the primary testing method.

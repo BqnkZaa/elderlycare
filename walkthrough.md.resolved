@@ -1,0 +1,253 @@
+# Elderly Care Management Platform - Walkthrough
+
+ระบบจัดการข้อมูลผู้สูงอายุสำหรับหน่วยงาน อปท. (องค์กรปกครองส่วนท้องถิ่น) พัฒนาด้วย Next.js 16, TypeScript, MySQL และ Prisma 7
+
+---
+
+## สถาปัตยกรรมระบบ
+
+```mermaid
+graph TB
+    subgraph Frontend
+        A[Next.js App Router] --> B[React Components]
+        B --> C[UI Components]
+    end
+    
+    subgraph Backend
+        D[Server Actions] --> E[Prisma ORM]
+        F[API Routes] --> E
+        G[NextAuth.js] --> E
+    end
+    
+    subgraph Database
+        E --> H[(MySQL)]
+    end
+    
+    subgraph Services
+        I[Notification Service] --> E
+        J[Encryption Service]
+    end
+    
+    A --> D
+    A --> F
+    A --> G
+    D --> J
+```
+
+---
+
+## โครงสร้างโปรเจค
+
+| Directory | Description |
+|-----------|-------------|
+| `src/app/` | Next.js App Router pages and API routes |
+| `src/actions/` | Server Actions for CRUD operations |
+| `src/components/` | Reusable React components |
+| `src/lib/` | Utilities, validations, encryption |
+| `src/services/` | Business logic services |
+| `src/generated/` | Prisma generated client |
+| `prisma/` | Database schema |
+
+---
+
+## หน้าหลักของระบบ
+
+### 1. Login Page (`/login`)
+- Authentication ด้วย NextAuth.js Credentials Provider
+- รองรับ Admin และ Staff roles
+
+### 2. Dashboard (`/dashboard`)
+- แสดงสถิติภาพรวม: จำนวนผู้สูงอายุ, บันทึกวันนี้, การแจ้งเตือน
+- แสดงวันเกิดและครบรอบการเข้าร่วมโครงการ
+- Quick actions สำหรับเพิ่มข้อมูล
+
+### 3. Elderly Profiles (`/dashboard/elderly`)
+- รายการผู้สูงอายุพร้อม pagination
+- ค้นหาตามชื่อและกรองตามจังหวัด (77 จังหวัด)
+- ดูรายละเอียดแต่ละคน
+
+### 4. Profile Detail (`/dashboard/elderly/[id]`)
+- ข้อมูลส่วนตัว, ที่อยู่, ผู้ติดต่อฉุกเฉิน
+- ข้อมูลสุขภาพ: โรคประจำตัว, ยา, อาการแพ้
+- บันทึกประจำวันล่าสุด
+
+### 5. Add/Edit Profile (`/dashboard/elderly/new`)
+- ฟอร์ม 20+ fields ครอบคลุมข้อมูลครบถ้วน
+- Validation ด้วย Zod + React Hook Form
+
+---
+
+## Data Models
+
+```mermaid
+erDiagram
+    User ||--o{ DailyLog : records
+    ElderlyProfile ||--o{ DailyLog : has
+    ElderlyProfile ||--o{ AlertLog : triggers
+    
+    User {
+        string id PK
+        string email UK
+        string password
+        string name
+        enum role
+        boolean isActive
+    }
+    
+    ElderlyProfile {
+        string id PK
+        string nationalId UK
+        string firstName
+        string lastName
+        date dateOfBirth
+        enum gender
+        enum bloodType
+        string province
+        enum careLevel
+        enum mobilityStatus
+    }
+    
+    DailyLog {
+        string id PK
+        string elderlyId FK
+        date date
+        json vitals
+        enum mood
+        enum mealIntake
+        enum sleepQuality
+        boolean medicationsTaken
+    }
+    
+    AlertLog {
+        string id PK
+        string elderlyId
+        string alertType
+        string message
+        string status
+    }
+```
+
+---
+
+## ฟีเจอร์หลัก
+
+### 🔐 PDPA Compliance
+- **Encryption**: เลขบัตรประชาชน, เบอร์โทร ถูกเข้ารหัส AES-256
+- **Masking**: แสดงเฉพาะ 4 หลักสุดท้าย
+
+```typescript
+// src/lib/encryption.ts
+export function encrypt(text: string): string
+export function decrypt(ciphertext: string): string
+export function maskSensitiveData(data: string, visibleChars: number): string
+```
+
+### 📊 Server Actions
+ใช้ Next.js Server Actions สำหรับ CRUD operations:
+
+| Action | File | Description |
+|--------|------|-------------|
+| `createElderlyProfile` | [elderly.actions.ts](file:///d:/Workshop/elderlycare/src/actions/elderly.actions.ts) | สร้างข้อมูลใหม่พร้อม encryption |
+| `getElderlyProfiles` | [elderly.actions.ts](file:///d:/Workshop/elderlycare/src/actions/elderly.actions.ts) | ดึงข้อมูลพร้อม decrypt และ pagination |
+| `updateElderlyProfile` | [elderly.actions.ts](file:///d:/Workshop/elderlycare/src/actions/elderly.actions.ts) | อัพเดทข้อมูล |
+| `createDailyLog` | [daily-log.actions.ts](file:///d:/Workshop/elderlycare/src/actions/daily-log.actions.ts) | บันทึกข้อมูลประจำวัน |
+
+### 🔔 Notification Service
+- ตรวจสอบวันเกิดและครบรอบ
+- Provider Interface Pattern สำหรับ SMS/LINE integration
+- Cron job endpoint: `GET /api/cron/daily-check`
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Framework** | Next.js 16.1.6 (App Router, Turbopack) |
+| **Language** | TypeScript 5.x |
+| **Database** | MySQL (via Prisma 7.x) |
+| **ORM** | Prisma 7.3.0 + MariaDB Adapter |
+| **Auth** | NextAuth.js 5 (Credentials) |
+| **Validation** | Zod 4 |
+| **Forms** | React Hook Form |
+| **Styling** | Tailwind CSS 4 |
+| **Icons** | Lucide React |
+
+---
+
+## Environment Variables
+
+```env
+# Database
+DATABASE_URL="mysql://user:pass@host:3306/elderlycare"
+DB_HOST="localhost"
+DB_PORT="3306"
+DB_USER="root"
+DB_PASSWORD="password"
+DB_NAME="elderlycare"
+
+# Auth
+NEXTAUTH_SECRET="your-secret-min-32-chars"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Security
+CRON_SECRET="your-cron-secret"
+ENCRYPTION_KEY="your-32-character-key"
+```
+
+---
+
+## การติดตั้งและใช้งาน
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Setup Database
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+```
+
+### 3. Seed Admin User
+เข้า `http://localhost:3000/api/seed` เพื่อสร้าง admin user:
+- Email: `admin@elderlycare.local`
+- Password: `admin123`
+
+### 4. Run Development Server
+```bash
+npm run dev
+```
+
+---
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/[...nextauth]` | * | NextAuth.js handlers |
+| `/api/seed` | GET | สร้าง admin user เริ่มต้น |
+| `/api/cron/daily-check` | GET | ตรวจสอบวันเกิด/ครบรอบ |
+
+---
+
+## Security Features
+
+1. **Authentication** - NextAuth.js with bcrypt password hashing
+2. **Authorization** - Role-based (ADMIN, STAFF) via middleware
+3. **Encryption** - AES-256 for sensitive data
+4. **CSRF Protection** - Built-in with Server Actions
+5. **Input Validation** - Zod schemas on all forms
+
+---
+
+## สรุป
+
+ระบบ Elderly Care Management Platform เป็นระบบที่พร้อม deploy บน Plesk hosting รองรับ:
+- ✅ ข้อมูลผู้สูงอายุ 20+ fields
+- ✅ บันทึกประจำวัน (vital signs, mood, meals, sleep)
+- ✅ 77 จังหวัดของประเทศไทย
+- ✅ PDPA-compliant encryption
+- ✅ Notification service สำหรับวันเกิด/ครบรอบ
+- ✅ Role-based authentication

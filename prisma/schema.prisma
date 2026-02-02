@@ -7,7 +7,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ============================================
@@ -75,6 +76,82 @@ enum SleepQuality {
   VERY_POOR
 }
 
+// New Enums for Comprehensive Form
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  WIDOWED
+  DIVORCED_SEPARATED
+}
+
+enum HearingStatus {
+  NORMAL
+  HARD_OF_HEARING_LEFT
+  HARD_OF_HEARING_RIGHT
+  HARD_OF_HEARING_BOTH
+  DEAF
+  HEARING_AID
+}
+
+enum VisionStatus {
+  NORMAL
+  NEARSIGHTED_FARSIGHTED
+  CATARACT_GLAUCOMA
+  GLASSES
+  CONTACT_LENS
+}
+
+enum SpeechStatus {
+  CLEAR
+  DYSARTHRIA
+  APHASIA
+  NON_VERBAL
+}
+
+enum GaitStatus {
+  INDEPENDENT
+  UNSTEADY
+  NEEDS_SUPPORT
+  NON_AMBULATORY_BEDRIDDEN
+}
+
+enum BladderControl {
+  CONTINENT
+  OCCASIONAL_INCONTINENCE
+  TOTAL_INCONTINENCE_FOLEY
+}
+
+enum BowelControl {
+  NORMAL
+  CONSTIPATION
+  DIARRHEA
+  INCONTINENCE
+}
+
+enum DiaperType {
+  NONE
+  TAPE
+  PANTS
+}
+
+enum HealthPrivilege {
+  SELF_PAY
+  SOCIAL_SECURITY
+  GOLD_CARD
+  GOVERNMENT_OFFICER
+}
+
+enum GoalOfCare {
+  REHABILITATION
+  LONG_TERM_CARE
+  PALLIATIVE
+}
+
+enum HomeType {
+  SINGLE_HOUSE
+  TOWNHOUSE
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -93,49 +170,130 @@ model User {
   @@map("users")
 }
 
-/// ElderlyProfile model with 20+ fields for comprehensive data
+/// ElderlyProfile model with comprehensive data for 14-section form
 model ElderlyProfile {
   id        String   @id @default(uuid())
   
-  // Personal Information (Fields 1-8)
-  nationalId            String   @unique @db.VarChar(255) // Encrypted for PDPA
+  // Header / Admission Info
+  admissionDate         DateTime @default(now())
+  admissionTime         String?   @db.VarChar(10)
+  safeId                String?   @unique @db.VarChar(20)  // SIDxxx69xxx format
+  partnerId             String?   @db.VarChar(20)          // PID001-PID999
+  
+  // Section 1: Identification & Personal Background
   firstName             String   @db.VarChar(100)
   lastName              String   @db.VarChar(100)
   nickname              String?  @db.VarChar(50)
-  dateOfBirth           DateTime
+  age                   Int?
   gender                Gender
-  bloodType             BloodType @default(UNKNOWN)
-  profilePhoto          String?  @db.Text // URL or base64
+  preferredPronouns     String?  @db.VarChar(100)
+  education             String?  @db.VarChar(100)
+  proudFormerOccupation String?  @db.VarChar(200)
+  dateOfBirth           DateTime? // Keep for backward compatibility/calculation
   
-  // Address Information (Fields 9-13)
-  address               String   @db.VarChar(255)
-  subDistrict           String   @db.VarChar(100) // Tambon
-  district              String   @db.VarChar(100) // Amphoe
-  province              String   @db.VarChar(100) // Changwat (77 provinces)
-  postalCode            String   @db.VarChar(10)
+  // Section 2: Marital Status & Contacts
+  maritalStatus         MaritalStatus @default(SINGLE)
+  keyCoordinatorName    String?   @db.VarChar(100)
+  keyCoordinatorPhone   String?   @db.VarChar(255)
+  keyCoordinatorRelation String?  @db.VarChar(100)
+  legalGuardianName     String?  @db.VarChar(100)
+  legalGuardianPhone    String?  @db.VarChar(255)
+  legalGuardianRelation String?  @db.VarChar(100)
   
-  // Contact Information (Fields 14-15)
-  phoneNumber           String?  @db.VarChar(255) // Encrypted
-  email                 String?  @db.VarChar(255)
+  // Section 3: Sensory & Communication
+  hearingStatus         HearingStatus @default(NORMAL)
+  visionStatus          VisionStatus  @default(NORMAL)
+  speechStatus          SpeechStatus  @default(CLEAR)
   
-  // Emergency Contact (Fields 16-18)
-  emergencyContactName     String  @db.VarChar(100)
-  emergencyContactPhone    String  @db.VarChar(255) // Encrypted
-  emergencyContactRelation String  @db.VarChar(50)
+  // Section 4: Mobility & Fall Risk
+  historyOfFalls        Boolean  @default(false)
+  fallsTimeframe        String?  @db.VarChar(50)  // 6-12 months
+  fallsCause            String?  @db.Text
+  gaitStatus            GaitStatus @default(INDEPENDENT)
+  assistiveDevices      String?  @db.Text  // JSON array: cane, walker, wheelchair
+  mobilityStatus        MobilityStatus @default(INDEPENDENT) // Keep for backward compatibility
   
-  // Health Information (Fields 19-22)
-  chronicDiseases       String?  @db.Text // JSON array as string
-  allergies             String?  @db.Text
+  // Section 5: Elimination
+  bladderControl        BladderControl @default(CONTINENT)
+  foleySize             String?  @db.VarChar(10)
+  bowelControl          BowelControl @default(NORMAL)
+  diaperType            DiaperType @default(NONE)
+  diaperSize            String?  @db.VarChar(10)
+  
+  // Section 6: Cognitive & Behavioral
+  hasConfusion          Boolean  @default(false)
+  confusionTimeframe    String?  @db.Text
+  memoryStatus          String?  @db.Text  // JSON array
+  behaviorStatus        String?  @db.Text  // JSON array
+  
+  // Section 7: Chief Complaint
+  reasonForAdmission    String?   @db.Text
+  initialMentalState    String?  @db.Text
+  
+  // Section 8: Medical History
+  underlyingDiseases    String?  @db.Text
   currentMedications    String?  @db.Text
+  surgicalHistory       String?  @db.Text
+  
+  // Section 9: Allergies
+  hasDrugAllergies      Boolean  @default(false)
+  drugAllergiesDetail   String?  @db.Text
+  hasFoodChemicalAllergies Boolean @default(false)
+  foodChemicalAllergiesDetail String? @db.Text
+  allergies             String?  @db.Text // Keep for backward compatibility
+  
+  // Section 10: Physical & Medical Devices
+  skinCondition         String?  @db.Text  // JSON array
+  hasPressureUlcer      Boolean  @default(false)
+  pressureUlcerLocation String?  @db.VarChar(100)
+  pressureUlcerStage    String?  @db.VarChar(10) // Changed to string for input flexibility
+  medicalDevices        String?  @db.Text  // JSON array
+  
+  // Section 11: Social Support & Financial
+  primaryCaregiverName  String?  @db.VarChar(100)
+  primaryCaregiverRelation String? @db.VarChar(100)
+  primaryCaregiverId    String?  @db.VarChar(100) // Keep for backward compatibility
+  healthPrivilege       HealthPrivilege @default(SELF_PAY)
+  sponsor               String?  @db.VarChar(200)
+  
+  // Section 12: Religion & Beliefs
+  religion              String?  @db.VarChar(100)
+  religiousRestrictions String?  @db.Text
+  spiritualNeeds        String?  @db.Text
+  
+  // Section 13: Goals & Expectations
+  goalOfCare            GoalOfCare @default(LONG_TERM_CARE)
+  expectationDetails    String?  @db.Text
+  careLevel             CareLevel      @default(LEVEL_1)
+  
+  // Section 14: Environment & Genogram
+  homeType              HomeType?
+  bedroomLocation       String?  @db.VarChar(50)
+  familyGenogram        String?  @db.Text
+  
+  // Address Information (Keep optional for backward compatibility/if needed)
+  address               String?   @db.VarChar(255)
+  subDistrict           String?   @db.VarChar(100)
+  district              String?   @db.VarChar(100)
+  province              String?   @db.VarChar(100)
+  postalCode            String?   @db.VarChar(10)
+  
+  // Other existing fields
+  nationalId            String?   @unique @db.VarChar(255) // Keep but make optional as we move to SAFE-ID
+  phoneNumber           String?  @db.VarChar(255)
+  email                 String?  @db.VarChar(255)
+  emergencyContactName     String?  @db.VarChar(100)
+  emergencyContactPhone    String?  @db.VarChar(255)
+  emergencyContactRelation String?  @db.VarChar(50)
+  bloodType             BloodType @default(UNKNOWN)
+  profilePhoto          String?  @db.Text 
   specialDietaryNeeds   String?  @db.Text
   
-  // Care Status (Fields 23-25)
-  mobilityStatus        MobilityStatus @default(INDEPENDENT)
-  careLevel             CareLevel      @default(LEVEL_1)
-  primaryCaregiverId    String?  @db.VarChar(100)
-  
-  // System Fields (Fields 26-29)
+  // System Fields
   registrationDate      DateTime @default(now())
+  assessorSignature     String?  @db.VarChar(100)
+  assessmentDate        DateTime?
+  
   notes                 String?  @db.Text
   isActive              Boolean  @default(true)
   createdAt             DateTime @default(now())
@@ -146,7 +304,7 @@ model ElderlyProfile {
 
   // Indexes for efficient filtering
   @@index([province])
-  @@index([dateOfBirth])
+  @@index([safeId])
   @@index([registrationDate])
   @@index([isActive])
   @@map("elderly_profiles")
