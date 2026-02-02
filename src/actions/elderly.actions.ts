@@ -12,7 +12,7 @@ import { encrypt, decrypt } from '@/lib/encryption';
 import { elderlyProfileSchema, elderlyFilterSchema, type ElderlyProfileInput, type ElderlyFilter } from '@/lib/validations';
 import { getPaginationMeta } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 
 // ============================================
 // CREATE
