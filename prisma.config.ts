@@ -14,8 +14,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // MySQL connection URL from environment
-    // Format: mysql://USER:PASSWORD@HOST:PORT/DATABASE
+    // Connection URL from environment
+    // Format: postgresql://USER:PASSWORD@HOST:PORT/DATABASE
     url: process.env["DATABASE_URL"],
   },
 });
