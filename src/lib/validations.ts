@@ -17,7 +17,11 @@ export const elderlyProfileSchema = z.object({
     preferredPronouns: z.string().optional(),
     education: z.string().optional(),
     proudFormerOccupation: z.string().optional(),
-    dateOfBirth: z.string().optional().transform((val) => val ? new Date(val) : undefined), // Converted to Date for Prisma
+    dateOfBirth: z.union([z.string(), z.date()]).optional().transform((val) => {
+        if (!val) return undefined;
+        if (typeof val === 'string') return val === '' ? undefined : new Date(val);
+        return val;
+    }), // Handle both string (from form) and Date (from internal/transformed data)
 
     // 2. Marital & Status
     maritalStatus: z.enum(["SINGLE", "MARRIED", "WIDOWED", "DIVORCED_SEPARATED"]),
