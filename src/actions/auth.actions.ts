@@ -4,7 +4,7 @@
 
 'use server';
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { userSchema, type UserInput } from '@/lib/validations';
 

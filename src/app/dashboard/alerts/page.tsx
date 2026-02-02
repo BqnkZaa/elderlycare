@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell } from 'lucide-react';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 

@@ -7,7 +7,7 @@
 
 'use server';
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { dailyLogSchema, dailyLogFilterSchema, type DailyLogInput, type DailyLogFilter } from '@/lib/validations';
 import { getPaginationMeta } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
