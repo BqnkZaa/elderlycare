@@ -1,0 +1,211 @@
+// Prisma Schema for Elderly Care Management Platform
+// Database: MySQL (for Plesk hosting compatibility)
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  UNKNOWN
+}
+
+enum MobilityStatus {
+  INDEPENDENT
+  NEEDS_ASSISTANCE
+  WHEELCHAIR
+  BEDRIDDEN
+}
+
+enum CareLevel {
+  LEVEL_1  // Minimal assistance
+  LEVEL_2  // Moderate assistance
+  LEVEL_3  // Full-time care
+  LEVEL_4  // Intensive care
+}
+
+enum Mood {
+  HAPPY
+  CONTENT
+  NEUTRAL
+  SAD
+  ANXIOUS
+  IRRITABLE
+}
+
+enum MealIntake {
+  FULL
+  PARTIAL
+  MINIMAL
+  NONE
+}
+
+enum SleepQuality {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  VERY_POOR
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+/// User model for Admin/Staff authentication
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // bcrypt hashed
+  name      String
+  role      Role     @default(STAFF)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+/// ElderlyProfile model with 20+ fields for comprehensive data
+model ElderlyProfile {
+  id        String   @id @default(uuid())
+  
+  // Personal Information (Fields 1-8)
+  nationalId            String   @unique @db.VarChar(255) // Encrypted for PDPA
+  firstName             String   @db.VarChar(100)
+  lastName              String   @db.VarChar(100)
+  nickname              String?  @db.VarChar(50)
+  dateOfBirth           DateTime
+  gender                Gender
+  bloodType             BloodType @default(UNKNOWN)
+  profilePhoto          String?  @db.Text // URL or base64
+  
+  // Address Information (Fields 9-13)
+  address               String   @db.VarChar(255)
+  subDistrict           String   @db.VarChar(100) // Tambon
+  district              String   @db.VarChar(100) // Amphoe
+  province              String   @db.VarChar(100) // Changwat (77 provinces)
+  postalCode            String   @db.VarChar(10)
+  
+  // Contact Information (Fields 14-15)
+  phoneNumber           String?  @db.VarChar(255) // Encrypted
+  email                 String?  @db.VarChar(255)
+  
+  // Emergency Contact (Fields 16-18)
+  emergencyContactName     String  @db.VarChar(100)
+  emergencyContactPhone    String  @db.VarChar(255) // Encrypted
+  emergencyContactRelation String  @db.VarChar(50)
+  
+  // Health Information (Fields 19-22)
+  chronicDiseases       String?  @db.Text // JSON array as string
+  allergies             String?  @db.Text
+  currentMedications    String?  @db.Text
+  specialDietaryNeeds   String?  @db.Text
+  
+  // Care Status (Fields 23-25)
+  mobilityStatus        MobilityStatus @default(INDEPENDENT)
+  careLevel             CareLevel      @default(LEVEL_1)
+  primaryCaregiverId    String?  @db.VarChar(100)
+  
+  // System Fields (Fields 26-29)
+  registrationDate      DateTime @default(now())
+  notes                 String?  @db.Text
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  // Relations
+  dailyLogs             DailyLog[]
+
+  // Indexes for efficient filtering
+  @@index([province])
+  @@index([dateOfBirth])
+  @@index([registrationDate])
+  @@index([isActive])
+  @@map("elderly_profiles")
+}
+
+/// DailyLog model for daily health/activity tracking (One-to-Many with ElderlyProfile)
+model DailyLog {
+  id          String   @id @default(uuid())
+  elderlyId   String
+  elderly     ElderlyProfile @relation(fields: [elderlyId], references: [id], onDelete: Cascade)
+  
+  date        DateTime
+  
+  // Vital Signs (JSON object: bp_systolic, bp_diastolic, heartRate, temperature, oxygenLevel, weight)
+  vitals      Json?
+  
+  // Daily Activity & Status
+  activityNote    String?    @db.Text
+  mood            Mood       @default(NEUTRAL)
+  mealIntake      MealIntake @default(FULL)
+  sleepQuality    SleepQuality @default(GOOD)
+  sleepHours      Float?
+  
+  // Medication & Care
+  medicationsTaken    Boolean @default(true)
+  medicationNotes     String? @db.Text
+  
+  // Observations
+  physicalCondition   String? @db.Text
+  behavioralNotes     String? @db.Text
+  incidentsReported   String? @db.Text
+  
+  // Recording Staff
+  recordedBy      String   @db.VarChar(100)
+  recordedByName  String?  @db.VarChar(100)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Index for efficient querying of logs by elderly and date
+  @@index([elderlyId, date])
+  @@index([date])
+  @@map("daily_logs")
+}
+
+/// AlertLog model to track sent notifications
+model AlertLog {
+  id          String   @id @default(uuid())
+  alertType   String   @db.VarChar(50) // BIRTHDAY, ANNIVERSARY
+  elderlyId   String
+  elderlyName String   @db.VarChar(200)
+  recipientType String @db.VarChar(50) // STAFF, RELATIVE
+  recipientContact String? @db.VarChar(255)
+  message     String   @db.Text
+  status      String   @db.VarChar(20) @default("PENDING") // PENDING, SENT, FAILED
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+  
+  @@index([alertType, createdAt])
+  @@index([elderlyId])
+  @@map("alert_logs")
+}
