@@ -59,7 +59,7 @@ async function getTodayAlerts() {
     }> = [];
 
     for (const profile of profiles) {
-        if (isBirthdayToday(profile.dateOfBirth)) {
+        if (profile.dateOfBirth && isBirthdayToday(profile.dateOfBirth)) {
             const age = calculateAge(profile.dateOfBirth);
             alerts.push({
                 id: profile.id,

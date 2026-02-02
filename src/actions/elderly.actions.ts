@@ -43,7 +43,7 @@ export async function createElderlyProfile(data: ElderlyProfileInput) {
             preferredPronouns: validated.preferredPronouns,
             education: validated.education,
             proudFormerOccupation: validated.proudFormerOccupation,
-            dateOfBirth: validated.dateOfBirth, // Optional now
+            dateOfBirth: validated.dateOfBirth ?? undefined, // Optional now
             nationalId: validated.nationalId, // Optional now, keeping unencrypted if simple ID, or encrypt if sensitive? Old code encrypted it.
             // Let's encrypt nationalId if provided to match old behavior/security
             // But wait, validation says it's optional now. 

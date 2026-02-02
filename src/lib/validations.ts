@@ -91,6 +91,7 @@ export const elderlyProfileSchema = z.object({
     // Section 11: Social Support & Financial
     primaryCaregiverName: z.string().max(100).optional().nullable(),
     primaryCaregiverRelation: z.string().max(100).optional().nullable(),
+    primaryCaregiverId: z.string().max(100).optional().nullable(),
     healthPrivilege: z.enum(['SELF_PAY', 'SOCIAL_SECURITY', 'GOLD_CARD', 'GOVERNMENT_OFFICER']),
     sponsor: z.string().max(200).optional().nullable(),
 

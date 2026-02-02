@@ -63,7 +63,7 @@ export default function NewElderlyPage() {
         setValue,
         formState: { errors },
     } = useForm<ElderlyProfileInput>({
-        resolver: zodResolver(elderlyProfileSchema),
+        resolver: zodResolver(elderlyProfileSchema) as any,
         defaultValues: {
             gender: 'MALE',
             bloodType: 'UNKNOWN',

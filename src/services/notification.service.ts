@@ -184,7 +184,7 @@ export class NotificationService {
                 const fullName = `${profile.firstName} ${profile.lastName}`;
 
                 // Check for birthday
-                if (isBirthdayToday(profile.dateOfBirth)) {
+                if (profile.dateOfBirth && isBirthdayToday(profile.dateOfBirth)) {
                     const age = calculateAge(profile.dateOfBirth);
                     alerts.push({
                         type: 'BIRTHDAY',

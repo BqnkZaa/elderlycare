@@ -107,7 +107,7 @@ export default async function ElderlyDetailPage({ params }: Props) {
                         </h1>
                         <p className="text-gray-500">
                             {profile.nickname && `(${profile.nickname}) • `}
-                            อายุ {calculateAge(profile.dateOfBirth)} ปี
+                            {profile.dateOfBirth ? `อายุ ${calculateAge(profile.dateOfBirth)} ปี` : ''}
                         </p>
                     </div>
                 </div>
@@ -144,15 +144,15 @@ export default async function ElderlyDetailPage({ params }: Props) {
                                 <h4 className="font-semibold text-gray-700 dark:text-gray-300 border-b pb-2">
                                     ข้อมูลทั่วไป
                                 </h4>
-                                <InfoRow label="เลขบัตรประชาชน" value={maskSensitiveData(profile.nationalId, 4)} />
+                                <InfoRow label="เลขบัตรประชาชน" value={profile.nationalId ? maskSensitiveData(profile.nationalId, 4) : '-'} />
                                 <InfoRow label="เพศ" value={genderLabels[profile.gender]} />
-                                <InfoRow label="วันเกิด" value={formatDate(profile.dateOfBirth)} />
+                                <InfoRow label="วันเกิด" value={profile.dateOfBirth ? formatDate(profile.dateOfBirth) : '-'} />
                                 <InfoRow label="กรุ๊ปเลือด" value={bloodTypeLabels[profile.bloodType]} />
                                 {profile.phoneNumber && (
                                     <InfoRow label="โทรศัพท์" value={maskSensitiveData(profile.phoneNumber, 4)} />
                                 )}
                                 {profile.email && (
-                                    <InfoRow label="อีเมล" value={profile.email} />
+                                    <InfoRow label="อีเมล" value={profile.email || '-'} />
                                 )}
                             </div>
 
@@ -175,9 +175,9 @@ export default async function ElderlyDetailPage({ params }: Props) {
                                     <Phone className="w-4 h-4" />
                                     ผู้ติดต่อฉุกเฉิน
                                 </h4>
-                                <InfoRow label="ชื่อ" value={profile.emergencyContactName} />
-                                <InfoRow label="ความสัมพันธ์" value={profile.emergencyContactRelation} />
-                                <InfoRow label="โทรศัพท์" value={maskSensitiveData(profile.emergencyContactPhone, 4)} />
+                                <InfoRow label="ชื่อ" value={profile.emergencyContactName || '-'} />
+                                <InfoRow label="ความสัมพันธ์" value={profile.emergencyContactRelation || '-'} />
+                                <InfoRow label="โทรศัพท์" value={profile.emergencyContactPhone ? maskSensitiveData(profile.emergencyContactPhone, 4) : '-'} />
                             </div>
 
                             {/* Registration */}
@@ -244,7 +244,7 @@ export default async function ElderlyDetailPage({ params }: Props) {
                         <HealthInfoCard
                             icon={<AlertTriangle className="w-5 h-5 text-red-500" />}
                             title="โรคประจำตัว"
-                            content={profile.chronicDiseases || 'ไม่มี'}
+                            content={profile.underlyingDiseases || 'ไม่มี'}
                         />
                         <HealthInfoCard
                             icon={<AlertTriangle className="w-5 h-5 text-orange-500" />}

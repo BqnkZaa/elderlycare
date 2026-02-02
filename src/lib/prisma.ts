@@ -1,20 +1,16 @@
-/**
- * Prisma Client Singleton
- * 
- * Creates a single Prisma client instance to be reused across the application.
- * This prevents connection pool exhaustion during development with hot-reloading.
- */
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '@prisma/client'
 
-import { PrismaClient } from '@prisma/client';
+const connectionString = `${process.env.DATABASE_URL}`
 
-const globalForPrisma = globalThis as unknown as {
-    prisma: PrismaClient | undefined;
-};
+const pool = new Pool({ connectionString })
+const adapter = new PrismaPg(pool)
 
-const prisma = globalForPrisma.prisma ?? new PrismaClient();
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
-if (process.env.NODE_ENV !== 'production') {
-    globalForPrisma.prisma = prisma;
-}
+const prisma = globalForPrisma.prisma || new PrismaClient({ adapter })
 
-export default prisma;
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+export default prisma
