@@ -55,23 +55,23 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
             {/* Background decoration */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" />
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" />
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/20 rounded-full blur-[100px] animate-pulse" />
             </div>
 
-            <Card className="w-full max-w-md relative backdrop-blur-sm bg-white/90 dark:bg-gray-800/90 border-0 shadow-2xl">
+            <Card className="w-full max-w-md relative backdrop-blur-md bg-card/40 border-border/50 shadow-2xl z-10">
                 <CardHeader className="space-y-4 text-center">
-                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
                         <Heart className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                             ระบบดูแลผู้สูงอายุ
                         </CardTitle>
-                        <CardDescription className="text-gray-500 mt-2">
+                        <CardDescription className="text-muted-foreground mt-2">
                             Elderly Care Management Platform
                         </CardDescription>
                     </div>
@@ -79,14 +79,14 @@ export default function LoginPage() {
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         {error && (
-                            <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm">
+                            <div className="flex items-center gap-2 p-3 bg-destructive/10 text-destructive rounded-lg text-sm border border-destructive/20">
                                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                 <span>{error}</span>
                             </div>
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className="text-sm font-medium text-foreground">
                                 อีเมล
                             </label>
                             <Input
@@ -94,11 +94,12 @@ export default function LoginPage() {
                                 placeholder="admin@elderlycare.com"
                                 {...register('email')}
                                 error={errors.email?.message}
+                                className="bg-background/50 border-input/50 focus:bg-background transition-all"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className="text-sm font-medium text-foreground">
                                 รหัสผ่าน
                             </label>
                             <Input
@@ -106,12 +107,13 @@ export default function LoginPage() {
                                 placeholder="••••••••"
                                 {...register('password')}
                                 error={errors.password?.message}
+                                className="bg-background/50 border-input/50 focus:bg-background transition-all"
                             />
                         </div>
 
                         <Button
                             type="submit"
-                            className="w-full"
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-[1.02]"
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -130,7 +132,7 @@ export default function LoginPage() {
                             )}
                         </Button>
 
-                        <p className="text-center text-xs text-gray-500 mt-4">
+                        <p className="text-center text-xs text-muted-foreground mt-4">
                             ค่าเริ่มต้น: admin@elderlycare.com / admin123
                         </p>
                     </form>

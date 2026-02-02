@@ -43,11 +43,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-background text-foreground">
             {/* Mobile sidebar backdrop */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+                    className="fixed inset-0 z-40 bg-black/50 lg:hidden backdrop-blur-sm"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
@@ -55,21 +55,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {/* Sidebar */}
             <aside
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 shadow-xl',
+                    'fixed inset-y-0 left-0 z-50 w-72 bg-card/80 backdrop-blur-md border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0 shadow-2xl',
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 )}
             >
                 {/* Logo */}
-                <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-gray-700">
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <div className="flex items-center gap-3 px-6 py-5 border-b border-border">
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
                         <Heart className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h1 className="font-bold text-gray-900 dark:text-white">Elderly Care</h1>
-                        <p className="text-xs text-gray-500">Management System</p>
+                        <h1 className="font-bold text-foreground">Elderly Care</h1>
+                        <p className="text-xs text-muted-foreground">Management System</p>
                     </div>
                     <button
-                        className="lg:hidden ml-auto p-1 text-gray-500 hover:text-gray-700"
+                        className="lg:hidden ml-auto p-1 text-muted-foreground hover:text-foreground"
                         onClick={() => setSidebarOpen(false)}
                     >
                         <X className="w-5 h-5" />
@@ -87,8 +87,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 className={cn(
                                     'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200',
                                     isActive
-                                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                                        : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                                 )}
                                 onClick={() => setSidebarOpen(false)}
                             >
@@ -101,23 +101,23 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </nav>
 
                 {/* User section */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card/50 backdrop-blur-sm">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-semibold">
+                        <div className="w-10 h-10 bg-gradient-to-br from-secondary to-primary rounded-full flex items-center justify-center text-white font-semibold">
                             {session?.user?.name?.charAt(0) || 'U'}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            <p className="text-sm font-medium text-foreground truncate">
                                 {session?.user?.name || 'ผู้ใช้งาน'}
                             </p>
-                            <p className="text-xs text-gray-500 truncate">
+                            <p className="text-xs text-muted-foreground truncate">
                                 {session?.user?.email}
                             </p>
                         </div>
                     </div>
                     <Button
                         variant="outline"
-                        className="w-full"
+                        className="w-full justify-start hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50"
                         onClick={() => signOut({ callbackUrl: '/login' })}
                     >
                         <LogOut className="w-4 h-4 mr-2" />
@@ -127,19 +127,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </aside>
 
             {/* Main content */}
-            <div className="lg:pl-72">
+            <div className="lg:pl-72 transition-all duration-300">
                 {/* Top bar */}
-                <header className="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+                <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border supports-[backdrop-filter]:bg-background/60">
                     <div className="flex items-center gap-4 px-4 py-3">
                         <button
-                            className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                            className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg"
                             onClick={() => setSidebarOpen(true)}
                         >
                             <Menu className="w-5 h-5" />
                         </button>
                         <div className="flex-1" />
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-muted-foreground bg-accent/50 px-3 py-1 rounded-full border border-border/50">
                                 {new Date().toLocaleDateString('th-TH', {
                                     weekday: 'long',
                                     year: 'numeric',
@@ -152,7 +152,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </header>
 
                 {/* Page content */}
-                <main className="p-4 lg:p-6">
+                <main className="p-4 lg:p-6 space-y-6">
                     {children}
                 </main>
             </div>

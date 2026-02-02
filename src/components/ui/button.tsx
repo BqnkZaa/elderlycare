@@ -13,13 +13,13 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl',
-                destructive: 'bg-red-600 text-white hover:bg-red-700',
-                outline: 'border-2 border-gray-300 bg-transparent hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800',
-                secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100',
-                ghost: 'hover:bg-gray-100 dark:hover:bg-gray-800',
-                link: 'text-indigo-600 underline-offset-4 hover:underline',
-                success: 'bg-emerald-600 text-white hover:bg-emerald-700',
+                default: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg',
+                destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+                outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+                secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+                ghost: 'hover:bg-accent hover:text-accent-foreground',
+                link: 'text-primary underline-offset-4 hover:underline',
+                success: 'bg-emerald-600 text-white hover:bg-emerald-700', // Keeping emerald for explicit success for now, or could map to a new var
             },
             size: {
                 default: 'h-10 px-4 py-2',

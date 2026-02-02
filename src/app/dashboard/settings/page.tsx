@@ -8,8 +8,8 @@ import { Settings, Shield, Bell, Database } from 'lucide-react';
 export default function SettingsPage() {
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Settings className="w-7 h-7 text-gray-600" />
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                <Settings className="w-7 h-7 text-muted-foreground" />
                 ตั้งค่าระบบ
             </h1>
 
@@ -23,7 +23,7 @@ export default function SettingsPage() {
                         <CardDescription>การตั้งค่าความปลอดภัยและ PDPA</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                             ข้อมูลส่วนบุคคลถูกเข้ารหัสด้วย AES-256
                         </p>
                     </CardContent>
@@ -38,7 +38,7 @@ export default function SettingsPage() {
                         <CardDescription>ตั้งค่าช่องทางการแจ้งเตือน</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                             ปัจจุบัน: Console Log (รอเชื่อมต่อ SMS/LINE API)
                         </p>
                     </CardContent>
@@ -53,7 +53,7 @@ export default function SettingsPage() {
                         <CardDescription>สถานะการเชื่อมต่อ</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                             MySQL Database - เชื่อมต่อสำเร็จ
                         </p>
                     </CardContent>

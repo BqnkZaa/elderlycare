@@ -123,18 +123,18 @@ export default function NewElderlyPage() {
                     </Button>
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h1 className="text-2xl font-bold text-foreground">
                         ลงทะเบียนผู้สูงอายุเข้าพัก (Admission Form)
                     </h1>
-                    <p className="text-gray-500">กรอกข้อมูลให้ครบถ้วนทั้ง 14 หมวดหมู่</p>
+                    <p className="text-muted-foreground">กรอกข้อมูลให้ครบถ้วนทั้ง 14 หมวดหมู่</p>
                 </div>
             </div>
 
             {/* Alert Messages */}
             {submitResult && (
                 <div className={`flex items-center gap-2 p-4 rounded-lg border ${submitResult.success
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400'
-                    : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400'
+                    ? 'bg-secondary/10 text-secondary border-secondary/20'
+                    : 'bg-destructive/10 text-destructive border-destructive/20'
                     }`}>
                     {submitResult.success ? <Check className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
                     {submitResult.message}
@@ -142,7 +142,7 @@ export default function NewElderlyPage() {
             )}
 
             {Object.keys(errors).length > 0 && (
-                <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200">
+                <div className="bg-destructive/10 text-destructive p-4 rounded-lg border border-destructive/20">
                     <p className="font-bold flex items-center gap-2">
                         <AlertCircle className="w-4 h-4" /> พบข้อผิดพลาดในข้อมูล (Validation Errors):
                     </p>
@@ -157,30 +157,30 @@ export default function NewElderlyPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
                 {/* Header Section */}
-                <Card className="border-indigo-100 shadow-sm">
-                    <CardHeader className="bg-slate-50 border-b pb-4">
-                        <CardTitle className="text-lg">ส่วนหัว: ข้อมูลการรับเข้า (Admission Info)</CardTitle>
+                <Card className="border-border shadow-sm bg-card/50 backdrop-blur-sm">
+                    <CardHeader className="bg-accent/20 border-b border-border pb-4">
+                        <CardTitle className="text-lg text-foreground">ส่วนหัว: ข้อมูลการรับเข้า (Admission Info)</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <FormField label="วันที่ลงทะเบียน *" error={errors.admissionDate?.message}>
-                                <Input type="date" {...register('admissionDate')} error={errors.admissionDate?.message} />
+                                <Input type="date" {...register('admissionDate')} error={errors.admissionDate?.message} className="bg-background/50 border-input" />
                             </FormField>
                             <FormField label="เวลา *" error={errors.admissionTime?.message}>
-                                <Input type="time" {...register('admissionTime')} error={errors.admissionTime?.message} />
+                                <Input type="time" {...register('admissionTime')} error={errors.admissionTime?.message} className="bg-background/50 border-input" />
                             </FormField>
                             <FormField label="รหัสผู้ป่วย (SAFE-ID) *" error={errors.safeId?.message}>
-                                <Input placeholder="SIDxxx69xxx" {...register('safeId')} error={errors.safeId?.message} className="font-mono uppercase" />
+                                <Input placeholder="SIDxxx69xxx" {...register('safeId')} error={errors.safeId?.message} className="font-mono uppercase bg-background/50 border-input" />
                             </FormField>
                             <FormField label="รหัสพันธมิตร" error={errors.partnerId?.message}>
-                                <Input placeholder="PID001-PID999" {...register('partnerId')} className="font-mono uppercase" />
+                                <Input placeholder="PID001-PID999" {...register('partnerId')} className="font-mono uppercase bg-background/50 border-input" />
                             </FormField>
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* 1. Identification */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <User className="w-5 h-5" />
@@ -189,34 +189,34 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <FormField label="ชื่อ *" error={errors.firstName?.message}>
-                            <Input placeholder="สมชาย" {...register('firstName')} error={errors.firstName?.message} />
+                            <Input placeholder="สมชาย" {...register('firstName')} error={errors.firstName?.message} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="นามสกุล *" error={errors.lastName?.message}>
-                            <Input placeholder="ใจดี" {...register('lastName')} error={errors.lastName?.message} />
+                            <Input placeholder="ใจดี" {...register('lastName')} error={errors.lastName?.message} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="ชื่อเล่น">
-                            <Input placeholder="ลุงชาย" {...register('nickname')} />
+                            <Input placeholder="ลุงชาย" {...register('nickname')} className="bg-background/50 border-input" />
                         </FormField>
 
                         <FormField label="อายุ *" error={errors.age?.message}>
-                            <Input type="number" placeholder="75" {...register('age')} error={errors.age?.message} />
+                            <Input type="number" placeholder="75" {...register('age')} error={errors.age?.message} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="เพศ *">
-                            <Select {...register('gender')}>
+                            <Select {...register('gender')} className="bg-background/50 border-input">
                                 <option value="MALE">ชาย (Male)</option>
                                 <option value="FEMALE">หญิง (Female)</option>
                                 <option value="OTHER">อื่นๆ (Other)</option>
                             </Select>
                         </FormField>
                         <FormField label="สรรพนามที่ชอบให้เรียก">
-                            <Input placeholder="พ่อใหญ่, คุณตา" {...register('preferredPronouns')} />
+                            <Input placeholder="พ่อใหญ่, คุณตา" {...register('preferredPronouns')} className="bg-background/50 border-input" />
                         </FormField>
 
                         <FormField label="ระดับการศึกษาสูงสุด">
-                            <Input placeholder="ปริญญาตรี" {...register('education')} />
+                            <Input placeholder="ปริญญาตรี" {...register('education')} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="อาชีพเดิมที่ภาคภูมิใจ" className="md:col-span-2">
-                            <Input placeholder="ครูใหญ่, ข้าราชการ" {...register('proudFormerOccupation')} />
+                            <Input placeholder="ครูใหญ่, ข้าราชการ" {...register('proudFormerOccupation')} className="bg-background/50 border-input" />
                         </FormField>
 
                         {/* Hidden/Computed fields maintained for schema compatibility */}
@@ -225,7 +225,7 @@ export default function NewElderlyPage() {
                 </Card>
 
                 {/* 2. Marital & Contact */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Phone className="w-5 h-5" />
@@ -235,7 +235,7 @@ export default function NewElderlyPage() {
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField label="สถานภาพสมรส *">
-                                <Select {...register('maritalStatus')}>
+                                <Select {...register('maritalStatus')} className="bg-background/50 border-input">
                                     <option value="SINGLE">โสด (Single)</option>
                                     <option value="MARRIED">สมรส (Married)</option>
                                     <option value="WIDOWED">หม้าย (Widowed)</option>
@@ -244,32 +244,32 @@ export default function NewElderlyPage() {
                             </FormField>
                         </div>
 
-                        <div className="border p-4 rounded-md bg-slate-50/50 space-y-4">
-                            <h3 className="font-semibold text-sm text-gray-900">ผู้ประสานงานหลัก (Key Coordinator)</h3>
+                        <div className="border border-border p-4 rounded-md bg-accent/10 space-y-4">
+                            <h3 className="font-semibold text-sm text-foreground">ผู้ประสานงานหลัก (Key Coordinator)</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <FormField label="ชื่อ-นามสกุล">
-                                    <Input {...register('keyCoordinatorName')} />
+                                    <Input {...register('keyCoordinatorName')} className="bg-background/50 border-input" />
                                 </FormField>
                                 <FormField label="เบอร์โทรศัพท์">
-                                    <Input {...register('keyCoordinatorPhone')} />
+                                    <Input {...register('keyCoordinatorPhone')} className="bg-background/50 border-input" />
                                 </FormField>
                                 <FormField label="ความสัมพันธ์">
-                                    <Input {...register('keyCoordinatorRelation')} />
+                                    <Input {...register('keyCoordinatorRelation')} className="bg-background/50 border-input" />
                                 </FormField>
                             </div>
                         </div>
 
-                        <div className="border p-4 rounded-md bg-slate-50/50 space-y-4">
-                            <h3 className="font-semibold text-sm text-gray-900">ผู้ทำสัญญา/ตัดสินใจ (Contract Signer)</h3>
+                        <div className="border border-border p-4 rounded-md bg-accent/10 space-y-4">
+                            <h3 className="font-semibold text-sm text-foreground">ผู้ทำสัญญา/ตัดสินใจ (Contract Signer)</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <FormField label="ชื่อ-นามสกุล">
-                                    <Input {...register('legalGuardianName')} />
+                                    <Input {...register('legalGuardianName')} className="bg-background/50 border-input" />
                                 </FormField>
                                 <FormField label="เบอร์โทรศัพท์">
-                                    <Input {...register('legalGuardianPhone')} />
+                                    <Input {...register('legalGuardianPhone')} className="bg-background/50 border-input" />
                                 </FormField>
                                 <FormField label="ความสัมพันธ์">
-                                    <Input {...register('legalGuardianRelation')} />
+                                    <Input {...register('legalGuardianRelation')} className="bg-background/50 border-input" />
                                 </FormField>
                             </div>
                         </div>
@@ -277,7 +277,7 @@ export default function NewElderlyPage() {
                 </Card>
 
                 {/* 3. Sensory */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Eye className="w-5 h-5" />
@@ -286,7 +286,7 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <FormField label="การได้ยิน (Hearing)">
-                            <Select {...register('hearingStatus')}>
+                            <Select {...register('hearingStatus')} className="bg-background/50 border-input">
                                 <option value="NORMAL">ปกติ</option>
                                 <option value="HARD_OF_HEARING_LEFT">หูตึง (ซ้าย)</option>
                                 <option value="HARD_OF_HEARING_RIGHT">หูตึง (ขวา)</option>
@@ -296,7 +296,7 @@ export default function NewElderlyPage() {
                             </Select>
                         </FormField>
                         <FormField label="การมองเห็น (Vision)">
-                            <Select {...register('visionStatus')}>
+                            <Select {...register('visionStatus')} className="bg-background/50 border-input">
                                 <option value="NORMAL">ปกติ</option>
                                 <option value="NEARSIGHTED_FARSIGHTED">สายตาสั้น/ยาว</option>
                                 <option value="CATARACT_GLAUCOMA">ต้อกระจก/ต้อหิน</option>
@@ -305,7 +305,7 @@ export default function NewElderlyPage() {
                             </Select>
                         </FormField>
                         <FormField label="การสื่อสาร (Speech)">
-                            <Select {...register('speechStatus')}>
+                            <Select {...register('speechStatus')} className="bg-background/50 border-input">
                                 <option value="CLEAR">พูดชัดเจน</option>
                                 <option value="DYSARTHRIA">พูดไม่ชัด (Dysarthria)</option>
                                 <option value="APHASIA">บกพร่องการสื่อความ</option>
@@ -316,7 +316,7 @@ export default function NewElderlyPage() {
                 </Card>
 
                 {/* 4. Mobility */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Accessibility className="w-5 h-5" />
@@ -324,16 +324,16 @@ export default function NewElderlyPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="flex items-start gap-4 border p-4 rounded bg-orange-50/50">
+                        <div className="flex items-start gap-4 border border-border p-4 rounded bg-accent/20">
                             <div className="flex items-center h-5">
-                                <input id="historyOfFalls" type="checkbox" {...register('historyOfFalls')} className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                                <input id="historyOfFalls" type="checkbox" {...register('historyOfFalls')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
                             </div>
                             <div className="flex-1 text-sm">
-                                <label htmlFor="historyOfFalls" className="font-medium text-gray-700">มีประวัติการหกล้ม (History of Falls)</label>
+                                <label htmlFor="historyOfFalls" className="font-medium text-foreground">มีประวัติการหกล้ม (History of Falls)</label>
                                 {watch('historyOfFalls') && (
                                     <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <Input placeholder="ช่วงเวลา (เช่น 6 เดือนที่ผ่านมา)" {...register('fallsTimeframe')} />
-                                        <Input placeholder="สาเหตุการหกล้ม" {...register('fallsCause')} />
+                                        <Input placeholder="ช่วงเวลา (เช่น 6 เดือนที่ผ่านมา)" {...register('fallsTimeframe')} className="bg-background/50 border-input" />
+                                        <Input placeholder="สาเหตุการหกล้ม" {...register('fallsCause')} className="bg-background/50 border-input" />
                                     </div>
                                 )}
                             </div>
@@ -341,7 +341,7 @@ export default function NewElderlyPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField label="การเดิน (Gait)">
-                                <Select {...register('gaitStatus')}>
+                                <Select {...register('gaitStatus')} className="bg-background/50 border-input">
                                     <option value="INDEPENDENT">เดินเองได้</option>
                                     <option value="UNSTEADY">เดินเซ</option>
                                     <option value="NEEDS_SUPPORT">ต้องพยุงเดิน</option>
@@ -349,14 +349,14 @@ export default function NewElderlyPage() {
                                 </Select>
                             </FormField>
                             <FormField label="อุปกรณ์ช่วย (ระบุ เช่น ไม้เท้า, วอล์คเกอร์)">
-                                <Input placeholder="ไม้เท้า, วอล์คเกอร์, รถเข็น" {...register('assistiveDevices')} />
+                                <Input placeholder="ไม้เท้า, วอล์คเกอร์, รถเข็น" {...register('assistiveDevices')} className="bg-background/50 border-input" />
                             </FormField>
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* 5. Elimination */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Utensils className="w-5 h-5" />
@@ -364,20 +364,20 @@ export default function NewElderlyPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4 border p-4 rounded">
-                            <h3 className="font-semibold text-sm">ปัสสาวะ (Bladder)</h3>
-                            <Select {...register('bladderControl')}>
+                        <div className="space-y-4 border border-border p-4 rounded bg-accent/5">
+                            <h3 className="font-semibold text-sm text-foreground">ปัสสาวะ (Bladder)</h3>
+                            <Select {...register('bladderControl')} className="bg-background/50 border-input">
                                 <option value="CONTINENT">กลั้นได้ปกติ</option>
                                 <option value="OCCASIONAL_INCONTINENCE">กลั้นไม่ได้บางครั้ง</option>
                                 <option value="TOTAL_INCONTINENCE_FOLEY">กลั้นไม่ได้เลย/ใส่สายสวน</option>
                             </Select>
                             <FormField label="ขนาดสายสวน (Foley Size) ถ้ามี">
-                                <Input {...register('foleySize')} placeholder="เบอร์ 14/16" />
+                                <Input {...register('foleySize')} placeholder="เบอร์ 14/16" className="bg-background/50 border-input" />
                             </FormField>
                         </div>
-                        <div className="space-y-4 border p-4 rounded">
-                            <h3 className="font-semibold text-sm">อุจจาระ (Bowel)</h3>
-                            <Select {...register('bowelControl')}>
+                        <div className="space-y-4 border border-border p-4 rounded bg-accent/5">
+                            <h3 className="font-semibold text-sm text-foreground">อุจจาระ (Bowel)</h3>
+                            <Select {...register('bowelControl')} className="bg-background/50 border-input">
                                 <option value="NORMAL">ขับถ่ายปกติ</option>
                                 <option value="CONSTIPATION">ท้องผูก</option>
                                 <option value="DIARRHEA">ท้องเสีย</option>
@@ -386,21 +386,21 @@ export default function NewElderlyPage() {
                         </div>
                         <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField label="การใช้ผ้าอ้อม (Diaper)">
-                                <Select {...register('diaperType')}>
+                                <Select {...register('diaperType')} className="bg-background/50 border-input">
                                     <option value="NONE">ไม่ใช้</option>
                                     <option value="TAPE">แบบเทป (Tape)</option>
                                     <option value="PANTS">แบบกางเกง (Pants)</option>
                                 </Select>
                             </FormField>
                             <FormField label="ไซส์ผ้าอ้อม">
-                                <Input {...register('diaperSize')} placeholder="M, L, XL" />
+                                <Input {...register('diaperSize')} placeholder="M, L, XL" className="bg-background/50 border-input" />
                             </FormField>
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* 6. Cognitive */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Brain className="w-5 h-5" />
@@ -410,28 +410,28 @@ export default function NewElderlyPage() {
                     <CardContent className="space-y-4">
                         <div className="flex items-start gap-4">
                             <div className="flex items-center h-5">
-                                <input id="hasConfusion" type="checkbox" {...register('hasConfusion')} className="w-4 h-4 rounded border-gray-300" />
+                                <input id="hasConfusion" type="checkbox" {...register('hasConfusion')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
                             </div>
                             <div className="flex-1 text-sm">
-                                <label htmlFor="hasConfusion" className="font-medium text-gray-700">มีภาวะสับสน (Confusion)</label>
+                                <label htmlFor="hasConfusion" className="font-medium text-foreground">มีภาวะสับสน (Confusion)</label>
                                 {watch('hasConfusion') && (
-                                    <Input className="mt-2" placeholder="ระบุช่วงเวลาที่มีอาการ" {...register('confusionTimeframe')} />
+                                    <Input className="mt-2 bg-background/50 border-input" placeholder="ระบุช่วงเวลาที่มีอาการ" {...register('confusionTimeframe')} />
                                 )}
                             </div>
                         </div>
 
                         <FormField label="ความจำ (Memory) - เลือกได้หลายข้อ (ระบุเป็นข้อความ)">
-                            <Input placeholder="เช่น ความจำสั้น, หลงลืม, จำญาติไม่ได้" {...register('memoryStatus')} />
+                            <Input placeholder="เช่น ความจำสั้น, หลงลืม, จำญาติไม่ได้" {...register('memoryStatus')} className="bg-background/50 border-input" />
                         </FormField>
 
                         <FormField label="พฤติกรรม (Behavior) - (เช่น ก้าวร้าว, ซึมเศร้า, เดินไปเรื่อย)">
-                            <Input placeholder="ระบุพฤติกรรม..." {...register('behaviorStatus')} />
+                            <Input placeholder="ระบุพฤติกรรม..." {...register('behaviorStatus')} className="bg-background/50 border-input" />
                         </FormField>
                     </CardContent>
                 </Card>
 
                 {/* 7. Chief Complaint */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <FileText className="w-5 h-5" />
@@ -440,16 +440,16 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <FormField label="สาเหตุที่มา (Reason for Admission)">
-                            <TextareaField rows={3} {...register('reasonForAdmission')} />
+                            <TextareaField rows={3} {...register('reasonForAdmission')} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="สภาพจิตใจแรกรับ (Initial Mental State)">
-                            <Input placeholder="เช่น วิตกกังวล, นิ่งเฉย, ร่าเริง" {...register('initialMentalState')} />
+                            <Input placeholder="เช่น วิตกกังวล, นิ่งเฉย, ร่าเริง" {...register('initialMentalState')} className="bg-background/50 border-input" />
                         </FormField>
                     </CardContent>
                 </Card>
 
                 {/* 8. Medical History */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Activity className="w-5 h-5" />
@@ -458,19 +458,19 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <FormField label="โรคประจำตัว (Underlying Diseases)">
-                            <TextareaField rows={2} placeholder="ระบุโรคประจำตัวทั้งหมด" {...register('underlyingDiseases')} />
+                            <TextareaField rows={2} placeholder="ระบุโรคประจำตัวทั้งหมด" {...register('underlyingDiseases')} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="ยาประจำ (Current Medications)">
-                            <TextareaField rows={2} placeholder="ระบุชื่อยาและขนาด" {...register('currentMedications')} />
+                            <TextareaField rows={2} placeholder="ระบุชื่อยาและขนาด" {...register('currentMedications')} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="ประวัติผ่าตัด (Surgical History)">
-                            <Input placeholder="ระบุการผ่าตัดและปีที่ทำ" {...register('surgicalHistory')} />
+                            <Input placeholder="ระบุการผ่าตัดและปีที่ทำ" {...register('surgicalHistory')} className="bg-background/50 border-input" />
                         </FormField>
                     </CardContent>
                 </Card>
 
                 {/* 9. Allergies */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <AlertCircle className="w-5 h-5" />
@@ -479,22 +479,22 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2 border p-3 rounded">
+                            <div className="space-y-2 border border-border p-3 rounded bg-accent/5">
                                 <div className="flex items-center gap-2">
-                                    <input id="drugAllergy" type="checkbox" {...register('hasDrugAllergies')} className="w-4 h-4" />
-                                    <label htmlFor="drugAllergy" className="font-medium">แพ้ยา (Drug Allergy)</label>
+                                    <input id="drugAllergy" type="checkbox" {...register('hasDrugAllergies')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
+                                    <label htmlFor="drugAllergy" className="font-medium text-foreground">แพ้ยา (Drug Allergy)</label>
                                 </div>
                                 {watch('hasDrugAllergies') && (
-                                    <Input placeholder="ระบุชื่อยาและอาการแพ้" {...register('drugAllergiesDetail')} />
+                                    <Input placeholder="ระบุชื่อยาและอาการแพ้" {...register('drugAllergiesDetail')} className="bg-background/50 border-input" />
                                 )}
                             </div>
-                            <div className="space-y-2 border p-3 rounded">
+                            <div className="space-y-2 border border-border p-3 rounded bg-accent/5">
                                 <div className="flex items-center gap-2">
-                                    <input id="foodAllergy" type="checkbox" {...register('hasFoodChemicalAllergies')} className="w-4 h-4" />
-                                    <label htmlFor="foodAllergy" className="font-medium">แพ้อาหาร/สารเคมี</label>
+                                    <input id="foodAllergy" type="checkbox" {...register('hasFoodChemicalAllergies')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
+                                    <label htmlFor="foodAllergy" className="font-medium text-foreground">แพ้อาหาร/สารเคมี</label>
                                 </div>
                                 {watch('hasFoodChemicalAllergies') && (
-                                    <Input placeholder="ระบุสิ่งที่แพ้และอาการ" {...register('foodChemicalAllergiesDetail')} />
+                                    <Input placeholder="ระบุสิ่งที่แพ้และอาการ" {...register('foodChemicalAllergiesDetail')} className="bg-background/50 border-input" />
                                 )}
                             </div>
                         </div>
@@ -502,7 +502,7 @@ export default function NewElderlyPage() {
                 </Card>
 
                 {/* 10. Physical & Devices */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Activity className="w-5 h-5" />
@@ -511,32 +511,32 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <FormField label="สภาพผิวหนัง (Skin)">
-                            <Input placeholder="ปกติ, แห้ง, คัน, มีรอยฟกช้ำ" {...register('skinCondition')} />
+                            <Input placeholder="ปกติ, แห้ง, คัน, มีรอยฟกช้ำ" {...register('skinCondition')} className="bg-background/50 border-input" />
                         </FormField>
 
-                        <div className="flex items-start gap-4 border p-4 rounded bg-slate-50">
+                        <div className="flex items-start gap-4 border border-border p-4 rounded bg-accent/20">
                             <div className="flex items-center h-5">
-                                <input id="pressureUlcer" type="checkbox" {...register('hasPressureUlcer')} className="w-4 h-4" />
+                                <input id="pressureUlcer" type="checkbox" {...register('hasPressureUlcer')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
                             </div>
                             <div className="flex-1 space-y-2">
-                                <label htmlFor="pressureUlcer" className="font-medium">มีแผลกดทับ (Pressure Ulcer)</label>
+                                <label htmlFor="pressureUlcer" className="font-medium text-foreground">มีแผลกดทับ (Pressure Ulcer)</label>
                                 {watch('hasPressureUlcer') && (
                                     <div className="grid grid-cols-2 gap-4">
-                                        <Input placeholder="ตำแหน่ง (Location)" {...register('pressureUlcerLocation')} />
-                                        <Input placeholder="ระดับ (Stage)" {...register('pressureUlcerStage')} />
+                                        <Input placeholder="ตำแหน่ง (Location)" {...register('pressureUlcerLocation')} className="bg-background/50 border-input" />
+                                        <Input placeholder="ระดับ (Stage)" {...register('pressureUlcerStage')} className="bg-background/50 border-input" />
                                     </div>
                                 )}
                             </div>
                         </div>
 
                         <FormField label="อุปกรณ์การแพทย์ (Medical Devices)">
-                            <Input placeholder="NG Tube, Tracheostomy, Oxygen, etc." {...register('medicalDevices')} />
+                            <Input placeholder="NG Tube, Tracheostomy, Oxygen, etc." {...register('medicalDevices')} className="bg-background/50 border-input" />
                         </FormField>
                     </CardContent>
                 </Card>
 
                 {/* 11. Social & Financial */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <User className="w-5 h-5" />
@@ -545,13 +545,13 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField label="ผู้ดูแลหลักเดิม (Primary Caregiver)">
-                            <Input placeholder="ชื่อผู้ดูแล" {...register('primaryCaregiverName')} />
+                            <Input placeholder="ชื่อผู้ดูแล" {...register('primaryCaregiverName')} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="ความสัมพันธ์">
-                            <Input placeholder="เช่น บุตร, คู่สมรส, จ้างผู้ดูแล" {...register('primaryCaregiverRelation')} />
+                            <Input placeholder="เช่น บุตร, คู่สมรส, จ้างผู้ดูแล" {...register('primaryCaregiverRelation')} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="สิทธิการรักษา (Privilege)">
-                            <Select {...register('healthPrivilege')}>
+                            <Select {...register('healthPrivilege')} className="bg-background/50 border-input">
                                 <option value="SELF_PAY">ชำระเอง (Self-pay)</option>
                                 <option value="SOCIAL_SECURITY">ประกันสังคม</option>
                                 <option value="GOLD_CARD">บัตรทอง (30 บาท)</option>
@@ -559,13 +559,13 @@ export default function NewElderlyPage() {
                             </Select>
                         </FormField>
                         <FormField label="ผู้รับผิดชอบค่าใช้จ่าย (Sponsor)">
-                            <Input placeholder="ระบุชื่อผู้จ่ายเงิน" {...register('sponsor')} />
+                            <Input placeholder="ระบุชื่อผู้จ่ายเงิน" {...register('sponsor')} className="bg-background/50 border-input" />
                         </FormField>
                     </CardContent>
                 </Card>
 
                 {/* 12. Religion */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Heart className="w-5 h-5" />
@@ -574,19 +574,19 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField label="ศาสนา">
-                            <Input placeholder="พุทธ, คริสต์, อิสลาม" {...register('religion')} />
+                            <Input placeholder="พุทธ, คริสต์, อิสลาม" {...register('religion')} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="สิ่งยึดเหนี่ยวจิตใจ">
-                            <Input placeholder="" {...register('spiritualNeeds')} />
+                            <Input placeholder="" {...register('spiritualNeeds')} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="ข้อห้าม/ข้อปฏิบัติ" className="md:col-span-2">
-                            <Input placeholder="เช่น ไม่ทานหมู, สวดมนต์ก่อนนอน" {...register('religiousRestrictions')} />
+                            <Input placeholder="เช่น ไม่ทานหมู, สวดมนต์ก่อนนอน" {...register('religiousRestrictions')} className="bg-background/50 border-input" />
                         </FormField>
                     </CardContent>
                 </Card>
 
                 {/* 13. Goals */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Cross className="w-5 h-5" />
@@ -595,20 +595,20 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <FormField label="เป้าหมายการดูแล (Goal of Care)">
-                            <Select {...register('goalOfCare')}>
+                            <Select {...register('goalOfCare')} className="bg-background/50 border-input">
                                 <option value="REHABILITATION">ฟื้นฟูสภาพ (Rehabilitation)</option>
                                 <option value="LONG_TERM_CARE">ดูแลระยะยาว (Long-term)</option>
                                 <option value="PALLIATIVE">ประคับประคอง (Palliative)</option>
                             </Select>
                         </FormField>
                         <FormField label="รายละเอียดความคาดหวัง">
-                            <TextareaField rows={3} placeholder="สิ่งที่ญาติคาดหวังจากการดูแล" {...register('expectationDetails')} />
+                            <TextareaField rows={3} placeholder="สิ่งที่ญาติคาดหวังจากการดูแล" {...register('expectationDetails')} className="bg-background/50 border-input" />
                         </FormField>
                     </CardContent>
                 </Card>
 
                 {/* 14. Environment */}
-                <Card>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Home className="w-5 h-5" />
@@ -617,49 +617,49 @@ export default function NewElderlyPage() {
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField label="ที่พักอาศัยเดิม">
-                            <Select {...register('homeType')}>
+                            <Select {...register('homeType')} className="bg-background/50 border-input">
                                 <option value="">ไม่ได้ระบุ</option>
                                 <option value="SINGLE_HOUSE">บ้านเดี่ยว</option>
                                 <option value="TOWNHOUSE">ตึกแถว/ทาวน์เฮาส์</option>
                             </Select>
                         </FormField>
                         <FormField label="ห้องนอนอยู่ชั้นไหน">
-                            <Input placeholder="ชั้นล่าง / ชั้นบน" {...register('bedroomLocation')} />
+                            <Input placeholder="ชั้นล่าง / ชั้นบน" {...register('bedroomLocation')} className="bg-background/50 border-input" />
                         </FormField>
                         <FormField label="ผังครอบครัว (Genogram Summary)" className="md:col-span-2">
-                            <TextareaField rows={3} placeholder="อธิบายผังครอบครัวโดยสังเขป" {...register('familyGenogram')} />
+                            <TextareaField rows={3} placeholder="อธิบายผังครอบครัวโดยสังเขป" {...register('familyGenogram')} className="bg-background/50 border-input" />
                         </FormField>
                     </CardContent>
                 </Card>
 
                 {/* 15. Assessor Signature Placeholder */}
-                <Card className="bg-slate-50 border-dashed">
+                <Card className="bg-card/20 border-dashed border-border/50">
                     <CardContent className="pt-6 flex flex-col items-end gap-4">
-                        <div className="w-64 border-b border-gray-400 h-8"></div>
-                        <p className="mr-8 text-sm text-gray-500">ลงชื่อผู้ประเมิน (Assessor Signature)</p>
+                        <div className="w-64 border-b border-muted-foreground/50 h-8"></div>
+                        <p className="mr-8 text-sm text-muted-foreground">ลงชื่อผู้ประเมิน (Assessor Signature)</p>
                     </CardContent>
                 </Card>
 
                 {/* Old Address fields - Hidden or minimal for schema compatibility if required, or keep as optional section at bottom */}
-                <details className="text-sm text-gray-400">
+                <details className="text-sm text-muted-foreground">
                     <summary>ข้อมูลที่อยู่ตามทะเบียนบ้าน (ถ้ามี)</summary>
-                    <div className="p-4 bg-gray-50 rounded mt-2 grid grid-cols-2 gap-4">
-                        <Input {...register('address')} placeholder="ที่อยู่" />
-                        <Input {...register('province')} placeholder="จังหวัด" />
-                        <Input {...register('district')} placeholder="เขต/อำเภอ" />
-                        <Input {...register('subDistrict')} placeholder="แขวง/ตำบล" />
-                        <Input {...register('postalCode')} placeholder="รหัสไปรษณีย์" />
+                    <div className="p-4 bg-muted/20 rounded mt-2 grid grid-cols-2 gap-4">
+                        <Input {...register('address')} placeholder="ที่อยู่" className="bg-background/50 border-input" />
+                        <Input {...register('province')} placeholder="จังหวัด" className="bg-background/50 border-input" />
+                        <Input {...register('district')} placeholder="เขต/อำเภอ" className="bg-background/50 border-input" />
+                        <Input {...register('subDistrict')} placeholder="แขวง/ตำบล" className="bg-background/50 border-input" />
+                        <Input {...register('postalCode')} placeholder="รหัสไปรษณีย์" className="bg-background/50 border-input" />
                     </div>
                 </details>
 
                 {/* Action Buttons */}
-                <div className="sticky bottom-4 z-10 flex justify-end gap-4 bg-white/80 p-4 backdrop-blur-sm rounded-xl border shadow-lg">
+                <div className="sticky bottom-4 z-10 flex justify-end gap-4 bg-background/80 p-4 backdrop-blur-sm rounded-xl border border-border shadow-lg">
                     <Link href="/dashboard/elderly">
-                        <Button variant="outline" type="button" size="lg">
+                        <Button variant="outline" type="button" size="lg" className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50">
                             ยกเลิก (Cancel)
                         </Button>
                     </Link>
-                    <Button type="submit" disabled={isSubmitting} size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[200px]">
+                    <Button type="submit" disabled={isSubmitting} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[200px] shadow-lg shadow-primary/20">
                         {isSubmitting ? (
                             <>
                                 <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -694,11 +694,11 @@ function FormField({
 }) {
     return (
         <div className={className}>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
                 {label}
             </label>
             {children}
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            {error && <p className="text-destructive text-xs mt-1">{error}</p>}
         </div>
     );
 }

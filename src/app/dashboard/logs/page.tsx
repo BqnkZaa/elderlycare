@@ -8,7 +8,7 @@ import { FileText } from 'lucide-react';
 export default function LogsPage() {
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <FileText className="w-7 h-7 text-emerald-600" />
                 บันทึกประจำวัน
             </h1>
@@ -18,7 +18,7 @@ export default function LogsPage() {
                     <CardTitle>รายการบันทึก</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-gray-500">ดูบันทึกประจำวันทั้งหมดได้ที่หน้ารายละเอียดผู้สูงอายุแต่ละคน</p>
+                    <p className="text-muted-foreground">ดูบันทึกประจำวันทั้งหมดได้ที่หน้ารายละเอียดผู้สูงอายุแต่ละคน</p>
                 </CardContent>
             </Card>
         </div>

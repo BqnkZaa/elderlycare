@@ -64,10 +64,16 @@ export async function GET(request: NextRequest) {
                 eventsProcessed: result.processed,
                 notificationsSent: result.successful,
                 notificationsFailed: result.failed,
+                channels: {
+                    emailConfigured: !!process.env.SMTP_HOST,
+                    smsConfigured: !!process.env.SMS_API_KEY,
+                },
                 alerts: result.alerts.map(a => ({
                     type: a.type,
                     elderlyName: a.elderlyName,
                     message: a.message,
+                    emailSent: a.emailSent,
+                    smsSent: a.smsSent,
                 })),
             },
         });

@@ -301,6 +301,8 @@ model ElderlyProfile {
   
   // Relations
   dailyLogs             DailyLog[]
+  appointments          Appointment[]
+  scheduledActivities   ScheduledActivity[]
 
   // Indexes for efficient filtering
   @@index([province])
@@ -353,7 +355,7 @@ model DailyLog {
 /// AlertLog model to track sent notifications
 model AlertLog {
   id          String   @id @default(uuid())
-  alertType   String   @db.VarChar(50) // BIRTHDAY, ANNIVERSARY
+  alertType   String   @db.VarChar(50) // BIRTHDAY, ANNIVERSARY, APPOINTMENT, ACTIVITY, MISSING_LOG
   elderlyId   String
   elderlyName String   @db.VarChar(200)
   recipientType String @db.VarChar(50) // STAFF, RELATIVE
@@ -367,3 +369,53 @@ model AlertLog {
   @@index([elderlyId])
   @@map("alert_logs")
 }
+
+/// Appointment model for doctor visits and medical appointments
+model Appointment {
+  id          String   @id @default(uuid())
+  elderlyId   String
+  elderly     ElderlyProfile @relation(fields: [elderlyId], references: [id], onDelete: Cascade)
+  
+  title       String   @db.VarChar(200)  // "นัดพบแพทย์", "ตรวจเลือด"
+  location    String?  @db.VarChar(200)  // โรงพยาบาล/คลินิก
+  doctorName  String?  @db.VarChar(100)
+  date        DateTime
+  time        String?  @db.VarChar(10)   // "09:00"
+  notes       String?  @db.Text
+  
+  remindDaysBefore Int @default(1)       // เตือนล่วงหน้ากี่วัน
+  isCompleted Boolean @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([elderlyId])
+  @@index([date])
+  @@map("appointments")
+}
+
+/// ScheduledActivity for recurring activities
+model ScheduledActivity {
+  id          String   @id @default(uuid())
+  elderlyId   String
+  elderly     ElderlyProfile @relation(fields: [elderlyId], references: [id], onDelete: Cascade)
+  
+  title       String   @db.VarChar(200)  // "กายภาพบำบัด", "กินยา"
+  description String?  @db.Text
+  
+  // Recurrence: DAILY, WEEKLY, MONTHLY
+  recurrence  String   @db.VarChar(20)   @default("DAILY")
+  dayOfWeek   Int?     // 0-6 for weekly (0=Sunday)
+  dayOfMonth  Int?     // 1-31 for monthly
+  time        String?  @db.VarChar(10)   // "08:00"
+  
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([elderlyId])
+  @@index([recurrence])
+  @@map("scheduled_activities")
+}
+

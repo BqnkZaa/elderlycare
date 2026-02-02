@@ -10,31 +10,35 @@ import {
 
 export async function seedUsers() {
     try {
-        const passwordHash = await bcrypt.hash('password123', 12);
+        const passwordHash = await bcrypt.hash('admin123', 12);
 
         // 1. Admin User
-        const adminEmail = 'admin@thesafe.com';
+        const adminEmail = 'admin@elderlycare.com';
         const admin = await prisma.user.upsert({
             where: { email: adminEmail },
-            update: {},
+            update: {
+                password: passwordHash, // Ensure password is updated if user exists
+            },
             create: {
                 email: adminEmail,
                 password: passwordHash,
-                name: 'The Safe Admin',
+                name: 'System Admin',
                 role: Role.ADMIN,
                 isActive: true,
             },
         });
 
         // 2. Staff User (Service Center Representation)
-        const staffEmail = 'center@thesafe.com';
+        const staffEmail = 'staff@elderlycare.com';
         const staff = await prisma.user.upsert({
             where: { email: staffEmail },
-            update: {},
+            update: {
+                password: passwordHash,
+            },
             create: {
                 email: staffEmail,
                 password: passwordHash,
-                name: 'Staff Member 1',
+                name: 'Staff Member',
                 role: Role.STAFF,
                 isActive: true,
             },
