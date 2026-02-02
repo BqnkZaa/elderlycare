@@ -4,8 +4,8 @@ import { defineConfig } from 'prisma/config'
 export default defineConfig({
     schema: path.join(__dirname, 'prisma', 'schema.prisma'),
     datasource: {
-        provider: 'postgresql',
         url: process.env.DATABASE_URL!,
+        // @ts-expect-error - directUrl is supported in newer Prisma versions but types might lag
         directUrl: process.env.DIRECT_URL!,
     },
 })
