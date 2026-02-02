@@ -17,7 +17,7 @@ export const elderlyProfileSchema = z.object({
     preferredPronouns: z.string().optional(),
     education: z.string().optional(),
     proudFormerOccupation: z.string().optional(),
-    dateOfBirth: z.string().optional(), // Hidden field
+    dateOfBirth: z.string().optional().transform((val) => val ? new Date(val) : undefined), // Converted to Date for Prisma
 
     // 2. Marital & Status
     maritalStatus: z.enum(["SINGLE", "MARRIED", "WIDOWED", "DIVORCED_SEPARATED"]),

@@ -9,7 +9,17 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 
+// Vercel deployment support
+const getNextAuthUrl = () => {
+    if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+    return 'http://localhost:3000';
+};
+
 export const authOptions: NextAuthOptions = {
+    // Force NextAuth to use the detected URL
+    // @ts-expect-error - Internal property
+    baseUrl: getNextAuthUrl(),
     providers: [
         CredentialsProvider({
             name: 'Credentials',
