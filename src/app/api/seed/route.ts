@@ -6,16 +6,29 @@
  */
 
 import { NextResponse } from 'next/server';
-import { seedAdminUser } from '@/actions/auth.actions';
+import { seedUsers, seedElderlyProfiles } from '@/actions/seed.actions';
 
 export async function GET() {
     try {
-        const result = await seedAdminUser();
+        // Seed Users
+        const usersResult = await seedUsers();
+        if (!usersResult.success) {
+            throw new Error(usersResult.error);
+        }
+
+        // Seed Elderly Profiles
+        const elderlyResult = await seedElderlyProfiles();
+        if (!elderlyResult.success) {
+            throw new Error(elderlyResult.error);
+        }
 
         return NextResponse.json({
-            success: result.success,
-            message: result.message,
-            data: result.data,
+            success: true,
+            message: 'Database seeded successfully',
+            data: {
+                users: usersResult.message,
+                elderly: elderlyResult.message
+            }
         });
     } catch (error) {
         console.error('Seed error:', error);
