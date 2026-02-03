@@ -419,3 +419,18 @@ model ScheduledActivity {
   @@map("scheduled_activities")
 }
 
+/// Review model for landing page testimonials/reviews
+model Review {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(100)
+  rating    Int      // 1-5 stars
+  comment   String   @db.Text
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isVisible])
+  @@index([createdAt])
+  @@map("reviews")
+}
+
