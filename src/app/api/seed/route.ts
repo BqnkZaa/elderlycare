@@ -1,34 +1,67 @@
 /**
  * Database Seed API Route
  * 
- * Creates initial admin user for the system.
+ * Creates sample data for the elderly care system.
+ * Includes: Users, Elderly Profiles, Daily Logs, Appointments, Scheduled Activities
+ * 
  * Call this once after deploying: GET /api/seed
+ * Or use query params for specific seeds:
+ *   - GET /api/seed?type=all (default - seeds everything)
+ *   - GET /api/seed?type=users
+ *   - GET /api/seed?type=elderly
+ *   - GET /api/seed?type=logs
+ *   - GET /api/seed?type=appointments
+ *   - GET /api/seed?type=activities
  */
 
-import { NextResponse } from 'next/server';
-import { seedUsers, seedElderlyProfiles } from '@/actions/seed.actions';
+import { NextRequest, NextResponse } from 'next/server';
+import {
+    seedUsers,
+    seedElderlyProfiles,
+    seedDailyLogs,
+    seedAppointments,
+    seedScheduledActivities,
+    seedAll
+} from '@/actions/seed.actions';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
-        // Seed Users
-        const usersResult = await seedUsers();
-        if (!usersResult.success) {
-            throw new Error(usersResult.error);
+        const searchParams = request.nextUrl.searchParams;
+        const type = searchParams.get('type') || 'all';
+
+        let result;
+
+        switch (type) {
+            case 'users':
+                result = await seedUsers();
+                break;
+            case 'elderly':
+                result = await seedElderlyProfiles();
+                break;
+            case 'logs':
+                result = await seedDailyLogs();
+                break;
+            case 'appointments':
+                result = await seedAppointments();
+                break;
+            case 'activities':
+                result = await seedScheduledActivities();
+                break;
+            case 'all':
+            default:
+                result = await seedAll();
+                break;
         }
 
-        // Seed Elderly Profiles
-        const elderlyResult = await seedElderlyProfiles();
-        if (!elderlyResult.success) {
-            throw new Error(elderlyResult.error);
+        if (!result.success) {
+            throw new Error('error' in result ? result.error : 'Seed failed');
         }
 
         return NextResponse.json({
             success: true,
-            message: 'Database seeded successfully',
-            data: {
-                users: usersResult.message,
-                elderly: elderlyResult.message
-            }
+            message: result.message,
+            type,
+            details: 'details' in result ? result.details : undefined
         });
     } catch (error) {
         console.error('Seed error:', error);
