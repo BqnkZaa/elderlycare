@@ -143,7 +143,7 @@ export default function LandingBoard() {
                 </section>
 
                 {/* Details & Brochure Section */}
-                <section className="container mx-auto px-4 py-16">
+                <section className="container mx-auto px-4 py-32">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6">
                             <h2 className="text-3xl md:text-4xl font-bold text-foreground">
@@ -205,7 +205,7 @@ export default function LandingBoard() {
                 </section>
 
                 {/* Videos & Courses Section */}
-                <section className="bg-muted/30 py-16">
+                <section className="bg-muted/30 py-24">
                     <div className="container mx-auto px-4">
                         <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
                             วีดิโอแนะนำ & <span className="text-secondary">หลักสูตรของเรา</span>
@@ -264,7 +264,7 @@ export default function LandingBoard() {
                 </section>
 
                 {/* Review Section */}
-                <section className="container mx-auto px-4 py-16">
+                <section className="container mx-auto px-4 py-24">
                     <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
                         รีวิวจาก <span className="text-primary">ผู้ใช้บริการ</span>
                     </h2>
@@ -316,8 +316,8 @@ export default function LandingBoard() {
                                     {message && (
                                         <div
                                             className={`p-3 rounded-lg text-sm ${message.type === "success"
-                                                    ? "bg-green-500/20 text-green-400"
-                                                    : "bg-red-500/20 text-red-400"
+                                                ? "bg-green-500/20 text-green-400"
+                                                : "bg-red-500/20 text-red-400"
                                                 }`}
                                         >
                                             {message.text}
