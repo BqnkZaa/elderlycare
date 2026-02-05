@@ -33,6 +33,7 @@ const navigation = [
     { name: 'แดชบอร์ด', href: '/dashboard', icon: LayoutDashboard },
     { name: 'ข้อมูลผู้สูงอายุ', href: '/dashboard/elderly', icon: Users },
     { name: 'บันทึกประจำวัน', href: '/dashboard/logs', icon: FileText },
+    { name: 'จัดการผู้ใช้งาน', href: '/dashboard/users', icon: Users },
     { name: 'การแจ้งเตือน', href: '/dashboard/alerts', icon: Bell },
     { name: 'ตั้งค่า', href: '/dashboard/settings', icon: Settings },
 ];

@@ -41,6 +41,10 @@ export const authOptions: NextAuthOptions = {
                         throw new Error('ไม่พบบัญชีผู้ใช้หรือบัญชีถูกปิดใช้งาน');
                     }
 
+                    if (user.status !== 'APPROVED') {
+                        throw new Error('บัญชีของคุณอยู่ระหว่างการตรวจสอบสถานะ');
+                    }
+
                     const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
 
                     if (!isPasswordValid) {
@@ -52,6 +56,7 @@ export const authOptions: NextAuthOptions = {
                         email: user.email,
                         name: user.name,
                         role: user.role,
+                        status: user.status,
                     };
                 } catch (error) {
                     console.error('Authentication error:', error);
@@ -65,6 +70,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id;
                 token.role = user.role;
+                token.status = user.status;
             }
             return token;
         },
@@ -72,6 +78,7 @@ export const authOptions: NextAuthOptions = {
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.role = token.role as string;
+                session.user.status = token.status as string;
             }
             return session;
         },

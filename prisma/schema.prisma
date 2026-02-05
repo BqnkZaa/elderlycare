@@ -18,6 +18,13 @@ datasource db {
 enum Role {
   ADMIN
   STAFF
+  NURSE
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum Gender {
@@ -163,6 +170,7 @@ model User {
   password  String   // bcrypt hashed
   name      String
   role      Role     @default(STAFF)
+  status    UserStatus @default(APPROVED)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -434,3 +442,26 @@ model Review {
   @@map("reviews")
 }
 
+
+/// Inquiry model for service applications/inquiries
+model Inquiry {
+  id        String   @id @default(uuid())
+  
+  // Contact Person Info
+  name      String   @db.VarChar(100)
+  phone     String   @db.VarChar(20)
+  lineId    String?  @db.VarChar(50)
+  
+  // Elderly Info
+  elderlyName   String?  @db.VarChar(100)
+  elderlyAge    Int?
+  elderlyGender String?  @db.VarChar(10) // Male, Female
+  elderlyNeeds  String?  @db.Text        // Condition description
+  
+  message   String?  @db.Text
+  status    String   @db.VarChar(20) @default("PENDING") // PENDING, CONTACTED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("inquiries")
+}

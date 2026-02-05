@@ -1,14 +1,15 @@
 "use client";
 
+
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { StarRating } from "@/components/ui/StarRating";
-import { createReview, getVisibleReviews } from "@/actions/reviews";
+import { Select } from "@/components/ui/select";
+import { createInquiry, InquiryInput } from "@/actions/inquiry";
 
 // Course data
 const courses = [
@@ -56,52 +57,41 @@ const videos = [
     },
 ];
 
-interface Review {
-    id: string;
-    name: string;
-    rating: number;
-    comment: string;
-    createdAt: string | Date;
-}
-
 export default function LandingBoard() {
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [reviewForm, setReviewForm] = useState({ name: "", rating: 0, comment: "" });
+    const [inquiryForm, setInquiryForm] = useState<InquiryInput>({
+        name: "",
+        phone: "",
+        lineId: "",
+        elderlyName: "",
+        elderlyAge: undefined,
+        elderlyGender: "",
+        elderlyNeeds: "",
+        message: "",
+    });
     const [isPending, startTransition] = useTransition();
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-    useEffect(() => {
-        loadReviews();
-    }, []);
-
-    const loadReviews = async () => {
-        const result = await getVisibleReviews();
-        if (result.success && result.reviews) {
-            setReviews(result.reviews);
-        }
-    };
-
-    const handleSubmitReview = async (e: React.FormEvent) => {
+    const handleSubmitInquiry = async (e: React.FormEvent) => {
         e.preventDefault();
         setMessage(null);
 
         startTransition(async () => {
-            const result = await createReview(reviewForm);
+            const result = await createInquiry(inquiryForm);
             if (result.success) {
-                setMessage({ type: "success", text: "ขอบคุณสำหรับรีวิว!" });
-                setReviewForm({ name: "", rating: 0, comment: "" });
-                loadReviews();
+                setMessage({ type: "success", text: "ส่งข้อมูลเรียบร้อยแล้ว เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุด" });
+                setInquiryForm({
+                    name: "",
+                    phone: "",
+                    lineId: "",
+                    elderlyName: "",
+                    elderlyAge: undefined,
+                    elderlyGender: "",
+                    elderlyNeeds: "",
+                    message: "",
+                });
             } else {
                 setMessage({ type: "error", text: result.error || "เกิดข้อผิดพลาด" });
             }
-        });
-    };
-
-    const formatDate = (date: string | Date) => {
-        return new Date(date).toLocaleDateString("th-TH", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
         });
     };
 
@@ -263,56 +253,129 @@ export default function LandingBoard() {
                     </div>
                 </section>
 
-                {/* Review Section */}
+                {/* Application / Inquiry Section */}
                 <section className="container mx-auto px-4 py-24">
                     <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-                        รีวิวจาก <span className="text-primary">ผู้ใช้บริการ</span>
+                        สนใจใช้บริการ <span className="text-primary">สอบถามข้อมูล</span>
                     </h2>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                        {/* Review Form */}
-                        <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
+                        {/* Inquiry Form */}
+                        <Card className="bg-card/50 border-border/50 backdrop-blur-sm lg:col-span-2">
                             <CardHeader>
-                                <CardTitle className="text-xl text-foreground">เขียนรีวิว</CardTitle>
-                                <CardDescription>แบ่งปันประสบการณ์ของคุณกับเรา</CardDescription>
+                                <CardTitle className="text-2xl text-foreground text-center">แบบฟอร์มยื่นความจำนง / สอบถามข้อมูล</CardTitle>
+                                <CardDescription className="text-center">กรอกรายละเอียดเพื่อให้เจ้าหน้าที่ติดต่อกลับ</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form onSubmit={handleSubmitReview} className="space-y-4">
-                                    <div>
-                                        <label htmlFor="review-name" className="block text-sm font-medium text-foreground mb-1">
-                                            ชื่อของคุณ
-                                        </label>
-                                        <Input
-                                            id="review-name"
-                                            value={reviewForm.name}
-                                            onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
-                                            placeholder="กรอกชื่อของคุณ"
-                                            required
-                                        />
+                                <form onSubmit={handleSubmitInquiry} className="space-y-6 max-w-4xl mx-auto">
+                                    {/* Section 1: Contact Info */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">1. ข้อมูลผู้ติดต่อ</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">
+                                                    ชื่อ-นามสกุล (ผู้ติดต่อ) <span className="text-red-500">*</span>
+                                                </label>
+                                                <Input
+                                                    value={inquiryForm.name}
+                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })}
+                                                    placeholder="กรอกชื่อ-นามสกุลของคุณ"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">
+                                                    เบอร์โทรศัพท์ <span className="text-red-500">*</span>
+                                                </label>
+                                                <Input
+                                                    value={inquiryForm.phone}
+                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, phone: e.target.value })}
+                                                    placeholder="0xx-xxx-xxxx"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">
+                                                    Line ID
+                                                </label>
+                                                <Input
+                                                    value={inquiryForm.lineId}
+                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, lineId: e.target.value })}
+                                                    placeholder="กรอก Line ID (ถ้ามี)"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-foreground mb-2">
-                                            คะแนน
-                                        </label>
-                                        <StarRating
-                                            value={reviewForm.rating}
-                                            onChange={(rating) => setReviewForm({ ...reviewForm, rating })}
-                                            size="lg"
-                                        />
+
+                                    {/* Section 2: Elderly Info */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">2. ข้อมูลผู้สูงอายุ</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-foreground mb-1">
+                                                    ชื่อ-นามสกุล (ผู้สูงอายุ)
+                                                </label>
+                                                <Input
+                                                    value={inquiryForm.elderlyName}
+                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, elderlyName: e.target.value })}
+                                                    placeholder="กรอกชื่อ-นามสกุลผู้สูงอายุ"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">
+                                                    อายุ (ปี)
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    value={inquiryForm.elderlyAge || ""}
+                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, elderlyAge: parseInt(e.target.value) || undefined })}
+                                                    placeholder="ระบุอายุ"
+                                                    min={50}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">
+                                                    เพศ
+                                                </label>
+                                                <Select
+                                                    value={inquiryForm.elderlyGender}
+                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, elderlyGender: e.target.value })}
+                                                >
+                                                    <option value="">-- ระบุเพศ --</option>
+                                                    <option value="ชาย">ชาย</option>
+                                                    <option value="หญิง">หญิง</option>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-foreground mb-1">
+                                                อาการเบื้องต้น / สิ่งที่ต้องการดูแลเป็นพิเศษ
+                                            </label>
+                                            <Textarea
+                                                value={inquiryForm.elderlyNeeds}
+                                                onChange={(e) => setInquiryForm({ ...inquiryForm, elderlyNeeds: e.target.value })}
+                                                placeholder="เช่น ช่วยเหลือตัวเองไม่ได้, มีแผลกดทับ, ต้องการกายภาพบำบัด..."
+                                                rows={3}
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label htmlFor="review-comment" className="block text-sm font-medium text-foreground mb-1">
-                                            ความคิดเห็น
-                                        </label>
-                                        <Textarea
-                                            id="review-comment"
-                                            value={reviewForm.comment}
-                                            onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
-                                            placeholder="เขียนความคิดเห็นของคุณ..."
-                                            rows={4}
-                                            required
-                                        />
+
+                                    {/* Section 3: Message */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">3. ข้อความเพิ่มเติม</h3>
+                                        <div>
+                                            <label className="block text-sm font-medium text-foreground mb-1">
+                                                ข้อความถึงเจ้าหน้าที่
+                                            </label>
+                                            <Textarea
+                                                value={inquiryForm.message}
+                                                onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
+                                                placeholder="สอบถามข้อมูลเพิ่มเติม..."
+                                                rows={3}
+                                            />
+                                        </div>
                                     </div>
+
                                     {message && (
                                         <div
                                             className={`p-3 rounded-lg text-sm ${message.type === "success"
@@ -325,50 +388,14 @@ export default function LandingBoard() {
                                     )}
                                     <Button
                                         type="submit"
-                                        className="w-full bg-primary hover:bg-primary/90"
-                                        disabled={isPending || reviewForm.rating === 0}
+                                        className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
+                                        disabled={isPending}
                                     >
-                                        {isPending ? "กำลังส่ง..." : "ส่งรีวิว"}
+                                        {isPending ? "กำลังส่งข้อมูล..." : "ส่งข้อมูลสมัคร / สอบถาม"}
                                     </Button>
                                 </form>
                             </CardContent>
                         </Card>
-
-                        {/* Reviews List */}
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-foreground mb-4">
-                                รีวิวล่าสุด ({reviews.length})
-                            </h3>
-                            {reviews.length === 0 ? (
-                                <Card className="bg-card/50 border-border/50 backdrop-blur-sm p-6 text-center">
-                                    <p className="text-muted-foreground">ยังไม่มีรีวิว เป็นคนแรกที่รีวิว!</p>
-                                </Card>
-                            ) : (
-                                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                                    {reviews.map((review) => (
-                                        <Card
-                                            key={review.id}
-                                            className="bg-card/50 border-border/50 backdrop-blur-sm hover:bg-card/80 transition-all"
-                                        >
-                                            <CardContent className="p-4">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <div>
-                                                        <h4 className="font-semibold text-foreground">{review.name}</h4>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {formatDate(review.createdAt)}
-                                                        </p>
-                                                    </div>
-                                                    <StarRating value={review.rating} readonly size="sm" />
-                                                </div>
-                                                <p className="text-muted-foreground text-sm leading-relaxed">
-                                                    {review.comment}
-                                                </p>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
                     </div>
                 </section>
             </main>

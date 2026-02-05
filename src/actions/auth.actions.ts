@@ -94,3 +94,103 @@ export async function seedAdminUser() {
         };
     }
 }
+
+export async function registerNurse(data: UserInput) {
+    try {
+        const validated = userSchema.parse(data);
+
+        const existingUser = await prisma.user.findUnique({
+            where: { email: validated.email },
+        });
+
+        if (existingUser) {
+            return {
+                success: false,
+                error: 'อีเมลนี้มีอยู่ในระบบแล้ว'
+            };
+        }
+
+        const hashedPassword = await bcrypt.hash(validated.password, 12);
+
+        const user = await prisma.user.create({
+            data: {
+                ...validated,
+                role: 'NURSE',
+                status: 'PENDING', // Force pending for nurses
+                password: hashedPassword,
+            },
+        });
+
+        return {
+            success: true,
+            data: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                status: user.status,
+            },
+            message: 'ลงทะเบียนสำเร็จ โปรดรอการอนุมัติจากผู้ดูแลระบบ'
+        };
+
+    } catch (error) {
+        console.error('Error registering nurse:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการลงทะเบียน'
+        };
+    }
+}
+
+export async function getPendingUsers() {
+    try {
+        const users = await prisma.user.findMany({
+            where: {
+                status: 'PENDING',
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                createdAt: true,
+            }
+        });
+
+        return { success: true, data: users };
+    } catch (error) {
+        console.error('Error fetching pending users:', error);
+        return { success: false, error: 'Failed to fetch pending users' };
+    }
+}
+
+export async function approveUser(userId: string) {
+    try {
+        await prisma.user.update({
+            where: { id: userId },
+            data: { status: 'APPROVED' },
+        });
+
+        return { success: true, message: 'User approved successfully' };
+    } catch (error) {
+        console.error('Error approving user:', error);
+        return { success: false, error: 'Failed to approve user' };
+    }
+}
+
+export async function rejectUser(userId: string) {
+    try {
+        await prisma.user.update({
+            where: { id: userId },
+            data: { status: 'REJECTED' },
+        });
+
+        return { success: true, message: 'User rejected successfully' };
+    } catch (error) {
+        console.error('Error rejecting user:', error);
+        return { success: false, error: 'Failed to reject user' };
+    }
+}
