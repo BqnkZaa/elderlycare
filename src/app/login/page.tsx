@@ -9,6 +9,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginInput } from '@/lib/validations';
@@ -135,6 +136,13 @@ export default function LoginPage() {
                         <p className="text-center text-xs text-muted-foreground mt-4">
                             ค่าเริ่มต้น: admin@elderlycare.com / admin123
                         </p>
+
+                        <div className="text-center text-sm mt-6">
+                            ยังไม่มีบัญชีผู้ใช้งาน?{' '}
+                            <Link href="/register/nurse" className="text-primary hover:underline font-medium">
+                                สมัครสมาชิก (สำหรับพยาบาล)
+                            </Link>
+                        </div>
                     </form>
                 </CardContent>
             </Card>
