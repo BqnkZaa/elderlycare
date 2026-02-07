@@ -78,25 +78,27 @@ export const smsService = {
             // ThaiBulkSMS API endpoint
             const url = 'https://api-v2.thaibulksms.com/sms';
 
+            // Format body as x-www-form-urlencoded
+            const body = new URLSearchParams();
+            phoneNumbers.forEach(p => body.append('msisdn', p));
+            body.append('message', options.message);
+            body.append('sender', sender);
+
             // Using node-fetch
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`,
                 },
-                body: JSON.stringify({
-                    msisdn: phoneNumbers,
-                    message: options.message,
-                    sender: sender,
-                }),
+                body: body,
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                // Typings for node-fetch response.json() are any, but we expect an error object or structure
-                const errorMsg = (data as any).message || `HTTP ${response.status}`;
+                // Return full error object for debugging
+                const errorMsg = JSON.stringify(data);
                 throw new Error(errorMsg);
             }
 

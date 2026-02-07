@@ -104,7 +104,7 @@ export const emailService = {
             const data = await response.json();
 
             if (!response.ok) {
-                const errorMsg = (data as any).message || JSON.stringify(data) || `HTTP ${response.status}`;
+                const errorMsg = JSON.stringify(data);
                 throw new Error(errorMsg);
             }
 
