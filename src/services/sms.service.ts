@@ -6,6 +6,7 @@
  * 
  * API Documentation: https://www.thaibulksms.com/developer
  */
+import fetch from 'node-fetch';
 
 interface SMSOptions {
     to: string | string[];
@@ -77,6 +78,7 @@ export const smsService = {
             // ThaiBulkSMS API endpoint
             const url = 'https://bulk.thaibulksms.com/v2/sms';
 
+            // Using node-fetch
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -93,13 +95,15 @@ export const smsService = {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || `HTTP ${response.status}`);
+                // Typings for node-fetch response.json() are any, but we expect an error object or structure
+                const errorMsg = (data as any).message || `HTTP ${response.status}`;
+                throw new Error(errorMsg);
             }
 
             console.log(`📱 [SMS] Sent successfully to ${phoneNumbers.length} recipient(s)`);
             return {
                 success: true,
-                creditUsed: data.credit_used || phoneNumbers.length * 0.5,
+                creditUsed: (data as any).credit_used || phoneNumbers.length * 0.5,
             };
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';

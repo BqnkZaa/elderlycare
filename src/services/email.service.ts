@@ -1,11 +1,10 @@
 /**
  * Email Service
  * 
- * Sends email notifications via SMTP (nodemailer).
+ * Sends email notifications via ThaiBulkSMS (ThaiBulkMail) API.
  * Configuration through environment variables.
  */
-
-import nodemailer from 'nodemailer';
+import fetch from 'node-fetch';
 
 interface EmailOptions {
     to: string | string[];
@@ -20,30 +19,24 @@ interface EmailResult {
     error?: string;
 }
 
-// Check if email is configured
+// Check if email API is configured
 function isEmailConfigured(): boolean {
-    return !!(
-        process.env.SMTP_HOST &&
-        process.env.SMTP_USER &&
-        process.env.SMTP_PASS
+    const isConfigured = !!(
+        process.env.SMS_API_KEY &&
+        process.env.SMS_API_SECRET &&
+        process.env.EMAIL_FROM_ADDRESS
     );
-}
 
-// Create transporter (lazy initialization)
-function createTransporter() {
-    if (!isEmailConfigured()) {
-        return null;
+    if (!isConfigured) {
+        console.log('📧 Email Config Debug:', {
+            SMS_API_KEY: !!process.env.SMS_API_KEY,
+            SMS_API_SECRET: !!process.env.SMS_API_SECRET,
+            EMAIL_FROM_ADDRESS: !!process.env.EMAIL_FROM_ADDRESS,
+            Value_EMAIL_FROM_ADDRESS: process.env.EMAIL_FROM_ADDRESS
+        });
     }
 
-    return nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
-    });
+    return isConfigured;
 }
 
 export const emailService = {
@@ -55,45 +48,74 @@ export const emailService = {
     },
 
     /**
-     * Send an email
+     * Send an email via ThaiBulkMail API
      */
     async send(options: EmailOptions): Promise<EmailResult> {
         if (!isEmailConfigured()) {
             console.log('📧 [EMAIL] Not configured - skipping send');
             return {
                 success: false,
-                error: 'Email not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS in .env'
-            };
-        }
-
-        const transporter = createTransporter();
-        if (!transporter) {
-            return {
-                success: false,
-                error: 'Failed to create email transporter'
+                error: 'Email not configured. Set SMS_API_KEY, SMS_API_SECRET, and EMAIL_FROM_ADDRESS in .env'
             };
         }
 
         try {
-            const from = process.env.SMTP_FROM || process.env.SMTP_USER;
-            const recipients = Array.isArray(options.to) ? options.to.join(', ') : options.to;
+            const apiKey = process.env.SMS_API_KEY!;
+            const apiSecret = process.env.SMS_API_SECRET!;
 
-            const info = await transporter.sendMail({
-                from,
-                to: recipients,
+            const fromAddress = process.env.EMAIL_FROM_ADDRESS!;
+            const fromName = process.env.EMAIL_FROM_NAME || 'ElderCare';
+
+            const templateId = process.env.EMAIL_TEMPLATE_ID;
+
+            if (!templateId) {
+                console.warn('📧 [EMAIL] No EMAIL_TEMPLATE_ID configured. Sending might fail if API requires it.');
+            }
+
+            const recipients = Array.isArray(options.to)
+                ? options.to.map(email => ({ email: email.trim() }))
+                : [{ email: options.to.trim() }];
+
+            const url = 'https://email-api.thaibulksms.com/email/v1/send_template';
+
+            const body = {
+                template_uuid: templateId || 'default-template-uuid',
                 subject: options.subject,
-                text: options.text,
-                html: options.html,
+                mail_from: {
+                    name: fromName,
+                    email: fromAddress
+                },
+                mail_to: recipients,
+                payload: {
+                    message: options.html || options.text,
+                    title: options.subject
+                }
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`
+                },
+                body: JSON.stringify(body),
             });
 
-            console.log(`📧 [EMAIL] Sent successfully: ${info.messageId}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                const errorMsg = (data as any).message || JSON.stringify(data) || `HTTP ${response.status}`;
+                throw new Error(errorMsg);
+            }
+
+            console.log(`📧 [EMAIL] Sent successfully via API: ${JSON.stringify(data)}`);
             return {
                 success: true,
-                messageId: info.messageId,
+                messageId: (data as any).message_id || 'sent-via-api',
             };
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            console.error(`📧 [EMAIL] Failed to send: ${errorMessage}`);
+            console.error(`📧 [EMAIL] Failed to send via API: ${errorMessage}`);
             return {
                 success: false,
                 error: errorMessage,

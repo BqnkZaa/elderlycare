@@ -14,7 +14,7 @@ import { getElderlyProfile, updateElderlyProfile } from '@/actions/elderly.actio
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { NativeSelect as Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
     ArrowLeft,

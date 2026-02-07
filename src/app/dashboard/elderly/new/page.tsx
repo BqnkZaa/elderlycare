@@ -17,7 +17,7 @@ import { PROVINCE_NAMES_TH } from '@/lib/provinces';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { NativeSelect as Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea'; // Assuming simple textarea for now if component doesn't exist, we'll check
 // If Textarea component doesn't exist, we can use <textarea className="..."/> or Input
 import { Checkbox } from '@/components/ui/checkbox'; // Need to verify if this exists, usually it does in Shadcn

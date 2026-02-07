@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
                 notificationsSent: result.successful,
                 notificationsFailed: result.failed,
                 channels: {
-                    emailConfigured: !!process.env.SMTP_HOST,
+                    emailConfigured: !!process.env.EMAIL_FROM_ADDRESS,
                     smsConfigured: !!process.env.SMS_API_KEY,
                 },
                 alerts: result.alerts.map(a => ({
