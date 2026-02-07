@@ -82,7 +82,8 @@ export const smsService = {
             const body = new URLSearchParams();
             phoneNumbers.forEach(p => body.append('msisdn', p));
             body.append('message', options.message);
-            body.append('sender', sender);
+            body.append('message', options.message);
+            // body.append('sender', sender); // Remove sender to use default
 
             // Using node-fetch
             const response = await fetch(url, {

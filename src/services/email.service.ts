@@ -4,7 +4,7 @@
  * Sends email notifications via ThaiBulkSMS (ThaiBulkMail) API.
  * Configuration through environment variables.
  */
-import fetch from 'node-fetch';
+import nodemailer from 'nodemailer';
 
 interface EmailOptions {
     to: string | string[];
@@ -21,22 +21,23 @@ interface EmailResult {
 
 // Check if email API is configured
 function isEmailConfigured(): boolean {
-    const isConfigured = !!(
+    const hasApiConfig = !!(
         process.env.SMS_API_KEY &&
         process.env.SMS_API_SECRET &&
         process.env.EMAIL_FROM_ADDRESS
     );
 
-    if (!isConfigured) {
-        console.log('📧 Email Config Debug:', {
-            SMS_API_KEY: !!process.env.SMS_API_KEY,
-            SMS_API_SECRET: !!process.env.SMS_API_SECRET,
-            EMAIL_FROM_ADDRESS: !!process.env.EMAIL_FROM_ADDRESS,
-            Value_EMAIL_FROM_ADDRESS: process.env.EMAIL_FROM_ADDRESS
-        });
+    const hasSmtpConfig = !!(
+        process.env.SMTP_HOST &&
+        process.env.SMTP_USER &&
+        process.env.SMTP_PASS
+    );
+
+    if (!hasApiConfig && !hasSmtpConfig) {
+        console.log('📧 Email Config Debug: Missing both API and SMTP config');
     }
 
-    return isConfigured;
+    return hasApiConfig || hasSmtpConfig;
 }
 
 export const emailService = {
@@ -48,28 +49,70 @@ export const emailService = {
     },
 
     /**
-     * Send an email via ThaiBulkMail API
+     * Send an email via SMTP (preferred) or ThaiBulkMail API
      */
     async send(options: EmailOptions): Promise<EmailResult> {
         if (!isEmailConfigured()) {
             console.log('📧 [EMAIL] Not configured - skipping send');
             return {
                 success: false,
-                error: 'Email not configured. Set SMS_API_KEY, SMS_API_SECRET, and EMAIL_FROM_ADDRESS in .env'
+                error: 'Email not configured. Set SMTP_* or SMS_API_* vars in .env'
             };
         }
 
-        try {
-            const apiKey = process.env.SMS_API_KEY!;
-            const apiSecret = process.env.SMS_API_SECRET!;
+        const fromAddress = process.env.EMAIL_FROM_ADDRESS || process.env.SMTP_USER || 'no-reply@eldercare.com';
+        const fromName = process.env.EMAIL_FROM_NAME || 'ElderCare';
 
-            const fromAddress = process.env.EMAIL_FROM_ADDRESS!;
-            const fromName = process.env.EMAIL_FROM_NAME || 'ElderCare';
+        // 1. Try SMTP first if configured
+        if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+            try {
+                const transporter = nodemailer.createTransport({
+                    host: process.env.SMTP_HOST,
+                    port: parseInt(process.env.SMTP_PORT || '587'),
+                    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+                    auth: {
+                        user: process.env.SMTP_USER,
+                        pass: process.env.SMTP_PASS,
+                    },
+                });
+
+                const recipients = Array.isArray(options.to) ? options.to.join(', ') : options.to;
+
+                const info = await transporter.sendMail({
+                    from: `"${fromName}" <${fromAddress}>`,
+                    to: recipients,
+                    subject: options.subject,
+                    text: options.text,
+                    html: options.html,
+                });
+
+                console.log(`📧 [EMAIL] Sent successfully via SMTP: ${info.messageId}`);
+                return {
+                    success: true,
+                    messageId: info.messageId,
+                };
+            } catch (error) {
+                console.error(`📧 [EMAIL] SMTP failed, trying API fallback... Error:`, error);
+                // Fallthrough to API
+            }
+        }
+
+        // 2. Fallback to API
+        try {
+            const apiKey = process.env.SMS_API_KEY;
+            const apiSecret = process.env.SMS_API_SECRET;
+
+            if (!apiKey || !apiSecret) {
+                return {
+                    success: false,
+                    error: 'SMTP failed and API keys missing.',
+                };
+            }
 
             const templateId = process.env.EMAIL_TEMPLATE_ID;
 
             if (!templateId) {
-                console.warn('📧 [EMAIL] No EMAIL_TEMPLATE_ID configured. Sending might fail if API requires it.');
+                console.warn('📧 [EMAIL] No EMAIL_TEMPLATE_ID configured. API send likely to fail.');
             }
 
             const recipients = Array.isArray(options.to)
