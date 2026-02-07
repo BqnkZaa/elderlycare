@@ -76,7 +76,7 @@ export const smsService = {
                 : [formatPhoneNumber(options.to)];
 
             // ThaiBulkSMS API endpoint
-            const url = 'https://bulk.thaibulksms.com/v2/sms';
+            const url = 'https://api-v2.thaibulksms.com/sms';
 
             // Using node-fetch
             const response = await fetch(url, {
