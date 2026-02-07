@@ -24,6 +24,8 @@ interface AlertItem {
     years?: number;
     emailSent: boolean;
     smsSent: boolean;
+    emailError?: string;
+    smsError?: string;
 }
 
 interface ProcessResult {
@@ -136,6 +138,8 @@ export const notificationService = {
                         message: `🎂 วันนี้เป็นวันเกิดของ ${fullName}!`,
                         emailSent,
                         smsSent,
+                        emailError: emailSent ? undefined : 'Failed to send',
+                        smsError: smsSent ? undefined : 'Failed to send',
                     };
 
                     await this.logAlert(alert, phoneToNotify);
@@ -170,6 +174,8 @@ export const notificationService = {
                         years,
                         emailSent,
                         smsSent,
+                        emailError: emailSent ? undefined : 'Failed to send',
+                        smsError: smsSent ? undefined : 'Failed to send',
                     };
 
                     await this.logAlert(alert, phoneToNotify);
@@ -244,6 +250,8 @@ export const notificationService = {
                     message: `💊 ${fullName} มีนัด "${apt.title}" ${daysUntil === 0 ? 'วันนี้' : `ในอีก ${daysUntil} วัน`}${apt.location ? ` ที่ ${apt.location}` : ''}`,
                     emailSent,
                     smsSent,
+                    emailError: emailSent ? undefined : 'Failed to send',
+                    smsError: smsSent ? undefined : 'Failed to send',
                 };
 
                 await this.logAlert(alert, phoneToNotify);
@@ -319,6 +327,8 @@ export const notificationService = {
                 message: `📅 ${fullName} มีกิจกรรม "${activity.title}"${activity.time ? ` เวลา ${activity.time}` : ''} วันนี้`,
                 emailSent,
                 smsSent,
+                emailError: emailSent ? undefined : 'Failed to send',
+                smsError: smsSent ? undefined : 'Failed to send',
             };
 
             await this.logAlert(alert, phoneToNotify);
@@ -387,6 +397,8 @@ export const notificationService = {
                     message: `⚠️ ${fullName} ไม่มีการบันทึก DailyLog มากกว่า ${MISSING_LOG_THRESHOLD_DAYS} วัน`,
                     emailSent,
                     smsSent,
+                    emailError: emailSent ? undefined : 'Failed to send',
+                    smsError: smsSent ? undefined : 'Failed to send',
                 };
 
                 await this.logAlert(alert, phoneToNotify);

@@ -74,6 +74,8 @@ export async function GET(request: NextRequest) {
                     message: a.message,
                     emailSent: a.emailSent,
                     smsSent: a.smsSent,
+                    emailError: a.emailError,
+                    smsError: a.smsError,
                 })),
             },
         });
