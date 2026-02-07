@@ -122,13 +122,18 @@ export const notificationService = {
 
                     let emailSent = false, smsSent = false;
 
+                    let emailError: string | undefined;
+                    let smsError: string | undefined;
+
                     if (adminEmail && emailService.isConfigured()) {
                         const result = await emailService.sendBirthdayNotification(fullName, adminEmail);
                         emailSent = result.success;
+                        if (!result.success) emailError = result.error;
                     }
                     if (phoneToNotify && smsService.isConfigured()) {
                         const result = await smsService.sendBirthdayNotification(fullName, phoneToNotify);
                         smsSent = result.success;
+                        if (!result.success) smsError = result.error;
                     }
 
                     const alert: AlertItem = {
@@ -138,8 +143,8 @@ export const notificationService = {
                         message: `🎂 วันนี้เป็นวันเกิดของ ${fullName}!`,
                         emailSent,
                         smsSent,
-                        emailError: emailSent ? undefined : 'Failed to send',
-                        smsError: smsSent ? undefined : 'Failed to send',
+                        emailError,
+                        smsError,
                     };
 
                     await this.logAlert(alert, phoneToNotify);
@@ -156,14 +161,18 @@ export const notificationService = {
                     console.log(`🎊 Anniversary: ${fullName} - ${years} year(s)`);
 
                     let emailSent = false, smsSent = false;
+                    let emailError: string | undefined;
+                    let smsError: string | undefined;
 
                     if (adminEmail && emailService.isConfigured()) {
                         const result = await emailService.sendAnniversaryNotification(fullName, years, adminEmail);
                         emailSent = result.success;
+                        if (!result.success) emailError = result.error;
                     }
                     if (phoneToNotify && smsService.isConfigured()) {
                         const result = await smsService.sendAnniversaryNotification(fullName, years, phoneToNotify);
                         smsSent = result.success;
+                        if (!result.success) smsError = result.error;
                     }
 
                     const alert: AlertItem = {
@@ -174,8 +183,8 @@ export const notificationService = {
                         years,
                         emailSent,
                         smsSent,
-                        emailError: emailSent ? undefined : 'Failed to send',
-                        smsError: smsSent ? undefined : 'Failed to send',
+                        emailError,
+                        smsError,
                     };
 
                     await this.logAlert(alert, phoneToNotify);
@@ -233,14 +242,18 @@ export const notificationService = {
                 console.log(`💊 Appointment reminder: ${fullName} - ${apt.title} on ${aptDate.toLocaleDateString('th-TH')}`);
 
                 let emailSent = false, smsSent = false;
+                let emailError: string | undefined;
+                let smsError: string | undefined;
 
                 if (adminEmail && emailService.isConfigured()) {
                     const result = await emailService.sendAppointmentReminder(fullName, apt.title, apt.date, apt.location, adminEmail);
                     emailSent = result.success;
+                    if (!result.success) emailError = result.error;
                 }
                 if (phoneToNotify && smsService.isConfigured()) {
                     const result = await smsService.sendAppointmentReminder(fullName, apt.title, apt.date, apt.location, phoneToNotify);
                     smsSent = result.success;
+                    if (!result.success) smsError = result.error;
                 }
 
                 const alert: AlertItem = {
@@ -250,8 +263,8 @@ export const notificationService = {
                     message: `💊 ${fullName} มีนัด "${apt.title}" ${daysUntil === 0 ? 'วันนี้' : `ในอีก ${daysUntil} วัน`}${apt.location ? ` ที่ ${apt.location}` : ''}`,
                     emailSent,
                     smsSent,
-                    emailError: emailSent ? undefined : 'Failed to send',
-                    smsError: smsSent ? undefined : 'Failed to send',
+                    emailError,
+                    smsError,
                 };
 
                 await this.logAlert(alert, phoneToNotify);
@@ -310,14 +323,18 @@ export const notificationService = {
             console.log(`📅 Activity reminder: ${fullName} - ${activity.title}`);
 
             let emailSent = false, smsSent = false;
+            let emailError: string | undefined;
+            let smsError: string | undefined;
 
             if (adminEmail && emailService.isConfigured()) {
                 const result = await emailService.sendActivityReminder(fullName, activity.title, activity.time, adminEmail);
                 emailSent = result.success;
+                if (!result.success) emailError = result.error;
             }
             if (phoneToNotify && smsService.isConfigured()) {
                 const result = await smsService.sendActivityReminder(fullName, activity.title, activity.time, phoneToNotify);
                 smsSent = result.success;
+                if (!result.success) smsError = result.error;
             }
 
             const alert: AlertItem = {
@@ -327,8 +344,8 @@ export const notificationService = {
                 message: `📅 ${fullName} มีกิจกรรม "${activity.title}"${activity.time ? ` เวลา ${activity.time}` : ''} วันนี้`,
                 emailSent,
                 smsSent,
-                emailError: emailSent ? undefined : 'Failed to send',
-                smsError: smsSent ? undefined : 'Failed to send',
+                emailError,
+                smsError,
             };
 
             await this.logAlert(alert, phoneToNotify);
@@ -380,14 +397,18 @@ export const notificationService = {
                 console.log(`⚠️ Missing log: ${fullName} - no log for ${MISSING_LOG_THRESHOLD_DAYS}+ days`);
 
                 let emailSent = false, smsSent = false;
+                let emailError: string | undefined;
+                let smsError: string | undefined;
 
                 if (adminEmail && emailService.isConfigured()) {
                     const result = await emailService.sendMissingLogWarning(fullName, MISSING_LOG_THRESHOLD_DAYS, adminEmail);
                     emailSent = result.success;
+                    if (!result.success) emailError = result.error;
                 }
                 if (phoneToNotify && smsService.isConfigured()) {
                     const result = await smsService.sendMissingLogWarning(fullName, MISSING_LOG_THRESHOLD_DAYS, phoneToNotify);
                     smsSent = result.success;
+                    if (!result.success) smsError = result.error;
                 }
 
                 const alert: AlertItem = {
@@ -397,8 +418,8 @@ export const notificationService = {
                     message: `⚠️ ${fullName} ไม่มีการบันทึก DailyLog มากกว่า ${MISSING_LOG_THRESHOLD_DAYS} วัน`,
                     emailSent,
                     smsSent,
-                    emailError: emailSent ? undefined : 'Failed to send',
-                    smsError: smsSent ? undefined : 'Failed to send',
+                    emailError,
+                    smsError,
                 };
 
                 await this.logAlert(alert, phoneToNotify);
