@@ -131,48 +131,49 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </aside>
 
             {/* Main content */}
-            <div className="lg:pl-72 transition-all duration-300 relative">
-                {/* Background Image */}
-                <div className="fixed lg:left-72 inset-0 z-0 overflow-hidden pointer-events-none">
-                    <Image
-                        src="/images/backgroud2.png"
-                        alt="Dashboard Background"
-                        fill
-                        className="object-cover opacity-100"
-                        priority
-                    />
-                    <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px]" />
-                </div>
-
-                <div className="relative z-10">
-                    {/* Top bar */}
-                    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border supports-[backdrop-filter]:bg-background/60">
-                        <div className="flex items-center gap-4 px-4 py-3">
-                            <button
-                                className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg"
-                                onClick={() => setSidebarOpen(true)}
-                            >
-                                <Menu className="w-5 h-5" />
-                            </button>
-                            <div className="flex-1" />
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-muted-foreground bg-accent/50 px-3 py-1 rounded-full border border-border/50">
-                                    {new Date().toLocaleDateString('th-TH', {
-                                        weekday: 'long',
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                    })}
-                                </span>
-                            </div>
+            {/* Main content */}
+            <div className="lg:pl-72 transition-all duration-300 flex flex-col min-h-screen">
+                {/* Top bar */}
+                <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border supports-[backdrop-filter]:bg-background/60">
+                    <div className="flex items-center gap-4 px-4 py-3">
+                        <button
+                            className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg"
+                            onClick={() => setSidebarOpen(true)}
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+                        <div className="flex-1" />
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground bg-accent/50 px-3 py-1 rounded-full border border-border/50">
+                                {new Date().toLocaleDateString('th-TH', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                })}
+                            </span>
                         </div>
-                    </header>
+                    </div>
+                </header>
 
-                    {/* Page content */}
-                    <main className="p-4 lg:p-6 space-y-6">
+                {/* Page content */}
+                <main className="p-10 lg:p-6 space-y-6 flex-1 relative">
+                    {/* Background Image */}
+                    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                        <Image
+                            src="/images/backgroud2.png"
+                            alt="Dashboard Background"
+                            fill
+                            className="object-fill opacity-100"
+                            priority
+                        />
+                        <div className="absolute inset-0 bg-background/20" />
+                    </div>
+
+                    <div className="relative z-10">
                         {children}
-                    </main>
-                </div>
+                    </div>
+                </main>
             </div>
         </div>
     );
