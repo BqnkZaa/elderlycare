@@ -92,8 +92,13 @@ export const emailService = {
                     messageId: info.messageId,
                 };
             } catch (error) {
-                console.error(`📧 [EMAIL] SMTP failed, trying API fallback... Error:`, error);
-                // Fallthrough to API
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                console.error(`📧 [EMAIL] SMTP failed:`, error);
+                // Do not fallback to API if SMTP is configured but fails - we want to see the SMTP error
+                return {
+                    success: false,
+                    error: `SMTP Error: ${errorMessage}`,
+                };
             }
         }
 

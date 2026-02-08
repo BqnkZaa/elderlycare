@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -57,10 +58,16 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/20 rounded-full blur-[100px] animate-pulse" />
+            {/* Background Image */}
+            <div className="absolute inset-0 z-0">
+                <Image
+                    src="/images/backgroud1.PNG"
+                    alt="Background"
+                    fill
+                    className="object-cover opacity-100"
+                    priority
+                />
+                <div className="absolute inset-0 bg-background/10 " />
             </div>
 
             <Card className="w-full max-w-md relative backdrop-blur-md bg-card/40 border-border/50 shadow-2xl z-10">
@@ -69,11 +76,11 @@ export default function LoginPage() {
                         <Heart className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                            ระบบดูแลผู้สูงอายุ
+                        <CardTitle className="text-2xl font-bold text-[#00FFFF]">
+                            E.O.S. Platform
                         </CardTitle>
-                        <CardDescription className="text-muted-foreground mt-2">
-                            Elderly Care Management Platform
+                        <CardDescription className="text-[cyan] mt-2">
+                            Database Management System of "SAFETY"
                         </CardDescription>
                     </div>
                 </CardHeader>
@@ -123,24 +130,24 @@ export default function LoginPage() {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                                     </svg>
-                                    กำลังเข้าสู่ระบบ...
+                                    I'M LOGGING...
                                 </span>
                             ) : (
                                 <span className="flex items-center gap-2">
                                     <LogIn className="w-4 h-4" />
-                                    เข้าสู่ระบบ
+                                    LOGIN
                                 </span>
                             )}
                         </Button>
 
                         <p className="text-center text-xs text-muted-foreground mt-4">
-                            ค่าเริ่มต้น: admin@elderlycare.com / admin123
+                            Buildeing... "Your Ecosystem of Safety"
                         </p>
 
                         <div className="text-center text-sm mt-6">
-                            ยังไม่มีบัญชีผู้ใช้งาน?{' '}
+                            Don't have an account yet?{' '}
                             <Link href="/register/nurse" className="text-primary hover:underline font-medium">
-                                สมัครสมาชิก (สำหรับพยาบาล)
+                                Sign up (for nurses)
                             </Link>
                         </div>
                     </form>
