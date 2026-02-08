@@ -135,7 +135,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {/* Background Image */}
                 <div className="fixed lg:left-72 inset-0 z-0 overflow-hidden pointer-events-none">
                     <Image
-                        src="/images/backgroud2.jpg"
+                        src="/images/backgroud2.png"
                         alt="Dashboard Background"
                         fill
                         className="object-cover opacity-100"
