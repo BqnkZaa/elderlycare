@@ -7,6 +7,7 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
@@ -44,7 +45,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-screen bg-background text-foreground relative">
+
+
             {/* Mobile sidebar backdrop */}
             {sidebarOpen && (
                 <div
@@ -128,34 +131,48 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </aside>
 
             {/* Main content */}
-            <div className="lg:pl-72 transition-all duration-300">
-                {/* Top bar */}
-                <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border supports-[backdrop-filter]:bg-background/60">
-                    <div className="flex items-center gap-4 px-4 py-3">
-                        <button
-                            className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg"
-                            onClick={() => setSidebarOpen(true)}
-                        >
-                            <Menu className="w-5 h-5" />
-                        </button>
-                        <div className="flex-1" />
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground bg-accent/50 px-3 py-1 rounded-full border border-border/50">
-                                {new Date().toLocaleDateString('th-TH', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}
-                            </span>
-                        </div>
-                    </div>
-                </header>
+            <div className="lg:pl-72 transition-all duration-300 relative">
+                {/* Background Image */}
+                <div className="fixed lg:left-72 inset-0 z-0 overflow-hidden pointer-events-none">
+                    <Image
+                        src="/images/backgroud2.jpg"
+                        alt="Dashboard Background"
+                        fill
+                        className="object-cover opacity-100"
+                        priority
+                    />
+                    <div className="absolute inset-0 bg-background/70 backdrop-blur-[1px]" />
+                </div>
 
-                {/* Page content */}
-                <main className="p-4 lg:p-6 space-y-6">
-                    {children}
-                </main>
+                <div className="relative z-10">
+                    {/* Top bar */}
+                    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border supports-[backdrop-filter]:bg-background/60">
+                        <div className="flex items-center gap-4 px-4 py-3">
+                            <button
+                                className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg"
+                                onClick={() => setSidebarOpen(true)}
+                            >
+                                <Menu className="w-5 h-5" />
+                            </button>
+                            <div className="flex-1" />
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground bg-accent/50 px-3 py-1 rounded-full border border-border/50">
+                                    {new Date().toLocaleDateString('th-TH', {
+                                        weekday: 'long',
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                </span>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Page content */}
+                    <main className="p-4 lg:p-6 space-y-6">
+                        {children}
+                    </main>
+                </div>
             </div>
         </div>
     );
