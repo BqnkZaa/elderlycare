@@ -64,7 +64,7 @@ export default function LoginPage() {
                     src="/images/backgroud1.PNG"
                     alt="Background"
                     fill
-                    className="object-cover opacity-100 scale-170 translate-x-30"
+                    className="object-cover opacity-100 scale-170 translate-x-17"
                     priority
                 />
                 <div className="absolute inset-0 bg-background/10 " />
