@@ -59,12 +59,12 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
             {/* Background Image */}
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 overflow-hidden">
                 <Image
                     src="/images/backgroud1.PNG"
                     alt="Background"
                     fill
-                    className="object-cover opacity-100"
+                    className="object-cover opacity-100 scale-125"
                     priority
                 />
                 <div className="absolute inset-0 bg-background/10 " />
