@@ -141,7 +141,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         className="object-cover opacity-100"
                         priority
                     />
-                    <div className="absolute inset-0 bg-background/70 backdrop-blur-[1px]" />
+                    <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px]" />
                 </div>
 
                 <div className="relative z-10">
