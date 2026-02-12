@@ -1,104 +1,108 @@
 "use client";
 
-
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { NativeSelect as Select } from '@/components/ui/select';
-import { createInquiry, InquiryInput } from "@/actions/inquiry";
+import { Checkbox } from "@/components/ui/checkbox";
+import { createInquiry } from "@/actions/inquiry";
+import { publicAdmissionSchema, type PublicAdmissionInput } from "@/lib/validations";
+// import { PROVINCE_NAMES_TH } from "@/lib/provinces"; // Optional if needed
 
-// Course data
+// Course data & Videos (Keep unchanged)
 const courses = [
     {
         id: 1,
         title: "การเตรียมตัวผู้สูงอายุก่อนเข้าอยู่ศูนย์ดูแล",
         description: "เรียนรู้พื้นฐานการดูแลผู้สูงอายุ การวัดสัญญาณชีพ และการช่วยเหลือในกิจวัตรประจำวัน",
-        // duration: "40 ชั่วโมง",
         level: "เริ่มต้น",
     },
     {
         id: 2,
         title: "ตัวอย่างแฟ้มประวัติที่ผู้ดูแลต้องทราบ",
         description: "การดูแลผู้ป่วยที่ไม่สามารถเคลื่อนไหวได้ การป้องกันแผลกดทับ และเทคนิคการเคลื่อนย้าย",
-        // duration: "60 ชั่วโมง",
         level: "กลาง",
     },
     {
         id: 3,
         title: "รายละเอียดของการบริหารจัดการส่วนกลาง",
         description: "การวางแผนอาหาร โภชนาการเฉพาะโรค และการเตรียมอาหารที่เหมาะสมกับผู้สูงอายุ",
-        // duration: "30 ชั่วโมง",
         level: "ทุกระดับ",
     },
     {
         id: 4,
         title: "หุ่นยนต์เอไอบริหารจัดการ",
         description: "เทคนิคการออกกำลังกายสำหรับผู้สูงอายุ การฟื้นฟูสมรรถภาพ และการป้องกันการหกล้ม",
-        // duration: "50 ชั่วโมง",
         level: "กลาง",
     },
 ];
 
-// YouTube video placeholders
 const videos = [
     {
         id: 1,
         title: "แนะนำ The Safe Zone",
-        embedId: "UMesEytPSaE", // placeholder
+        embedId: "UMesEytPSaE",
     },
     {
         id: 2,
         title: "ทัวร์สถานที่ดูแลผู้สูงอายุ",
-        embedId: "dQw4w9WgXcQ", // placeholder
+        embedId: "dQw4w9WgXcQ",
     },
 ];
 
 export default function LandingBoard() {
-    const [inquiryForm, setInquiryForm] = useState<InquiryInput>({
-        name: "",
-        phone: "",
-        lineId: "",
-        elderlyName: "",
-        elderlyAge: undefined,
-        elderlyGender: "",
-        elderlyNeeds: "",
-        feedingMethod: "",
-        walkingAbility: "",
-        bathingAbility: "",
-        bedVacancyDate: undefined,
-        message: "",
-    });
     const [isPending, startTransition] = useTransition();
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-    const handleSubmitInquiry = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setMessage(null);
+    const {
+        register,
+        handleSubmit,
+        watch,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm<PublicAdmissionInput>({
+        resolver: zodResolver(publicAdmissionSchema) as any,
+        defaultValues: {
+            name: '', // Mandatory contact name
+            phone: '', // Mandatory contact phone
+            gender: 'MALE',
+            bloodType: 'UNKNOWN',
+            mobilityStatus: 'INDEPENDENT',
+            careLevel: 'LEVEL_1',
+            age: 0,
+            maritalStatus: 'SINGLE',
+            hearingStatus: 'NORMAL',
+            visionStatus: 'NORMAL',
+            speechStatus: 'CLEAR',
+            gaitStatus: 'INDEPENDENT',
+            bladderControl: 'CONTINENT',
+            bowelControl: 'NORMAL',
+            diaperType: 'NONE',
+            healthPrivilege: 'SELF_PAY',
+            goalOfCare: 'LONG_TERM_CARE',
+            // admissionDate: new Date(), // Not used in public form directly usually
+        },
+    });
 
+    const onSubmit = (data: PublicAdmissionInput) => {
+        setMessage(null);
         startTransition(async () => {
-            const result = await createInquiry(inquiryForm);
+            const result = await createInquiry(data);
             if (result.success) {
-                setMessage({ type: "success", text: "ส่งข้อมูลเรียบร้อยแล้ว เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุด" });
-                setInquiryForm({
-                    name: "",
-                    phone: "",
-                    lineId: "",
-                    elderlyName: "",
-                    elderlyAge: undefined,
-                    elderlyGender: "",
-                    elderlyNeeds: "",
-                    feedingMethod: "",
-                    walkingAbility: "",
-                    bathingAbility: "",
-                    bedVacancyDate: undefined,
-                    message: "",
-                });
+                setMessage({ type: "success", text: "บันทึกข้อมูลสำเร็จ! เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุด" });
+                reset();
+                // Optional: Scroll to message
+                const formElement = document.getElementById("registration-form");
+                if (formElement) formElement.scrollIntoView({ behavior: 'smooth' });
             } else {
-                setMessage({ type: "error", text: result.error || "เกิดข้อผิดพลาด" });
+                setMessage({ type: "error", text: result.error || "เกิดข้อผิดพลาดในการบันทึกข้อมูล" });
             }
         });
     };
@@ -111,22 +115,30 @@ export default function LandingBoard() {
                     <h1 className="text-2xl font-bold text-primary tracking-tighter hover:text-primary/80 transition-colors cursor-pointer">
                         -T-H-E-S-A-F-E-Z-O-N-E-
                     </h1>
-                    <Link href="/login">
-                        <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
-                            เข้าสู่ระบบ (พันธมิตรในเครือ)
-                        </Button>
-                    </Link>
+                    <div className="flex items-center gap-4">
+                        <Link href="#registration-form">
+                            <Button variant="default" className="bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-600/20">
+                                ลงทะเบียนผู้สูงอายุใหม่
+                            </Button>
+                        </Link>
+                        <Link href="/login">
+                            <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
+                                เข้าสู่ระบบ (พันธมิตรในเครือ)
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </header>
 
             <main className="flex-grow">
                 {/* Hero Section - Advertisement Image */}
-                <section className="relative w-full h-[300px] md:h-[600px] overflow-hidden">
+                <section className="relative w-full h-[650px] md:h-[650px] overflow-hidden">
                     <Image
-                        src="/images/banner.jpg"
+                        src="/images/banner1.jpg"
                         alt="The Safe Zone - Premium Elderly Care"
-                        fill
-                        className="object-cover"
+                        width={1920}
+                        height={600}
+                        className="w-full h-auto object-contain"
                         priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
@@ -273,7 +285,7 @@ export default function LandingBoard() {
                 </section>
 
                 {/* Application / Inquiry Section */}
-                <section className="container mx-auto px-4 py-24">
+                <section id="registration-form" className="container mx-auto px-4 py-24">
                     <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
                         สนใจพาผู้สูงอายุเข้า <span className="text-primary">โครงการ</span>
                     </h2>
@@ -286,194 +298,315 @@ export default function LandingBoard() {
                                 <CardDescription className="text-center">กรอกรายละเอียดเพื่อให้เจ้าหน้าที่ติดต่อกลับ</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form onSubmit={handleSubmitInquiry} className="space-y-6 max-w-4xl mx-auto">
-                                    {/* Section 1: Contact Info */}
+                                <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-4xl mx-auto">
+                                    {/* Section 1: Contact Info & Identification */}
                                     <div className="space-y-4">
-                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">1. ข้อมูลผู้ติดต่อ</h3>
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">1. ข้อมูลผู้ติดต่อ & ประวัติส่วนตัว</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-sm font-medium text-foreground mb-1">
                                                     ชื่อ-นามสกุล (ผู้ติดต่อ) <span className="text-red-500">*</span>
                                                 </label>
-                                                <Input
-                                                    value={inquiryForm.name}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })}
-                                                    placeholder="กรอกชื่อ-นามสกุลของคุณ"
-                                                    required
-                                                />
+                                                <Input {...register("name")} placeholder="ชื่อผู้ติดต่อหลัก (ลูก/หลาน)" />
+                                                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-foreground mb-1">
                                                     เบอร์โทรศัพท์ <span className="text-red-500">*</span>
                                                 </label>
-                                                <Input
-                                                    value={inquiryForm.phone}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, phone: e.target.value })}
-                                                    placeholder="0xx-xxx-xxxx"
-                                                    required
-                                                />
+                                                <Input {...register("phone")} placeholder="0xx-xxx-xxxx" />
+                                                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-foreground mb-1">
-                                                    Line ID
-                                                </label>
-                                                <Input
-                                                    value={inquiryForm.lineId}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, lineId: e.target.value })}
-                                                    placeholder="กรอก Line ID (ถ้ามี)"
-                                                />
+                                                <label className="block text-sm font-medium text-foreground mb-1">Line ID</label>
+                                                <Input {...register("lineId")} placeholder="Line ID (ถ้ามี)" />
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-4 border-t border-border/20"></div>
+                                        <h4 className="font-medium text-foreground">ข้อมูลผู้สูงอายุ</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">ชื่อจริง (ผู้สูงอายุ)</label>
+                                                <Input {...register("firstName")} placeholder="ชื่อจริง" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">นามสกุล</label>
+                                                <Input {...register("lastName")} placeholder="นามสกุล" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">ชื่อเล่น</label>
+                                                <Input {...register("nickname")} placeholder="ชื่อเล่น" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">อายุ (ปี)</label>
+                                                <Input type="number" {...register("age")} placeholder="ระบุอายุ" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">เพศ</label>
+                                                <Select {...register("gender")}>
+                                                    <option value="MALE">ชาย</option>
+                                                    <option value="FEMALE">หญิง</option>
+                                                    <option value="OTHER">อื่นๆ</option>
+                                                </Select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">วันเกิด</label>
+                                                <Input type="date" {...register("dateOfBirth")} className="block" />
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Section 2: Elderly Info */}
+                                    {/* Section 2: Marital & Status */}
                                     <div className="space-y-4">
-                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">2. ข้อมูลผู้สูงอายุ</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div className="md:col-span-2">
-                                                <label className="block text-sm font-medium text-foreground mb-1">
-                                                    ชื่อ-นามสกุล (ผู้สูงอายุ)
-                                                </label>
-                                                <Input
-                                                    value={inquiryForm.elderlyName}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, elderlyName: e.target.value })}
-                                                    placeholder="กรอกชื่อ-นามสกุลผู้สูงอายุ"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-foreground mb-1">
-                                                    อายุ (ปี)
-                                                </label>
-                                                <Input
-                                                    type="number"
-                                                    value={inquiryForm.elderlyAge || ""}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, elderlyAge: parseInt(e.target.value) || undefined })}
-                                                    placeholder="ระบุอายุ"
-                                                    min={50}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-foreground mb-1">
-                                                    เพศ
-                                                </label>
-                                                <Select
-                                                    value={inquiryForm.elderlyGender}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, elderlyGender: e.target.value })}
-                                                >
-                                                    <option value="">-- ระบุเพศ --</option>
-                                                    <option value="ชาย">ชาย</option>
-                                                    <option value="หญิง">หญิง</option>
-                                                </Select>
-                                            </div>
-                                        </div>
-
-                                        {/* New Fields: Feeding, Walking, Bathing */}
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-foreground mb-1">
-                                                    วิธีการทานอาหาร
-                                                </label>
-                                                <Select
-                                                    value={inquiryForm.feedingMethod}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, feedingMethod: e.target.value })}
-                                                >
-                                                    <option value="">-- โปรดระบุ --</option>
-                                                    <option value="ทานเองได้">ทานเองได้</option>
-                                                    <option value="ต้องป้อน">ต้องป้อน</option>
-                                                    <option value="สายยางจมูก">สายยางจมูก</option>
-                                                    <option value="สายยางหน้าท้อง">สายยางหน้าท้อง</option>
-                                                </Select>
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-foreground mb-1">
-                                                    กำลังในการเดิน
-                                                </label>
-                                                <Select
-                                                    value={inquiryForm.walkingAbility}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, walkingAbility: e.target.value })}
-                                                >
-                                                    <option value="">-- โปรดระบุ --</option>
-                                                    <option value="เดินได้เอง">เดินได้เอง</option>
-                                                    <option value="ใช้อุปกรณ์ช่วยเดิน">ใช้อุปกรณ์ช่วยเดิน</option>
-                                                    <option value="นั่งรถเข็น">นั่งรถเข็น</option>
-                                                    <option value="ผู้ป่วยติดเตียง">ผู้ป่วยติดเตียง</option>
-                                                </Select>
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-foreground mb-1">
-                                                    การอาบน้ำ
-                                                </label>
-                                                <Select
-                                                    value={inquiryForm.bathingAbility}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, bathingAbility: e.target.value })}
-                                                >
-                                                    <option value="">-- โปรดระบุ --</option>
-                                                    <option value="อาบเองได้">อาบเองได้</option>
-                                                    <option value="ต้องมีคนช่วย">ต้องมีคนช่วย</option>
-                                                    <option value="เช็ดตัวบนเตียง">เช็ดตัวบนเตียง</option>
-                                                </Select>
-                                            </div>
-                                        </div>
-
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">2. สถานภาพ & ผู้ดูแลหลัก</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-foreground mb-1">
-                                                    อาการในปัจจุบัน
-                                                </label>
-                                                <Textarea
-                                                    value={inquiryForm.elderlyNeeds}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, elderlyNeeds: e.target.value })}
-                                                    placeholder="ระบุอาการสำคัญ เช่น มีแผลกดทับ, ให้ออกซิเจน, เจาะคอ ฯลฯ"
-                                                    rows={3}
-                                                />
+                                                <label className="block text-sm font-medium text-foreground mb-1">สถานภาพ</label>
+                                                <Select {...register("maritalStatus")}>
+                                                    <option value="SINGLE">โสด</option>
+                                                    <option value="MARRIED">สมรส</option>
+                                                    <option value="WIDOWED">หม้าย</option>
+                                                    <option value="DIVORCED_SEPARATED">หย่าร้าง/แยกกันอยู่</option>
+                                                </Select>
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-foreground mb-1">
-                                                    วันที่ต้องการเช็คเตียงว่าง (โดยประมาณ)
-                                                </label>
-                                                <Input
-                                                    type="date"
-                                                    value={inquiryForm.bedVacancyDate ? new Date(inquiryForm.bedVacancyDate).toISOString().split('T')[0] : ""}
-                                                    onChange={(e) => setInquiryForm({ ...inquiryForm, bedVacancyDate: e.target.value ? new Date(e.target.value) : undefined })}
-                                                    className="h-[86px]" // Match height of Textarea rows=3 approx
-                                                />
+                                                <label className="block text-sm font-medium text-foreground mb-1">ผู้ประสานงานหลัก (ชื่อ-สกุล)</label>
+                                                <Input {...register("keyCoordinatorName")} placeholder="ชื่อผู้ประสานงานหลัก" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">เบอร์โทรศัพท์ผู้ประสานงาน</label>
+                                                <Input {...register("keyCoordinatorPhone")} placeholder="เบอร์โทรศัพท์" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">ความสัมพันธ์</label>
+                                                <Input {...register("keyCoordinatorRelation")} placeholder="เช่น บุตร, หลาน" />
                                             </div>
                                         </div>
-
                                     </div>
 
-                                    {/* Section 3: Message */}
+                                    {/* Section 3: Sensory */}
                                     <div className="space-y-4">
-                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">3. ข้อความเพิ่มเติม</h3>
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">3. การรับรู้และสื่อสาร</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">การได้ยิน (หู)</label>
+                                                <Select {...register("hearingStatus")}>
+                                                    <option value="NORMAL">ปกติ</option>
+                                                    <option value="HARD_OF_HEARING_LEFT">หูตึงข้างซ้าย</option>
+                                                    <option value="HARD_OF_HEARING_RIGHT">หูตึงข้างขวา</option>
+                                                    <option value="HARD_OF_HEARING_BOTH">หูตึงทั้ง 2 ข้าง</option>
+                                                    <option value="DEAF">หูหนวก</option>
+                                                    <option value="HEARING_AID">ใช้เครื่องช่วยฟัง</option>
+                                                </Select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">การมองเห็น (ตา)</label>
+                                                <Select {...register("visionStatus")}>
+                                                    <option value="NORMAL">ปกติ</option>
+                                                    <option value="NEARSIGHTED_FARSIGHTED">สั้น/ยาว</option>
+                                                    <option value="CATARACT_GLAUCOMA">ต้อกระจก/ต้อหิน</option>
+                                                    <option value="GLASSES">สวมแว่นตา</option>
+                                                    <option value="CONTACT_LENS">คอนแทคเลนส์</option>
+                                                </Select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">การสื่อสาร (ปาก)</label>
+                                                <Select {...register("speechStatus")}>
+                                                    <option value="CLEAR">ปกติ (พูดชัดเจน)</option>
+                                                    <option value="DYSARTHRIA">พูดไม่ชัด</option>
+                                                    <option value="APHASIA">พูดไม่ได้ (แต่ฟังรู้เรื่อง)</option>
+                                                    <option value="NON_VERBAL">สื่อสารไม่ได้</option>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section 4: Mobility */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">4. การเคลื่อนไหว (Mobility)</h3>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox
+                                                    id="historyOfFalls"
+                                                    onCheckedChange={(checked) => setValue("historyOfFalls", checked as boolean)}
+                                                />
+                                                <label htmlFor="historyOfFalls" className="text-sm font-medium text-foreground">
+                                                    เคยมีประวัติหกล้ม (History of falls)
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">ลักษณะการเดิน (Gait)</label>
+                                                <Select {...register("gaitStatus")}>
+                                                    <option value="INDEPENDENT">เดินเองได้ (Independent)</option>
+                                                    <option value="UNSTEADY">เดินเซ (Unsteady)</option>
+                                                    <option value="NEEDS_SUPPORT">ต้องพยุงเดิน (Needs support)</option>
+                                                    <option value="NON_AMBULATORY_BEDRIDDEN">เดินไม่ได้ / ติดเตียง</option>
+                                                </Select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">อุปกรณ์ช่วยเดิน</label>
+                                                <Input {...register("assistiveDevices")} placeholder="เช่น ไม้เท้า, Walker, Wheelchair" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section 5: Elimination */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">5. การขับถ่าย (Elimination)</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">การปัสสาวะ</label>
+                                                <Select {...register("bladderControl")}>
+                                                    <option value="CONTINENT">กลั้นได้ปกติ</option>
+                                                    <option value="OCCASIONAL_INCONTINENCE">กลั้นไม่ได้เป็นบางครั้ง</option>
+                                                    <option value="TOTAL_INCONTINENCE_FOLEY">กลั้นไม่ได้เลย / ใส่สายสวน</option>
+                                                </Select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">การอุจจาระ</label>
+                                                <Select {...register("bowelControl")}>
+                                                    <option value="NORMAL">ปกติ</option>
+                                                    <option value="CONSTIPATION">ท้องผูก</option>
+                                                    <option value="DIARRHEA">ท้องเสีย</option>
+                                                    <option value="INCONTINENCE">กลั้นไม่ได้</option>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section 6-7: Cognitive & Complaint */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">6. อาการสำคัญ & ภาวะสมอง</h3>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">อาการสำคัญที่นำมา (Chief Complaint)</label>
+                                                <Textarea {...register("reasonForAdmission")} placeholder="ทำไมถึงต้องการให้ศูนย์ดูแล?" />
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox
+                                                    id="hasConfusion"
+                                                    onCheckedChange={(checked) => setValue("hasConfusion", checked as boolean)}
+                                                />
+                                                <label htmlFor="hasConfusion" className="text-sm font-medium text-foreground">
+                                                    มีภาวะสับสน (Confusion)
+                                                </label>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">ความจำ / พฤติกรรม</label>
+                                                <Input {...register("behaviorStatus")} placeholder="เช่น หลงลืม, ก้าวร้าว, ซึมเศร้า" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section 8-9: Medical & Allergies */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">7. ประวัติการแพทย์ & การแพ้</h3>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">โรคประจำตัว</label>
+                                                <Textarea {...register("underlyingDiseases")} placeholder="ระบุโรคประจำตัวทั้งหมด" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">ยาที่ทานปัจจุบัน</label>
+                                                <Textarea {...register("currentMedications")} placeholder="ระบุยา หรือแนบรูปถ่ายภายหลัง" />
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Checkbox
+                                                            id="hasDrugAllergies"
+                                                            onCheckedChange={(checked) => setValue("hasDrugAllergies", checked as boolean)}
+                                                        />
+                                                        <label htmlFor="hasDrugAllergies" className="text-sm font-medium text-foreground">
+                                                            แพ้ยา
+                                                        </label>
+                                                    </div>
+                                                    <Input {...register("drugAllergiesDetail")} placeholder="ระบุชื่อยาที่แพ้" />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Checkbox
+                                                            id="hasFoodAllergies"
+                                                            onCheckedChange={(checked) => setValue("hasFoodChemicalAllergies", checked as boolean)}
+                                                        />
+                                                        <label htmlFor="hasFoodAllergies" className="text-sm font-medium text-foreground">
+                                                            แพ้อาหาร/สารเคมี
+                                                        </label>
+                                                    </div>
+                                                    <Input {...register("foodChemicalAllergiesDetail")} placeholder="ระบุสิ่งที่แพ้" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section 10: Physical */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">8. การดูแลทางกายภาพ & แผล</h3>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox
+                                                    id="hasPressureUlcer"
+                                                    onCheckedChange={(checked) => setValue("hasPressureUlcer", checked as boolean)}
+                                                />
+                                                <label htmlFor="hasPressureUlcer" className="text-sm font-medium text-foreground">
+                                                    มีแผลกดทับ (Pressure Ulcer)
+                                                </label>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <Input {...register("pressureUlcerLocation")} placeholder="ตำแหน่งแผล" />
+                                                <Input {...register("pressureUlcerStage")} placeholder="ระดับแผล (Stage)" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">อุปกรณ์การแพทย์ที่ติดตัว</label>
+                                                <Input {...register("medicalDevices")} placeholder="เช่น สายสวนปัสสาวะ, สายให้อาหาร" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section 12-13: Religion & Goals */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-primary border-b border-border/50 pb-2">9. ความเชื่อ & สิทธิ & เป้าหมาย</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">ศาสนา</label>
+                                                <Input {...register("religion")} placeholder="ระบุศาสนา" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">สิทธิการรักษา</label>
+                                                <Select {...register("healthPrivilege")}>
+                                                    <option value="SELF_PAY">ชำระเอง (Self-pay)</option>
+                                                    <option value="GOLD_CARD">บัตรทอง (Gold Card)</option>
+                                                    <option value="GOVERNMENT">เบิกราชการ (Gov)</option>
+                                                    <option value="INSURANCE">ประกันชีวิต (Insurance)</option>
+                                                    <option value="OTHER">อื่นๆ (Other)</option>
+                                                </Select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1">เป้าหมายการดูแล</label>
+                                                <Select {...register("goalOfCare")}>
+                                                    <option value="LONG_TERM_CARE">ดูแลระยะยาว (Long-term)</option>
+                                                    <option value="REHABILITATION">ฟื้นฟูสภาพ (Rehabilitation)</option>
+                                                    <option value="PALLIATIVE">ประคับประคอง (Palliative)</option>
+                                                </Select>
+                                            </div>
+                                        </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-foreground mb-1">
-                                                ข้อความถึงเจ้าหน้าที่
-                                            </label>
-                                            <Textarea
-                                                value={inquiryForm.message}
-                                                onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
-                                                placeholder="สอบถามข้อมูลเพิ่มเติม..."
-                                                rows={3}
-                                            />
+                                            <label className="block text-sm font-medium text-foreground mb-1">ความคาดหวัง / รายละเอียดเพิ่มเติม</label>
+                                            <Textarea {...register("expectationDetails")} placeholder="ความต้องการพิเศษอื่นๆ" />
                                         </div>
                                     </div>
 
                                     {message && (
-                                        <div
-                                            className={`p-3 rounded-lg text-sm ${message.type === "success"
-                                                ? "bg-green-500/20 text-green-400"
-                                                : "bg-red-500/20 text-red-400"
-                                                }`}
-                                        >
-                                            {message.text}
+                                        <div className={`p-4 rounded-lg text-sm flex items-center gap-2 ${message.type === "success" ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>
+                                            {message.type === "success" ? "✅" : "❌"} {message.text}
                                         </div>
                                     )}
-                                    <Button
-                                        type="submit"
-                                        className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
-                                        disabled={isPending}
-                                    >
-                                        {isPending ? "กำลังบันทึกข้อมูล..." : "บันทึกข้อมมูล"}
+
+                                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-lg py-6" disabled={isPending}>
+                                        {isPending ? "กำลังบันทึกข้อมูล..." : "ส่งแบบฟอร์มลงทะเบียน"}
                                     </Button>
                                 </form>
                             </CardContent>

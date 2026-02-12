@@ -146,6 +146,8 @@ enum HealthPrivilege {
   SOCIAL_SECURITY
   GOLD_CARD
   GOVERNMENT_OFFICER
+  INSURANCE
+  OTHER
 }
 
 enum GoalOfCare {
@@ -453,16 +455,98 @@ model Inquiry {
   lineId    String?  @db.VarChar(50)
   
   // Elderly Info
-  elderlyName   String?  @db.VarChar(100)
-  elderlyAge    Int?
-  elderlyGender String?  @db.VarChar(10) // Male, Female
-  elderlyNeeds  String?  @db.Text        // Condition description
+  // Section 1: Identification & Personal Background
+  firstName             String?   @db.VarChar(100)
+  lastName              String?   @db.VarChar(100)
+  nickname              String?  @db.VarChar(50)
+  age                   Int?
+  gender                Gender?  @default(MALE)
   
-  // New Fields
-  feedingMethod  String? @db.VarChar(50)
-  walkingAbility String? @db.VarChar(50)
-  bathingAbility String? @db.VarChar(50)
-  bedVacancyDate DateTime?
+  // Existing fields kept/deprecated
+  // elderlyName   String?  @db.VarChar(100) 
+  
+  preferredPronouns     String?  @db.VarChar(100)
+  education             String?  @db.VarChar(100)
+  proudFormerOccupation String?  @db.VarChar(200)
+  dateOfBirth           DateTime?
+
+  // Section 2: Marital Status & Contacts
+  maritalStatus         MaritalStatus @default(SINGLE)
+  keyCoordinatorName    String?   @db.VarChar(100)
+  keyCoordinatorPhone   String?   @db.VarChar(255)
+  keyCoordinatorRelation String?  @db.VarChar(100)
+  legalGuardianName     String?  @db.VarChar(100)
+  legalGuardianPhone    String?  @db.VarChar(255)
+  legalGuardianRelation String?  @db.VarChar(100)
+
+  // Section 3: Sensory & Communication
+  hearingStatus         HearingStatus @default(NORMAL)
+  visionStatus          VisionStatus  @default(NORMAL)
+  speechStatus          SpeechStatus  @default(CLEAR)
+
+  // Section 4: Mobility & Fall Risk
+  historyOfFalls        Boolean  @default(false)
+  fallsTimeframe        String?  @db.VarChar(50)
+  fallsCause            String?  @db.Text
+  gaitStatus            GaitStatus @default(INDEPENDENT)
+  assistiveDevices      String?  @db.Text
+  mobilityStatus        MobilityStatus @default(INDEPENDENT)
+
+  // Section 5: Elimination
+  bladderControl        BladderControl @default(CONTINENT)
+  foleySize             String?  @db.VarChar(10)
+  bowelControl          BowelControl @default(NORMAL)
+  diaperType            DiaperType @default(NONE)
+  diaperSize            String?  @db.VarChar(10)
+
+  // Section 6: Cognitive & Behavioral
+  hasConfusion          Boolean  @default(false)
+  confusionTimeframe    String?  @db.Text
+  memoryStatus          String?  @db.Text
+  behaviorStatus        String?  @db.Text
+
+  // Section 7: Chief Complaint
+  reasonForAdmission    String?   @db.Text
+  initialMentalState    String?  @db.Text
+
+  // Section 8: Medical History
+  underlyingDiseases    String?  @db.Text
+  currentMedications    String?  @db.Text
+  surgicalHistory       String?  @db.Text
+
+  // Section 9: Allergies
+  hasDrugAllergies      Boolean  @default(false)
+  drugAllergiesDetail   String?  @db.Text
+  hasFoodChemicalAllergies Boolean @default(false)
+  foodChemicalAllergiesDetail String? @db.Text
+
+  // Section 10: Physical & Medical Devices
+  skinCondition         String?  @db.Text
+  hasPressureUlcer      Boolean  @default(false)
+  pressureUlcerLocation String?  @db.VarChar(100)
+  pressureUlcerStage    String?  @db.VarChar(10)
+  medicalDevices        String?  @db.Text
+
+  // Section 11: Social Support & Financial
+  primaryCaregiverName  String?  @db.VarChar(100)
+  primaryCaregiverRelation String? @db.VarChar(100)
+  healthPrivilege       HealthPrivilege @default(SELF_PAY)
+  sponsor               String?  @db.VarChar(200)
+
+  // Section 12: Religion & Beliefs
+  religion              String?  @db.VarChar(100)
+  religiousRestrictions String?  @db.Text
+  spiritualNeeds        String?  @db.Text
+
+  // Section 13: Goals & Expectations
+  goalOfCare            GoalOfCare @default(LONG_TERM_CARE)
+  expectationDetails    String?  @db.Text
+  careLevel             CareLevel      @default(LEVEL_1)
+
+  // Section 14: Environment & Genogram
+  homeType              HomeType?
+  bedroomLocation       String?  @db.VarChar(50)
+  familyGenogram        String?  @db.Text
   
   message   String?  @db.Text
   status    String   @db.VarChar(20) @default("PENDING") // PENDING, CONTACTED

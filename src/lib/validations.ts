@@ -82,7 +82,7 @@ export const elderlyProfileSchema = z.object({
     // 11. Social
     primaryCaregiverName: z.string().optional(),
     primaryCaregiverRelation: z.string().optional(),
-    healthPrivilege: z.enum(["SELF_PAY", "SOCIAL_SECURITY", "GOLD_CARD", "GOVERNMENT_OFFICER"]),
+    healthPrivilege: z.enum(["SELF_PAY", "SOCIAL_SECURITY", "GOLD_CARD", "GOVERNMENT_OFFICER", "INSURANCE", "OTHER"]),
     sponsor: z.string().optional(),
 
     // 12. Religion
@@ -131,6 +131,24 @@ export const userSchema = z.object({
 });
 
 export type UserInput = z.infer<typeof userSchema>;
+
+export const publicAdmissionSchema = elderlyProfileSchema.omit({
+    safeId: true,
+    admissionDate: true,
+    admissionTime: true,
+    partnerId: true,
+    // careLevel: true, // Keep as optional/default
+    isActive: true,
+}).extend({
+    // Override/Add specific fields for public inquiry
+    name: z.string().min(1, "Contact name is required"), // Contact person name
+    phone: z.string().min(1, "Phone number is required"), // Contact person phone
+    lineId: z.string().optional(),
+    // Make these mandatory for public form if needed, or keep optional matching schema
+});
+
+export type PublicAdmissionInput = z.infer<typeof publicAdmissionSchema>;
+
 
 
 export const dailyLogSchema = z.object({

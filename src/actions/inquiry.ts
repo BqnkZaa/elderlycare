@@ -2,60 +2,115 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { PublicAdmissionInput } from "@/lib/validations";
 
-export interface InquiryInput {
-    // Contact Info
-    name: string;
-    phone: string;
-    lineId?: string;
-
-    // Elderly Info
-    elderlyName?: string;
-    elderlyAge?: number;
-    elderlyGender?: string;
-    elderlyNeeds?: string;
-
-    // New Fields
-    feedingMethod?: string;
-    walkingAbility?: string;
-    bathingAbility?: string;
-    bedVacancyDate?: Date;
-
-    // Message
-    message?: string;
-
-}
-
-export async function createInquiry(data: InquiryInput) {
+export async function createInquiry(data: PublicAdmissionInput) {
     try {
-        // Validate required fields
-        if (!data.name || data.name.trim().length === 0) {
-            return { success: false, error: "กรุณากรอกชื่อผู้ติดต่อ" };
-        }
-        if (!data.phone || data.phone.trim().length === 0) {
+        // Basic validation is handled by Zod on client, but good to be safe
+        if (!data.phone) {
             return { success: false, error: "กรุณากรอกเบอร์โทรศัพท์" };
         }
 
-        // Create inquiry
+        // Create inquiry with comprehensive data
         const inquiry = await prisma.inquiry.create({
             data: {
-                name: data.name.trim(),
-                phone: data.phone.trim(),
-                lineId: data.lineId ? data.lineId.trim() : null,
-                elderlyName: data.elderlyName ? data.elderlyName.trim() : null,
-                elderlyAge: data.elderlyAge,
-                elderlyGender: data.elderlyGender,
-                elderlyNeeds: data.elderlyNeeds ? data.elderlyNeeds.trim() : null,
-                feedingMethod: data.feedingMethod ? data.feedingMethod.trim() : null,
-                walkingAbility: data.walkingAbility ? data.walkingAbility.trim() : null,
-                bathingAbility: data.bathingAbility ? data.bathingAbility.trim() : null,
-                bedVacancyDate: data.bedVacancyDate,
-                message: data.message ? data.message.trim() : null,
+                // Contact Info
+                name: data.name,
+                phone: data.phone,
+                lineId: data.lineId,
+
+                // Section 1: Identification
+                firstName: data.firstName,
+                lastName: data.lastName,
+                nickname: data.nickname,
+                age: data.age,
+                gender: data.gender,
+                preferredPronouns: data.preferredPronouns,
+                education: data.education,
+                proudFormerOccupation: data.proudFormerOccupation,
+                dateOfBirth: data.dateOfBirth,
+
+                // Section 2: Marital
+                maritalStatus: data.maritalStatus,
+                keyCoordinatorName: data.keyCoordinatorName,
+                keyCoordinatorPhone: data.keyCoordinatorPhone,
+                keyCoordinatorRelation: data.keyCoordinatorRelation,
+                legalGuardianName: data.legalGuardianName,
+                legalGuardianPhone: data.legalGuardianPhone,
+                legalGuardianRelation: data.legalGuardianRelation,
+
+                // Section 3: Sensory
+                hearingStatus: data.hearingStatus,
+                visionStatus: data.visionStatus,
+                speechStatus: data.speechStatus,
+
+                // Section 4: Mobility
+                historyOfFalls: data.historyOfFalls,
+                fallsTimeframe: data.fallsTimeframe,
+                fallsCause: data.fallsCause,
+                gaitStatus: data.gaitStatus,
+                assistiveDevices: data.assistiveDevices, // JSON string or text
+
+                // Section 5: Elimination
+                bladderControl: data.bladderControl,
+                foleySize: data.foleySize,
+                bowelControl: data.bowelControl,
+                diaperType: data.diaperType,
+                diaperSize: data.diaperSize,
+
+                // Section 6: Cognitive
+                hasConfusion: data.hasConfusion,
+                confusionTimeframe: data.confusionTimeframe,
+                memoryStatus: data.memoryStatus, // JSON/Text
+                behaviorStatus: data.behaviorStatus, // JSON/Text
+
+                // Section 7: Chief Complaint
+                reasonForAdmission: data.reasonForAdmission,
+                initialMentalState: data.initialMentalState,
+
+                // Section 8: Medical History
+                underlyingDiseases: data.underlyingDiseases,
+                currentMedications: data.currentMedications,
+                surgicalHistory: data.surgicalHistory,
+
+                // Section 9: Allergies
+                hasDrugAllergies: data.hasDrugAllergies,
+                drugAllergiesDetail: data.drugAllergiesDetail,
+                hasFoodChemicalAllergies: data.hasFoodChemicalAllergies,
+                foodChemicalAllergiesDetail: data.foodChemicalAllergiesDetail,
+
+                // Section 10: Physical
+                skinCondition: data.skinCondition,
+                hasPressureUlcer: data.hasPressureUlcer,
+                pressureUlcerLocation: data.pressureUlcerLocation,
+                pressureUlcerStage: data.pressureUlcerStage,
+                medicalDevices: data.medicalDevices,
+
+                // Section 11: Social
+                primaryCaregiverName: data.primaryCaregiverName,
+                primaryCaregiverRelation: data.primaryCaregiverRelation,
+                healthPrivilege: data.healthPrivilege,
+                sponsor: data.sponsor,
+
+                // Section 12: Religion
+                religion: data.religion,
+                spiritualNeeds: data.spiritualNeeds,
+                religiousRestrictions: data.religiousRestrictions,
+
+                // Section 13: Goals
+                goalOfCare: data.goalOfCare,
+                expectationDetails: data.expectationDetails,
+
+                // Section 14: Environment
+                homeType: data.homeType as any, // Cast if enum mismatch or ensure enum matches
+                bedroomLocation: data.bedroomLocation,
+                familyGenogram: data.familyGenogram,
+
                 status: "PENDING",
             },
         });
 
-        // Revalidate landing page (though not strictly necessary as this doesn't show up there immediately)
+        // Revalidate landing page
         revalidatePath("/");
 
         return { success: true, inquiry };
