@@ -121,7 +121,7 @@ export default function LandingBoard() {
 
             <main className="flex-grow">
                 {/* Hero Section - Advertisement Image */}
-                <section className="relative w-full h-[300px] md:h-[700px] overflow-hidden">
+                <section className="relative w-full h-[300px] md:h-[600px] overflow-hidden">
                     <Image
                         src="/images/banner.jpg"
                         alt="The Safe Zone - Premium Elderly Care"
