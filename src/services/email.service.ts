@@ -93,12 +93,8 @@ export const emailService = {
                 };
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                console.error(`📧 [EMAIL] SMTP failed:`, error);
-                // Do not fallback to API if SMTP is configured but fails - we want to see the SMTP error
-                return {
-                    success: false,
-                    error: `SMTP Error: ${errorMessage}`,
-                };
+                console.error(`📧 [EMAIL] SMTP failed, falling back to API:`, errorMessage);
+                // Fall through to API fallback below
             }
         }
 
@@ -120,25 +116,27 @@ export const emailService = {
                 console.warn('📧 [EMAIL] No EMAIL_TEMPLATE_ID configured. API send likely to fail.');
             }
 
-            const recipients = Array.isArray(options.to)
-                ? options.to.map(email => ({ email: email.trim() }))
-                : [{ email: options.to.trim() }];
+            const recipientEmails = Array.isArray(options.to)
+                ? options.to.map(e => e.trim())
+                : [options.to.trim()];
 
             const url = 'https://email-api.thaibulksms.com/email/v1/send_template';
 
             const body = {
-                template_uuid: templateId || 'default-template-uuid',
+                template_uuid: templateId,
                 subject: options.subject,
                 mail_from: {
                     name: fromName,
                     email: fromAddress
                 },
-                mail_to: recipients,
+                mail_to: recipientEmails.map(email => ({ email })),
                 payload: {
                     message: options.html || options.text,
                     title: options.subject
                 }
             };
+
+            console.log(`📧 [EMAIL] API Request body:`, JSON.stringify(body, null, 2));
 
             const response = await fetch(url, {
                 method: 'POST',

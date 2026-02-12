@@ -68,7 +68,7 @@ export const smsService = {
         try {
             const apiKey = process.env.SMS_API_KEY!;
             const apiSecret = process.env.SMS_API_SECRET!;
-            const sender = process.env.SMS_SENDER || 'ELDERCARE';
+            const sender = process.env.SMS_SENDER || '';
 
             // Format phone numbers
             const phoneNumbers = Array.isArray(options.to)
@@ -77,37 +77,49 @@ export const smsService = {
 
             // ThaiBulkSMS API endpoint
             const url = 'https://api-v2.thaibulksms.com/sms';
+            const authHeader = `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`;
 
-            // Format body as x-www-form-urlencoded
-            const body = new URLSearchParams();
-            phoneNumbers.forEach(p => body.append('msisdn', p));
-            body.append('message', options.message);
-            body.append('message', options.message);
-            body.append('sender', sender);
+            // Try with sender first, then without if sender not found
+            const attempts = sender ? [sender, ''] : [''];
 
-            // Using node-fetch
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`,
-                },
-                body: body,
-            });
+            for (const currentSender of attempts) {
+                const body = new URLSearchParams();
+                phoneNumbers.forEach(p => body.append('msisdn', p));
+                body.append('message', options.message);
+                body.append('force', 'premium'); // Use corporate credits
+                if (currentSender) {
+                    body.append('sender', currentSender);
+                }
 
-            const data = await response.json();
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': authHeader,
+                    },
+                    body: body,
+                });
 
-            if (!response.ok) {
-                // Return full error object for debugging
-                const errorMsg = JSON.stringify(data);
-                throw new Error(errorMsg);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    const errorData = data as any;
+                    // If sender not found and we have more attempts, try next
+                    if (errorData?.error?.code === 111 && currentSender && attempts.indexOf(currentSender) < attempts.length - 1) {
+                        console.warn(`📱 [SMS] Sender "${currentSender}" not found, retrying without sender...`);
+                        continue;
+                    }
+                    throw new Error(JSON.stringify(data));
+                }
+
+                console.log(`📱 [SMS] Sent successfully to ${phoneNumbers.length} recipient(s)${currentSender ? ` (sender: ${currentSender})` : ' (default sender)'}`);
+                return {
+                    success: true,
+                    creditUsed: (data as any).credit_used || phoneNumbers.length * 0.5,
+                };
             }
 
-            console.log(`📱 [SMS] Sent successfully to ${phoneNumbers.length} recipient(s)`);
-            return {
-                success: true,
-                creditUsed: (data as any).credit_used || phoneNumbers.length * 0.5,
-            };
+            throw new Error('All send attempts failed');
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             console.error(`📱 [SMS] Failed to send: ${errorMessage}`);

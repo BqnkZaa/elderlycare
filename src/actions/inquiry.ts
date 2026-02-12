@@ -15,8 +15,15 @@ export interface InquiryInput {
     elderlyGender?: string;
     elderlyNeeds?: string;
 
+    // New Fields
+    feedingMethod?: string;
+    walkingAbility?: string;
+    bathingAbility?: string;
+    bedVacancyDate?: Date;
+
     // Message
     message?: string;
+
 }
 
 export async function createInquiry(data: InquiryInput) {
@@ -39,6 +46,10 @@ export async function createInquiry(data: InquiryInput) {
                 elderlyAge: data.elderlyAge,
                 elderlyGender: data.elderlyGender,
                 elderlyNeeds: data.elderlyNeeds ? data.elderlyNeeds.trim() : null,
+                feedingMethod: data.feedingMethod ? data.feedingMethod.trim() : null,
+                walkingAbility: data.walkingAbility ? data.walkingAbility.trim() : null,
+                bathingAbility: data.bathingAbility ? data.bathingAbility.trim() : null,
+                bedVacancyDate: data.bedVacancyDate,
                 message: data.message ? data.message.trim() : null,
                 status: "PENDING",
             },

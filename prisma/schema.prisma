@@ -458,6 +458,12 @@ model Inquiry {
   elderlyGender String?  @db.VarChar(10) // Male, Female
   elderlyNeeds  String?  @db.Text        // Condition description
   
+  // New Fields
+  feedingMethod  String? @db.VarChar(50)
+  walkingAbility String? @db.VarChar(50)
+  bathingAbility String? @db.VarChar(50)
+  bedVacancyDate DateTime?
+  
   message   String?  @db.Text
   status    String   @db.VarChar(20) @default("PENDING") // PENDING, CONTACTED
   createdAt DateTime @default(now())
