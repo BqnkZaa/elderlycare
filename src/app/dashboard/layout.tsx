@@ -6,7 +6,7 @@
 
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -43,6 +43,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const pathname = usePathname();
     const { data: session } = useSession();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [time, setTime] = useState(new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTime(new Date());
+        }, 1000);
+
+        return () => {
+            clearInterval(timer);
+        };
+    }, []);
 
     return (
         <div className="min-h-screen bg-background text-foreground relative">
@@ -150,6 +161,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     year: 'numeric',
                                     month: 'long',
                                     day: 'numeric',
+                                })} {' '}
+                                {time.toLocaleTimeString('th-TH', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit',
                                 })}
                             </span>
                         </div>
@@ -159,16 +175,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {/* Page content */}
                 <main className="p-10 lg:p-6 space-y-6 flex-1 relative">
                     {/* Background Image */}
-                    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                        <Image
-                            src="/images/backgroud2.png"
-                            alt="Dashboard Background"
-                            fill
-                            className="object-fill opacity-100"
-                            priority
-                        />
-                        <div className="absolute inset-0 bg-background/20" />
-                    </div>
+                    {pathname !== '/dashboard/elderly/new' && (
+                        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                            <Image
+                                src="/images/backgroud2.png"
+                                alt="Dashboard Background"
+                                fill
+                                className="object-fill opacity-100"
+                                priority
+                            />
+                            <div className="absolute inset-0 bg-background/20" />
+                        </div>
+                    )}
 
                     <div className="relative z-10">
                         {children}

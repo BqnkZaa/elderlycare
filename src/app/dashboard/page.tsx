@@ -35,7 +35,7 @@ export default async function DashboardPage() {
                 <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">
-                            ผู้สูงอายุทั้งหมด
+                            ผู้สูงอายุทั้งหมดที่เคยเข้าพักในโครงการ
                         </CardTitle>
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
@@ -52,7 +52,7 @@ export default async function DashboardPage() {
                 <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">
-                            ที่ยังอยู่ในความดูแล (Active)
+                            ผู้สูงอายุที่พักอยู่ในตอนนี้ (Active)
                         </CardTitle>
                         <Activity className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
@@ -70,16 +70,16 @@ export default async function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
-                        <CardTitle className="text-foreground">เมนูลัด (Quick Actions)</CardTitle>
+                        <CardTitle className="text-foreground">บันทึกเร่งด่วน (Quick Actions)</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-2 gap-4">
                         <Link href="/dashboard/elderly" className="block p-4 border border-border rounded-lg hover:bg-accent transition-colors text-center group">
                             <Users className="w-8 h-8 mx-auto mb-2 text-primary group-hover:scale-110 transition-transform" />
-                            <span className="font-medium text-sm text-foreground">รายชื่อผู้สูงอายุ</span>
+                            <span className="font-medium text-sm text-foreground">รายชื่อผู้สูงอายุทั้งหมด</span>
                         </Link>
                         <Link href="/dashboard/elderly/new" className="block p-4 border border-border rounded-lg hover:bg-accent transition-colors text-center group">
                             <Activity className="w-8 h-8 mx-auto mb-2 text-secondary group-hover:scale-110 transition-transform" />
-                            <span className="font-medium text-sm text-foreground">เพิ่มข้อมูลใหม่</span>
+                            <span className="font-medium text-sm text-foreground">เพิ่มข้อมูลรายละเอียดเพิ่มในปัจจุบัน</span>
                         </Link>
                     </CardContent>
                 </Card>
