@@ -121,9 +121,9 @@ export default function LandingBoard() {
 
             <main className="flex-grow">
                 {/* Hero Section - Advertisement Image */}
-                <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
+                <section className="relative w-full h-[300px] md:h-[470px] overflow-hidden">
                     <Image
-                        src="/images/ad-banner.png"
+                        src="/images/banner.jpg"
                         alt="The Safe Zone - Premium Elderly Care"
                         fill
                         className="object-cover"
@@ -132,10 +132,10 @@ export default function LandingBoard() {
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                     <div className="absolute bottom-8 left-0 right-0 text-center px-4">
                         <h2 className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
-                            รับดูแลผู้สูงอายุเดือนละ 12,500 บาท
+                            รับดูแลผู้สูงอายุ 12,500 บาท / เดือน
                         </h2>
-                        <p className="text-lg md:text-xl text-white/90 drop-shadow-md max-w-2xl mx-auto">
-                            โครงการพื้นที่ปลิดภัยเดอะเซฟโซน / พันธมิตรในเครือ 300 ศูนย์ทั่วกรุงเทพและปรืมณฑล (ขึ้นมะเบียนถูกต้อง 100%)
+                        <p className="text-lg md:text-l text-white/90 drop-shadow-md max-w-2xl mx-auto">
+                            โครงการพื้นที่ปลิดภัยเดอะเซฟโซน / พันธมิตรในเครือ 300 ศูนย์ทั่วกรุงเทพและปริมณฑล
                         </p>
                     </div>
                 </section>
@@ -192,7 +192,7 @@ export default function LandingBoard() {
                         <Card className="bg-card/50 border-border/50 backdrop-blur-sm overflow-hidden group hover:bg-card/80 transition-all">
                             <div className="relative h-[300px] overflow-hidden">
                                 <Image
-                                    src="/images/brochure.png"
+                                    src="/images/brochure1.jpg"
                                     alt="โบรชัวร์ The Safe Zone"
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
