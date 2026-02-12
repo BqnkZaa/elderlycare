@@ -217,9 +217,11 @@ export default function LandingBoard() {
                                 <p className="text-muted-foreground mb-4">
                                     คู่มือเช็คลิสศูนย์ดูแลที่ท่านอยู่และแนวทางการหาศูนย์ดูแลที่มีมาตรฐาน
                                 </p>
-                                <Button className="w-full bg-primary hover:bg-primary/90">
-                                    ดาวน์โหลด..... (ฟรี)
-                                </Button>
+                                <a href="/brochure.pdf" download="brochure.pdf" className="w-full">
+                                    <Button className="w-full bg-primary hover:bg-primary/90">
+                                        ดาวน์โหลด..... (ฟรี)
+                                    </Button>
+                                </a>
                             </CardContent>
                         </Card>
                     </div>
