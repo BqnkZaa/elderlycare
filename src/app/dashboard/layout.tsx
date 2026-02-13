@@ -43,9 +43,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const pathname = usePathname();
     const { data: session } = useSession();
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [time, setTime] = useState(new Date());
+    const [time, setTime] = useState<Date | null>(null);
 
     useEffect(() => {
+        setTime(new Date());
         const timer = setInterval(() => {
             setTime(new Date());
         }, 1000);
@@ -155,18 +156,22 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         </button>
                         <div className="flex-1" />
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground bg-accent/50 px-3 py-1 rounded-full border border-border/50">
-                                {new Date().toLocaleDateString('th-TH', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })} {' '}
-                                {time.toLocaleTimeString('th-TH', {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    second: '2-digit',
-                                })}
+                            <span className="text-sm text-muted-foreground bg-accent/50 px-3 py-1 rounded-full border border-border/50 min-h-[32px] min-w-[200px] inline-flex items-center justify-center">
+                                {time && (
+                                    <>
+                                        {time.toLocaleDateString('th-TH', {
+                                            weekday: 'long',
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })} {' '}
+                                        {time.toLocaleTimeString('th-TH', {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            second: '2-digit',
+                                        })}
+                                    </>
+                                )}
                             </span>
                         </div>
                     </div>
@@ -176,12 +181,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <main className="p-10 lg:p-6 space-y-6 flex-1 relative">
                     {/* Background Image */}
                     {pathname !== '/dashboard/elderly/new' && (
-                        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                        <div className="fixed inset-0 z-0 lg:left-72 pointer-events-none">
                             <Image
-                                src="/images/backgroud2.png"
+                                src="/images/backgroud3.png"
                                 alt="Dashboard Background"
                                 fill
-                                className="object-fill opacity-100"
+                                className="object-cover opacity-100"
                                 priority
                             />
                             <div className="absolute inset-0 bg-background/20" />

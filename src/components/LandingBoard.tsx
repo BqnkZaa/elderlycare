@@ -152,78 +152,111 @@ export default function LandingBoard() {
                     </div>
                 </section>
 
-                {/* Details & Brochure Section */}
-                <section className="container mx-auto px-4 py-32">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-6">
-                            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                                เครือข่ายศูนย์พันธมิตรในเครือฯ <span className="text-primary">300</span> กิจการทั่วกรุงเทพและปริมณฑล
-                            </h2>
-                            <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
-                                <p>
-                                    การบริการด้วยความเท่าเทียมคือพื้นฐานในหัวใจของผู้ดูแล คุณค่าของความทรงจำสิ่งคือสิ่งที่เราให้ความสำคัญกับผู้สูงวัย ทุกท่าน การใช้ชีวิตที่ผ่านวันเวลามาร่วม 70-80 ปี ทุกท่านได้เก็บเกี่ยวเรื่องราวเฉพาะตนเองมามากมาย วันนี้เหมือนเรามากลับเข้าสู่โรงเรียนอนุบาลวัยเกษียณอีกครั้ง......</p>
-                                <p className="text-primary">“บันทึกไว้ในใจ” (ข้อมูลสำคัญที่ท่านต้องจัดเตรียม)</p>
-                            </div>
-                            <ul className="grid grid-cols-2 gap-4 text-foreground">
-                                <li className="flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-primary rounded-full" />
-                                    ชื่อน่ารัก ชื่อตะมุตะมิ ที่เอาไว้เรียกท่าน
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-secondary rounded-full" />
-                                    โรคประจำตัว/ภาวะ/อาการ ในปัจจุบัน (ดูจากยาคุณหมอในปัจจุบัน)
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-primary rounded-full" />
-                                    ยาที่ท่านแพ้ หรือ การหยุดยา
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-secondary rounded-full" />
-                                    ในอดีตมีไม่ได้ไปพบคุณหมอตามนัดบ้างไหม
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-primary rounded-full" />
-                                    อาการสับสนหรือมึนงง
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-secondary rounded-full" />
-                                    กำลังในการช่วยเหลือตัวเองในตอนนี้
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-primary rounded-full" />
-                                    มีสิ่งใดบ้างที่ท่านโปรดมากที่สุด
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-secondary rounded-full" />
-                                    สิ่งใดบางที่ท่านไม่โปรดปรานเลยแม้แต่น้อย
-                                </li>
-                            </ul>
+                {/* Network Partners Section */}
+                <section className="container mx-auto px-4 py-16 md:py-24">
+                    <div className="max-w-5xl mx-auto space-y-6">
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                            เครือข่ายศูนย์พันธมิตรในเครือฯ <span className="text-primary">300</span> กิจการทั่วกรุงเทพและปริมณฑล
+                        </h2>
+                        <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
+                            <p>
+                                การบริการด้วยความเท่าเทียมคือพื้นฐานในหัวใจของผู้ดูแล คุณค่าของความทรงจำสิ่งคือสิ่งที่เราให้ความสำคัญกับผู้สูงวัย ทุกท่าน การใช้ชีวิตที่ผ่านวันเวลามาร่วม 70-80 ปี ทุกท่านได้เก็บเกี่ยวเรื่องราวเฉพาะตนเองมามากมาย วันนี้เหมือนเรามากลับเข้าสู่โรงเรียนอนุบาลวัยเกษียณอีกครั้ง......</p>
+                            <p className="text-primary">“บันทึกไว้ในใจ” (ข้อมูลสำคัญที่ท่านต้องจัดเตรียม)</p>
                         </div>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-foreground text-lg">
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-primary rounded-full" />
+                                ชื่อน่ารัก ชื่อตะมุตะมิ ที่เอาไว้เรียกท่าน
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-secondary rounded-full" />
+                                โรคประจำตัว/ภาวะ/อาการ ในปัจจุบัน (ดูจากยาคุณหมอในปัจจุบัน)
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-primary rounded-full" />
+                                ยาที่ท่านแพ้ หรือ การหยุดยา
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-secondary rounded-full" />
+                                ในอดีตมีไม่ได้ไปพบคุณหมอตามนัดบ้างไหม
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-primary rounded-full" />
+                                อาการสับสนหรือมึนงง
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-secondary rounded-full" />
+                                กำลังในการช่วยเหลือตัวเองในตอนนี้
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-primary rounded-full" />
+                                มีสิ่งใดบ้างที่ท่านโปรดมากที่สุด
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-secondary rounded-full" />
+                                สิ่งใดบางที่ท่านไม่โปรดปรานเลยแม้แต่น้อย
+                            </li>
+                        </ul>
+                    </div>
+                </section>
 
-                        {/* Brochure Card */}
-                        <Card className="bg-card/50 border-border/50 backdrop-blur-sm overflow-hidden group hover:bg-card/80 transition-all">
-                            <div className="relative h-[300px] overflow-hidden">
-                                <Image
-                                    src="/images/brochure1.jpg"
-                                    alt="โบรชัวร์ The Safe Zone"
-                                    fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
+                {/* Brochure Section */}
+                <section className="container mx-auto px-4 py-24">
+                    <div className="max-w-6xl mx-auto">
+                        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-card to-background border border-border/50 shadow-2xl p-8 md:p-12">
+                            {/* Decorative background elements */}
+                            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
+                            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-secondary/10 rounded-full blur-3xl" />
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
+                                {/* Image Container */}
+                                <div className="relative group perspective-1000">
+                                    <div className="relative h-[400px] md:h-[500px] w-full transform transition-transform duration-500 group-hover:scale-[1.02] group-hover:rotate-1">
+                                        <div className="absolute inset-0 bg-black/20 translate-x-4 translate-y-4 rounded-xl blur-sm" />
+                                        <Image
+                                            src="/images/brochure1.jpg"
+                                            alt="โบรชัวร์ The Safe Zone"
+                                            fill
+                                            className="object-cover rounded-xl shadow-xl border border-white/10"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Content Container */}
+                                <div className="space-y-8 text-center md:text-left">
+                                    <div className="space-y-4">
+                                        <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary font-medium text-sm">
+                                            แจกฟรี! ไม่มีค่าใช้จ่าย
+                                        </div>
+                                        <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
+                                            E-Book 10 แนวทางการเลือกศูนย์ดูแลที่คุณรัก
+                                        </h3>
+                                        <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                                            คู่มือเช็คลิสต์ที่คุณต้องมีก่อนตัดสินใจเลือกศูนย์ดูแล รวบรวมมาตรฐานที่สำคัญและข้อควรระวัง เพื่อความอุ่นใจและคุณภาพชีวิตที่ดีที่สุดของคนที่คุณรัก
+                                        </p>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                                        <a href="/brochure.pdf" download="brochure.pdf" className="w-full sm:w-auto">
+                                            <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-lg bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all rounded-xl">
+                                                <span className="mr-2">📥</span> ดาวน์โหลด E-Book ฟรี
+                                            </Button>
+                                        </a>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-6 pt-6 border-t border-border/50">
+                                        <div>
+                                            <p className="text-3xl font-bold text-primary">10+</p>
+                                            <p className="text-sm text-muted-foreground">เช็คลิสต์มาตรฐาน</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-3xl font-bold text-secondary">100%</p>
+                                            <p className="text-sm text-muted-foreground">อ่านเข้าใจง่าย</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <CardContent className="p-6">
-                                <h3 className="text-xl font-semibold text-foreground mb-2">
-                                    E-Book 10 แนวทางการเลือกศูนย์ดูแลที่คุณรัก.....
-                                </h3>
-                                <p className="text-muted-foreground mb-4">
-                                    คู่มือเช็คลิสศูนย์ดูแลที่ท่านอยู่และแนวทางการหาศูนย์ดูแลที่มีมาตรฐาน
-                                </p>
-                                <a href="/brochure.pdf" download="brochure.pdf" className="w-full">
-                                    <Button className="w-full bg-primary hover:bg-primary/90">
-                                        ดาวน์โหลด..... (ฟรี)
-                                    </Button>
-                                </a>
-                            </CardContent>
-                        </Card>
+                        </div>
                     </div>
                 </section>
 
