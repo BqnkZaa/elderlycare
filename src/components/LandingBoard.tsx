@@ -15,6 +15,14 @@ import { createInquiry } from "@/actions/inquiry";
 import { publicAdmissionSchema, type PublicAdmissionInput } from "@/lib/validations";
 // import { PROVINCE_NAMES_TH } from "@/lib/provinces"; // Optional if needed
 
+import { UserPlus, LogIn, Menu } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 // Course data & Videos (Keep unchanged)
 const courses = [
     {
@@ -107,25 +115,69 @@ export default function LandingBoard() {
         });
     };
 
+
+
     return (
-        <div className="min-h-screen bg-background flex flex-col text-foreground">
+        <div className="min-h-screen bg-background flex flex-col text-foreground font-sans">
             {/* Navbar */}
-            <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container mx-auto px-4 flex justify-between items-center h-16">
-                    <h1 className="text-2xl font-bold text-primary tracking-tighter hover:text-primary/80 transition-colors cursor-pointer">
-                        -T-H-E-S-A-F-E-Z-O-N-E-
-                    </h1>
-                    <div className="flex items-center gap-4">
+            <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm transition-all duration-300">
+                <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center h-20">
+                    {/* Logo */}
+                    <Link href="/" className="group">
+                        <h1 className="text-2xl md:text-3xl font-extrabold tracking-widest transition-all duration-300 transform group-hover:scale-105">
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-blue-600">
+                                THE SAFE ZONE
+                            </span>
+                        </h1>
+                    </Link>
+
+                    {/* Desktop Menu */}
+                    <div className="hidden md:flex items-center gap-4">
                         <Link href="#registration-form">
-                            <Button variant="default" className="bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-600/20">
+                            <Button
+                                variant="default"
+                                size="lg"
+                                className="rounded-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-all duration-300 border-0 px-6"
+                            >
+                                <UserPlus className="w-5 h-5 mr-2" />
                                 ลงทะเบียนผู้สูงอายุใหม่
                             </Button>
                         </Link>
                         <Link href="/login">
-                            <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
-                                เข้าสู่ระบบ (พันธมิตรในเครือ)
+                            <Button
+                                variant="outline"
+                                size="lg"
+                                className="rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white shadow-lg shadow-primary/10 hover:shadow-primary/30 transition-all duration-300 px-6"
+                            >
+                                <LogIn className="w-5 h-5 mr-2" />
+                                เข้าสู่ระบบ
                             </Button>
                         </Link>
+                    </div>
+
+                    {/* Mobile Menu */}
+                    <div className="md:hidden">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                                    <Menu className="w-6 h-6 text-foreground" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl backdrop-blur-xl bg-background/95 border-primary/20">
+                                <DropdownMenuItem asChild>
+                                    <Link href="#registration-form" className="flex items-center gap-2 cursor-pointer p-3 text-red-600 font-medium hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg">
+                                        <UserPlus className="w-4 h-4" />
+                                        ลงทะเบียนผู้สูงอายุ
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/login" className="flex items-center gap-2 cursor-pointer p-3 text-primary font-medium hover:bg-primary/10 rounded-lg mt-1">
+                                        <LogIn className="w-4 h-4" />
+                                        เข้าสู่ระบบพันธมิตร
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             </header>
@@ -134,20 +186,20 @@ export default function LandingBoard() {
                 {/* Hero Section - Advertisement Image */}
                 <section className="relative w-full h-[650px] md:h-[650px] overflow-hidden">
                     <Image
-                        src="/images/banner1.jpg"
+                        src="/images/background1.jpg"
                         alt="The Safe Zone - Premium Elderly Care"
                         width={1920}
                         height={600}
-                        className="w-full h-auto object-contain"
+                        className="w-full h-full object-cover object-top -mt-24"
                         priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
                     <div className="absolute bottom-8 left-0 right-0 text-center px-4">
                         <h2 className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
                             รับดูแลผู้สูงอายุ 12,500 บาท / เดือน
                         </h2>
                         <p className="text-lg md:text-l text-white/90 drop-shadow-md max-w-2xl mx-auto">
-                            โครงการพื้นที่ปลิดภัยเดอะเซฟโซน / พันธมิตรในเครือ 300 ศูนย์ทั่วกรุงเทพและปริมณฑล
+                            โครงการพื้นที่ปลอดภัยเดอะเซฟโซน / พันธมิตรในเครือ 300 ศูนย์ทั่วกรุงเทพและปริมณฑล
                         </p>
                     </div>
                 </section>

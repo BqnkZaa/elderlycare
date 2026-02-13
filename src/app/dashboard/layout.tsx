@@ -77,13 +77,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 )}
             >
-                {/* Logo */}
+                {/* Logo Section */}
                 <div className="flex items-center gap-3 px-6 py-5 border-b border-border">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                        <Heart className="w-5 h-5 text-white" />
+                    <div className="relative w-12 h-12 flex-shrink-0">
+                        <Image
+                            src="/images/Logo.jpg"
+                            alt="E.O.S. Logo"
+                            fill
+                            className="object-cover rounded-xl"
+                            priority
+                        />
                     </div>
                     <div>
-                        <h1 className="font-bold text-foreground">E.O.S.</h1>
+                        <h1 className="font-bold text-foreground text-xl">E.O.S.</h1>
                         <p className="text-xs text-muted-foreground">Ecosystem of Safety</p>
                     </div>
                     <button
@@ -97,7 +103,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {/* Navigation */}
                 <nav className="p-4 space-y-1">
                     {navigation.map((item) => {
-                        const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                        const isExactMatch = pathname === item.href;
+                        const isSubPathMatch = item.href !== '/dashboard' && pathname.startsWith(item.href + '/');
+                        const isActive = isExactMatch || isSubPathMatch;
                         return (
                             <Link
                                 key={item.name}
@@ -105,7 +113,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 className={cn(
                                     'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200',
                                     isActive
-                                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                                        ? 'bg-teal-400 text-teal-950 shadow-lg shadow-teal-500/20'
                                         : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                                 )}
                                 onClick={() => setSidebarOpen(false)}
@@ -185,7 +193,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     {pathname !== '/dashboard/elderly/new' && (
                         <div className="fixed inset-0 z-0 lg:left-72 pointer-events-none">
                             <Image
-                                src="/images/backgroud3.png"
+                                src="/images/background2.png"
                                 alt="Dashboard Background"
                                 fill
                                 className="object-cover opacity-100"
