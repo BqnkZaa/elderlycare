@@ -24,6 +24,7 @@ import {
     Menu,
     X,
     ChevronRight,
+    Grip,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -37,6 +38,7 @@ const navigation = [
     { name: 'จัดการผู้ใช้งาน', href: '/dashboard/users', icon: Users },
     { name: 'บันทึกการแจ้งเตือนต่างๆ', href: '/dashboard/alerts', icon: Bell },
     { name: 'ตั้งค่าระบบ', href: '/dashboard/settings', icon: Settings },
+    { name: 'ศูนย์สั่งการ (Command Center)', href: '/dashboard/command', icon: Grip },
 ];
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
