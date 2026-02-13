@@ -78,26 +78,36 @@ export default function RegisterNursePage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
             {/* Background decoration */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
-                <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-secondary/20 rounded-full blur-[100px] animate-pulse" />
+            {/* Background Image */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+                <Image
+                    src="/images/backgroud1.PNG"
+                    alt="Background"
+                    fill
+                    className="object-cover opacity-100 scale-170 translate-x-17"
+                    priority
+                />
+                <div className="absolute inset-0 bg-background/10 " />
             </div>
 
             <Card className="w-full max-w-md relative backdrop-blur-md bg-card/40 border-border/50 shadow-2xl z-10">
-                <CardHeader className="space-y-4 text-center">
-                    <div className="mx-auto relative w-32 h-32">
+
+                <CardHeader className="space-y-6 text-center flex flex-col items-center pb-2">
+                    <div className="relative w-28 h-28 group">
+                        <div className="absolute inset-0 bg-teal-500/20 rounded-[2rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <Image
                             src="/images/Logo.jpg"
                             alt="The Safe Zone Logo"
                             fill
-                            className="object-contain"
+                            className="object-cover rounded-[2rem] shadow-2xl border border-white/10"
+                            priority
                         />
                     </div>
-                    <div>
-                        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    <div className="space-y-2">
+                        <CardTitle className="text-3xl font-black tracking-tight bg-gradient-to-r from-teal-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-sm animate-gradient-x bg-[length:200%_auto]">
                             สมัครสมาชิก (พยาบาล)
                         </CardTitle>
-                        <CardDescription className="text-muted-foreground mt-2">
+                        <CardDescription className="text-slate-400 font-medium tracking-wide">
                             Nurse Registration
                         </CardDescription>
                     </div>
