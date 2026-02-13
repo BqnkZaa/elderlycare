@@ -26,12 +26,12 @@ export default async function AlertsPage() {
         <div className="space-y-6">
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <Bell className="w-7 h-7 text-amber-600" />
-                การแจ้งเตือน
+                บันทึกการแจ้งเตือนต่าง (Alert)
             </h1>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>ประวัติการแจ้งเตือน</CardTitle>
+                    <CardTitle>รายการบันทึกล่าสุด</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {alerts.length === 0 ? (

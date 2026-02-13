@@ -61,14 +61,14 @@ export async function createElderlyProfile(data: ElderlyProfileInput) {
 
 interface GetProfilesParams {
     search?: string;
-    province?: string;
+    partnerId?: string;
     page?: number;
     pageSize?: number;
 }
 
 export async function getElderlyProfiles({
     search,
-    province,
+    partnerId,
     page = 1,
     pageSize = 10,
 }: GetProfilesParams) {
@@ -82,14 +82,18 @@ export async function getElderlyProfiles({
 
         if (search) {
             where.OR = [
-                { firstName: { contains: search } },
-                { lastName: { contains: search } },
-                { safeId: { contains: search } },
+                { firstName: { contains: search, mode: 'insensitive' } },
+                { lastName: { contains: search, mode: 'insensitive' } },
+                { safeId: { contains: search, mode: 'insensitive' } },
+                { nationalId: { contains: search, mode: 'insensitive' } },
+                { phoneNumber: { contains: search, mode: 'insensitive' } },
+                { keyCoordinatorName: { contains: search, mode: 'insensitive' } },
+                { emergencyContactName: { contains: search, mode: 'insensitive' } },
             ];
         }
 
-        if (province) {
-            where.province = province;
+        if (partnerId) {
+            where.partnerId = partnerId;
         }
 
         // Parallel fetch: data and count
@@ -103,7 +107,7 @@ export async function getElderlyProfiles({
                     nickname: true,
                     dateOfBirth: true,
                     gender: true,
-                    province: true,
+                    partnerId: true,
                     careLevel: true,
                     mobilityStatus: true,
                     isActive: true,

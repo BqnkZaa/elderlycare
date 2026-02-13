@@ -14,12 +14,10 @@ import { formatDate } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { NativeSelect as Select } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
     FileText,
     Search,
-    Filter,
     ChevronLeft,
     ChevronRight,
     Eye,
@@ -27,7 +25,6 @@ import {
     Heart,
     Utensils,
     Moon,
-    User,
     X,
     Plus,
     Edit,
@@ -56,13 +53,9 @@ interface DailyLog {
         id: string;
         firstName: string;
         lastName: string;
+        nickname: string | null;
+        safeId: string | null;
     };
-}
-
-interface ElderlyOption {
-    id: string;
-    firstName: string;
-    lastName: string;
 }
 
 interface PaginationMeta {
@@ -101,37 +94,21 @@ const sleepLabels: Record<string, { label: string; color: 'default' | 'success' 
 
 export default function LogsPage() {
     const [logs, setLogs] = useState<DailyLog[]>([]);
-    const [elderlyOptions, setElderlyOptions] = useState<ElderlyOption[]>([]);
     const [pagination, setPagination] = useState<PaginationMeta | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     // Filters
-    const [elderlyId, setElderlyId] = useState('');
+    const [search, setSearch] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [page, setPage] = useState(1);
-
-    // Fetch elderly options for dropdown
-    useEffect(() => {
-        async function fetchElderlyOptions() {
-            const result = await getElderlyProfiles({ pageSize: 100 });
-            if (result.success && result.data) {
-                setElderlyOptions(result.data.map((e: { id: string; firstName: string; lastName: string }) => ({
-                    id: e.id,
-                    firstName: e.firstName,
-                    lastName: e.lastName,
-                })));
-            }
-        }
-        fetchElderlyOptions();
-    }, []);
 
     // Fetch logs
     const fetchLogs = useCallback(async () => {
         setIsLoading(true);
         try {
             const result = await getDailyLogs({
-                elderlyId: elderlyId || undefined,
+                search: search || undefined,
                 startDate: startDate ? new Date(startDate) : undefined,
                 endDate: endDate ? new Date(endDate) : undefined,
                 page,
@@ -146,7 +123,7 @@ export default function LogsPage() {
             console.error('Error fetching logs:', error);
         }
         setIsLoading(false);
-    }, [elderlyId, startDate, endDate, page]);
+    }, [search, startDate, endDate, page]);
 
     useEffect(() => {
         fetchLogs();
@@ -159,7 +136,7 @@ export default function LogsPage() {
     };
 
     const clearFilters = () => {
-        setElderlyId('');
+        setSearch('');
         setStartDate('');
         setEndDate('');
         setPage(1);
@@ -190,7 +167,7 @@ export default function LogsPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                         <FileText className="w-7 h-7 text-emerald-600" />
-                        บันทึกประจำวัน
+                        บันทึกอาการประจำวัน (Recording)
                     </h1>
                     <p className="text-muted-foreground mt-1">
                         ดูบันทึกประจำวันของผู้สูงอายุทั้งหมดในระบบ
@@ -199,7 +176,7 @@ export default function LogsPage() {
                 <Link href="/dashboard/logs/new">
                     <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20">
                         <Plus className="w-4 h-4 mr-2" />
-                        เพิ่มบันทึกใหม่
+                        เพิ่มบันทึก
                     </Button>
                 </Link>
             </div>
@@ -208,24 +185,16 @@ export default function LogsPage() {
             <Card className="bg-card/50 backdrop-blur-sm border-border">
                 <CardContent className="p-4">
                     <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
-                        {/* Elderly Select */}
-                        <div className="flex-1 flex items-center gap-2">
-                            <User className="w-4 h-4 text-muted-foreground" />
-                            <Select
-                                value={elderlyId}
-                                onChange={(e) => {
-                                    setElderlyId(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="bg-background/50 border-input"
-                            >
-                                <option value="">ผู้สูงอายุทั้งหมด</option>
-                                {elderlyOptions.map((e) => (
-                                    <option key={e.id} value={e.id}>
-                                        {e.firstName} {e.lastName}
-                                    </option>
-                                ))}
-                            </Select>
+                        {/* Search Input */}
+                        <div className="flex-1 relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input
+                                type="text"
+                                placeholder="ค้นหา: ชื่อ, นามสกุล, รหัส, เลขบัตรประชาชน"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="pl-9 bg-background/50 border-input w-full"
+                            />
                         </div>
 
                         {/* Date Range */}
@@ -253,7 +222,7 @@ export default function LogsPage() {
                                 <Search className="w-4 h-4 mr-2" />
                                 ค้นหา
                             </Button>
-                            {(elderlyId || startDate || endDate) && (
+                            {(search || startDate || endDate) && (
                                 <Button type="button" variant="outline" onClick={clearFilters}>
                                     <X className="w-4 h-4 mr-2" />
                                     ล้าง
@@ -268,10 +237,10 @@ export default function LogsPage() {
             <Card className="bg-card/50 backdrop-blur-sm border-border">
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between text-foreground">
-                        <span>รายการบันทึก</span>
+                        <span>รายการบันทึกข้อมูล</span>
                         {pagination && (
                             <span className="text-sm font-normal text-muted-foreground">
-                                ทั้งหมด {pagination.totalItems} รายการ
+                                รายการทั้งหมด {pagination.totalItems} รายการ
                             </span>
                         )}
                     </CardTitle>
@@ -297,11 +266,9 @@ export default function LogsPage() {
                                 <table className="w-full">
                                     <thead>
                                         <tr className="border-b border-border">
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">วันที่</th>
+                                            <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground w-[150px]">วันที่</th>
                                             <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">ผู้สูงอายุ</th>
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">อารมณ์</th>
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">อาหาร</th>
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">การนอน</th>
+                                            <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">สถานะ (อารมณ์/อาหาร/นอน)</th>
                                             <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">สัญญาณชีพ</th>
                                             <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">ผู้บันทึก</th>
                                             <th className="py-3 px-4 text-right text-sm font-semibold text-muted-foreground">การดำเนินการ</th>
@@ -317,36 +284,33 @@ export default function LogsPage() {
                                                     </span>
                                                 </td>
                                                 <td className="py-3 px-4">
-                                                    <Link
-                                                        href={`/dashboard/elderly/${log.elderly.id}`}
-                                                        className="text-primary hover:underline font-medium"
-                                                    >
-                                                        {log.elderly.firstName} {log.elderly.lastName}
-                                                    </Link>
+                                                    <div className="flex flex-col">
+                                                        <Link
+                                                            href={`/dashboard/elderly/${log.elderly.id}`}
+                                                            className="text-primary hover:underline font-medium"
+                                                        >
+                                                            {log.elderly.firstName} {log.elderly.lastName}
+                                                        </Link>
+                                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                            {log.elderly.nickname && <span>({log.elderly.nickname})</span>}
+                                                            {log.elderly.safeId && <span className="text-xs bg-muted px-1.5 py-0.5 rounded">{log.elderly.safeId}</span>}
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td className="py-3 px-4">
-                                                    <Badge variant={moodLabels[log.mood]?.color || 'default'}>
-                                                        {moodLabels[log.mood]?.label || log.mood}
-                                                    </Badge>
-                                                </td>
-                                                <td className="py-3 px-4">
-                                                    <span className="flex items-center gap-1 text-sm">
-                                                        <Utensils className="w-3 h-3 text-muted-foreground" />
-                                                        <Badge variant={mealLabels[log.mealIntake]?.color || 'default'} className="bg-opacity-20">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        <Badge variant={moodLabels[log.mood]?.color || 'default'} className="h-6">
+                                                            {moodLabels[log.mood]?.label || log.mood}
+                                                        </Badge>
+                                                        <Badge variant={mealLabels[log.mealIntake]?.color || 'default'} className="bg-opacity-20 h-6">
+                                                            <Utensils className="w-3 h-3 mr-1" />
                                                             {mealLabels[log.mealIntake]?.label || log.mealIntake}
                                                         </Badge>
-                                                    </span>
-                                                </td>
-                                                <td className="py-3 px-4">
-                                                    <span className="flex items-center gap-1 text-sm">
-                                                        <Moon className="w-3 h-3 text-muted-foreground" />
-                                                        <Badge variant={sleepLabels[log.sleepQuality]?.color || 'default'} className="bg-opacity-20">
+                                                        <Badge variant={sleepLabels[log.sleepQuality]?.color || 'default'} className="bg-opacity-20 h-6">
+                                                            <Moon className="w-3 h-3 mr-1" />
                                                             {sleepLabels[log.sleepQuality]?.label || log.sleepQuality}
                                                         </Badge>
-                                                        {log.sleepHours && (
-                                                            <span className="text-muted-foreground ml-1">({log.sleepHours} ชม.)</span>
-                                                        )}
-                                                    </span>
+                                                    </div>
                                                 </td>
                                                 <td className="py-3 px-4">
                                                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -387,33 +351,43 @@ export default function LogsPage() {
                                         href={`/dashboard/elderly/${log.elderly.id}`}
                                         className="block p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors bg-card/30"
                                     >
-                                        <div className="flex items-center justify-between mb-3">
-                                            <span className="font-semibold text-foreground">
-                                                {log.elderly.firstName} {log.elderly.lastName}
-                                            </span>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="flex flex-col">
+                                                <span className="font-semibold text-foreground">
+                                                    {log.elderly.firstName} {log.elderly.lastName}
+                                                </span>
+                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                    {log.elderly.nickname && <span>({log.elderly.nickname})</span>}
+                                                    {log.elderly.safeId && <span className="text-xs bg-muted px-1.5 py-0.5 rounded">{log.elderly.safeId}</span>}
+                                                </div>
+                                            </div>
                                             <span className="text-sm text-muted-foreground flex items-center gap-1">
                                                 <Calendar className="w-3 h-3" />
                                                 {formatDate(log.date)}
                                             </span>
                                         </div>
-                                        <div className="flex flex-wrap gap-2 mb-2">
-                                            <Badge variant={moodLabels[log.mood]?.color || 'default'}>
+
+                                        <div className="flex flex-wrap gap-2 mb-3">
+                                            <Badge variant={moodLabels[log.mood]?.color || 'default'} className="h-6">
                                                 {moodLabels[log.mood]?.label || log.mood}
                                             </Badge>
-                                            <Badge variant={mealLabels[log.mealIntake]?.color || 'default'}>
+                                            <Badge variant={mealLabels[log.mealIntake]?.color || 'default'} className="bg-opacity-20 h-6">
                                                 <Utensils className="w-3 h-3 mr-1" />
                                                 {mealLabels[log.mealIntake]?.label || log.mealIntake}
                                             </Badge>
-                                            <Badge variant={sleepLabels[log.sleepQuality]?.color || 'default'}>
+                                            <Badge variant={sleepLabels[log.sleepQuality]?.color || 'default'} className="bg-opacity-20 h-6">
                                                 <Moon className="w-3 h-3 mr-1" />
                                                 {sleepLabels[log.sleepQuality]?.label || log.sleepQuality}
                                             </Badge>
                                         </div>
+
                                         {log.vitals && (
-                                            <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                                <Heart className="w-3 h-3" />
-                                                {formatVitals(log.vitals)}
-                                            </p>
+                                            <div className="pt-2 border-t border-border/50">
+                                                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                                    <Heart className="w-3 h-3" />
+                                                    {formatVitals(log.vitals)}
+                                                </p>
+                                            </div>
                                         )}
                                     </Link>
                                 ))}

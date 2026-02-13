@@ -9,7 +9,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { getElderlyProfiles } from '@/actions/elderly.actions';
-import { PROVINCE_NAMES_TH } from '@/lib/provinces';
 import { calculateAge, formatDate } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,13 +33,15 @@ interface ElderlyProfile {
     nickname: string | null;
     dateOfBirth: Date;
     gender: string;
-    province: string;
+    partnerId: string | null;
     careLevel: string;
     mobilityStatus: string;
     isActive: boolean;
     createdAt: Date;
     _count: { dailyLogs: number };
 }
+
+const PID_OPTIONS = Array.from({ length: 300 }, (_, i) => `PID${String(i + 1).padStart(3, '0')}`);
 
 interface PaginationMeta {
     currentPage: number;
@@ -70,7 +71,7 @@ export default function ElderlyListPage() {
     const [pagination, setPagination] = useState<PaginationMeta | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [province, setProvince] = useState('');
+    const [partnerId, setPartnerId] = useState('');
     const [page, setPage] = useState(1);
 
     const fetchProfiles = useCallback(async () => {
@@ -78,7 +79,7 @@ export default function ElderlyListPage() {
         try {
             const result = await getElderlyProfiles({
                 search: search || undefined,
-                province: province || undefined,
+                partnerId: partnerId || undefined,
                 page,
                 pageSize: 10,
             });
@@ -91,7 +92,7 @@ export default function ElderlyListPage() {
             console.error('Error fetching profiles:', error);
         }
         setIsLoading(false);
-    }, [search, province, page]);
+    }, [search, partnerId, page]);
 
     useEffect(() => {
         fetchProfiles();
@@ -110,28 +111,27 @@ export default function ElderlyListPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                         <Users className="w-7 h-7 text-primary" />
-                        ข้อมูลผู้สูงอายุ
+                        ฐานข้อมูลประชากร
                     </h1>
                     <p className="text-muted-foreground mt-1">
-                        จัดการข้อมูลผู้สูงอายุทั้งหมดในระบบ
+                        (จัดการข้อมูลผู้สูงอายุทั้งหมดในระบบ)
                     </p>
                 </div>
                 <Link href="/dashboard/elderly/new">
                     <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20">
                         <Plus className="w-4 h-4 mr-2" />
-                        เพิ่มผู้สูงอายุ
+                        ลงทะเบียนผู้สูงอายุในระบบ (PID)
                     </Button>
                 </Link>
             </div>
 
-            {/* Filters */}
             <Card className="bg-card/50 backdrop-blur-sm border-border">
                 <CardContent className="p-4">
                     <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
                         <div className="flex-1 relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
-                                placeholder="ค้นหาชื่อ-นามสกุล..."
+                                placeholder="ค้นหาชื่อ, นามสกุล, รหัส, เลขบัตรประชาชน, เบอร์โทร, ชื่อญาติ..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="pl-9 bg-background/50 border-input"
@@ -140,22 +140,22 @@ export default function ElderlyListPage() {
                         <div className="w-full md:w-64 flex items-center gap-2">
                             <Filter className="w-4 h-4 text-muted-foreground" />
                             <Select
-                                value={province}
+                                value={partnerId}
                                 onChange={(e) => {
-                                    setProvince(e.target.value);
+                                    setPartnerId(e.target.value);
                                     setPage(1);
                                 }}
                                 className="bg-background/50 border-input"
                             >
-                                <option value="">ทุกจังหวัด (77)</option>
-                                {PROVINCE_NAMES_TH.map((p) => (
-                                    <option key={p} value={p}>{p}</option>
+                                <option value="">ทุกศูนย์ (PID)</option>
+                                {PID_OPTIONS.map((pid) => (
+                                    <option key={pid} value={pid}>{pid}</option>
                                 ))}
                             </Select>
                         </div>
                         <Button type="submit" variant="secondary" className="hover:bg-secondary/80">
                             <Search className="w-4 h-4 mr-2" />
-                            ค้นหา
+                            ฐานข้อมูล
                         </Button>
                     </form>
                 </CardContent>
@@ -165,10 +165,10 @@ export default function ElderlyListPage() {
             <Card className="bg-card/50 backdrop-blur-sm border-border">
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between text-foreground">
-                        <span>รายการผู้สูงอายุ</span>
+                        <span>รายชื้อผู้สูงอายุในระบบทั้งหมด</span>
                         {pagination && (
                             <span className="text-sm font-normal text-muted-foreground">
-                                ทั้งหมด {pagination.totalItems} คน
+                                จำนวนผู้สูงอายุทั้งหมดในระบบตอนนี้ {pagination.totalItems} คน
                             </span>
                         )}
                     </CardTitle>
@@ -196,10 +196,9 @@ export default function ElderlyListPage() {
                                         <tr className="border-b border-border">
                                             <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">ชื่อ-นามสกุล</th>
                                             <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">อายุ</th>
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">จังหวัด</th>
+                                            <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">รหัสศูนย์ (PID)</th>
                                             <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">ระดับการดูแล</th>
                                             <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">สถานะ</th>
-                                            <th className="py-3 px-4 text-left text-sm font-semibold text-muted-foreground">บันทึก</th>
                                             <th className="py-3 px-4 text-right text-sm font-semibold text-muted-foreground">การดำเนินการ</th>
                                         </tr>
                                     </thead>
@@ -227,7 +226,7 @@ export default function ElderlyListPage() {
                                                 <td className="py-3 px-4">
                                                     <span className="flex items-center gap-1 text-sm text-muted-foreground">
                                                         <MapPin className="w-3 h-3" />
-                                                        {profile.province}
+                                                        {profile.partnerId || '-'}
                                                     </span>
                                                 </td>
                                                 <td className="py-3 px-4">
@@ -239,9 +238,6 @@ export default function ElderlyListPage() {
                                                     <Badge variant={profile.isActive ? 'success' : 'secondary'} className="bg-opacity-20">
                                                         {profile.isActive ? 'ใช้งาน' : 'ไม่ใช้งาน'}
                                                     </Badge>
-                                                </td>
-                                                <td className="py-3 px-4 text-sm text-muted-foreground">
-                                                    {profile._count.dailyLogs} รายการ
                                                 </td>
                                                 <td className="py-3 px-4 text-right">
                                                     <Link href={`/dashboard/elderly/${profile.id}`}>
@@ -274,7 +270,7 @@ export default function ElderlyListPage() {
                                                     {profile.firstName} {profile.lastName}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {calculateAge(profile.dateOfBirth)} ปี • {profile.province}
+                                                    {calculateAge(profile.dateOfBirth)} ปี • {profile.partnerId || '-'}
                                                 </p>
                                             </div>
                                         </div>

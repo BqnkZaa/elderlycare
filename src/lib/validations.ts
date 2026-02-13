@@ -193,6 +193,7 @@ export const dailyLogFilterSchema = z.object({
     date: z.coerce.date().optional(),
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
+    search: z.string().optional(),
     page: z.number().optional(),
     pageSize: z.number().optional(),
 });

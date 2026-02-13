@@ -88,6 +88,20 @@ export async function getDailyLogs(filters: DailyLogFilter = { page: 1, pageSize
             }
         }
 
+        if (filters.search) {
+            const search = filters.search.trim();
+            // Check if search term is effectively applied to elderly profile
+            where.elderly = {
+                OR: [
+                    { firstName: { contains: search } }, // Case-insensitive in Postgres (if configured) or handle via mode. For MySQL/Standard Prisma, contains is usually case-insensitive.
+                    { lastName: { contains: search } },
+                    { nickname: { contains: search } },
+                    { safeId: { contains: search } },
+                    { nationalId: { contains: search } },
+                ],
+            };
+        }
+
         // Get total count
         const totalItems = await prisma.dailyLog.count({ where });
 
@@ -103,6 +117,8 @@ export async function getDailyLogs(filters: DailyLogFilter = { page: 1, pageSize
                         id: true,
                         firstName: true,
                         lastName: true,
+                        safeId: true,
+                        nickname: true,
                     },
                 },
             },

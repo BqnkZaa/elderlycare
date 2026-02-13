@@ -10,7 +10,7 @@ export default function SettingsPage() {
         <div className="space-y-6">
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <Settings className="w-7 h-7 text-muted-foreground" />
-                ตั้งค่าระบบ
+                ตั้งค่าระบบ (Setup)
             </h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -18,7 +18,7 @@ export default function SettingsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Shield className="w-5 h-5 text-indigo-600" />
-                            ความปลอดภัย
+                            ระเบียบข้อบังคับใช้เด็ดขาด
                         </CardTitle>
                         <CardDescription>การตั้งค่าความปลอดภัยและ PDPA</CardDescription>
                     </CardHeader>
@@ -33,7 +33,7 @@ export default function SettingsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Bell className="w-5 h-5 text-amber-600" />
-                            การแจ้งเตือน
+                            การแจ้งเตือนต่างๆ (Alert)
                         </CardTitle>
                         <CardDescription>ตั้งค่าช่องทางการแจ้งเตือน</CardDescription>
                     </CardHeader>
@@ -48,7 +48,7 @@ export default function SettingsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Database className="w-5 h-5 text-emerald-600" />
-                            ฐานข้อมูล
+                            ฐานข้อมูลทั้งหมด (Database)
                         </CardTitle>
                         <CardDescription>สถานะการเชื่อมต่อ</CardDescription>
                     </CardHeader>

@@ -31,12 +31,12 @@ interface DashboardLayoutProps {
 }
 
 const navigation = [
-    { name: 'แดชบอร์ด', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'ข้อมูลผู้สูงอายุ', href: '/dashboard/elderly', icon: Users },
-    { name: 'บันทึกประจำวัน', href: '/dashboard/logs', icon: FileText },
+    { name: 'แดชบอร์ดผู้บริหาร', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'ฐานข้อมูลประชากร', href: '/dashboard/elderly', icon: Users },
+    { name: 'บันทึกอาการประจำวัน', href: '/dashboard/logs', icon: FileText },
     { name: 'จัดการผู้ใช้งาน', href: '/dashboard/users', icon: Users },
-    { name: 'การแจ้งเตือน', href: '/dashboard/alerts', icon: Bell },
-    { name: 'ตั้งค่า', href: '/dashboard/settings', icon: Settings },
+    { name: 'บันทึกการแจ้งเตือนต่างๆ', href: '/dashboard/alerts', icon: Bell },
+    { name: 'ตั้งค่าระบบ', href: '/dashboard/settings', icon: Settings },
 ];
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
@@ -80,8 +80,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         <Heart className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h1 className="font-bold text-foreground">Elderly Care</h1>
-                        <p className="text-xs text-muted-foreground">Management System</p>
+                        <h1 className="font-bold text-foreground">E.O.S.</h1>
+                        <p className="text-xs text-muted-foreground">Ecosystem of Safety</p>
                     </div>
                     <button
                         className="lg:hidden ml-auto p-1 text-muted-foreground hover:text-foreground"
