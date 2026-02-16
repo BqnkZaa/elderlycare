@@ -396,6 +396,11 @@ model Appointment {
   remindDaysBefore Int @default(1)       // เตือนล่วงหน้ากี่วัน
   isCompleted Boolean @default(false)
   
+  // Phase 2: Enhancements
+  attachmentUrl    String?  @db.Text       // ลิงก์ไฟล์แนบ/รูปถ่าย
+  notifyCoordinator Boolean @default(true) // แจ้งเตือนผู้ประสานงาน
+  notifyGuardian    Boolean @default(true) // แจ้งเตือนผู้มีอำนาจตัดสินใจ
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   

@@ -77,7 +77,7 @@ export function AppointmentList({ elderlyId }: AppointmentListProps) {
                     <Calendar className="w-5 h-5" />
                     การนัดหมายแพทย์ (Medical Appointments)
                 </CardTitle>
-                <Button size="sm" onClick={handleCreate} className="bg-primary hover:bg-primary/90">
+                <Button type="button" size="sm" onClick={handleCreate} className="bg-primary hover:bg-primary/90">
                     <Plus className="w-4 h-4 mr-1" />
                     เพิ่มนัดหมาย
                 </Button>
@@ -94,7 +94,7 @@ export function AppointmentList({ elderlyId }: AppointmentListProps) {
                     <div className="text-center py-8 text-muted-foreground border border-dashed rounded-lg bg-accent/5">
                         <Calendar className="w-12 h-12 mx-auto mb-3 opacity-20" />
                         <p>ยังไม่มีรายการนัดหมาย</p>
-                        <Button variant="link" onClick={handleCreate}>
+                        <Button type="button" variant="link" onClick={handleCreate}>
                             สร้างนัดหมายใหม่
                         </Button>
                     </div>
@@ -161,10 +161,10 @@ export function AppointmentList({ elderlyId }: AppointmentListProps) {
 
                                 {/* Actions */}
                                 <div className="flex md:flex-col gap-2 items-end justify-start">
-                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(apt)} className="hover:text-primary hover:bg-primary/10 w-8 h-8">
+                                    <Button type="button" variant="ghost" size="icon" onClick={() => handleEdit(apt)} className="hover:text-primary hover:bg-primary/10 w-8 h-8">
                                         <Edit className="w-4 h-4" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" onClick={() => setDeletingId(apt.id)} className="hover:text-destructive hover:bg-destructive/10 text-destructive/70 w-8 h-8">
+                                    <Button type="button" variant="ghost" size="icon" onClick={() => setDeletingId(apt.id)} className="hover:text-destructive hover:bg-destructive/10 text-destructive/70 w-8 h-8">
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
                                 </div>

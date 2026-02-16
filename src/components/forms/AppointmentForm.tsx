@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { appointmentSchema, type AppointmentInput } from '@/lib/validations/appointment';
-import { createAppointment, updateAppointment } from '@/actions/appointment.actions';
+import { createAppointment, updateAppointment, getDistinctAppointmentOptions } from '@/actions/appointment.actions';
 import {
     Dialog,
     DialogContent,
@@ -20,12 +20,17 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { CalendarIcon, Clock, MapPin, User, FileText, Bell } from 'lucide-react';
-import { format } from 'date-fns';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+    CalendarIcon, Clock, MapPin, User, FileText, Bell,
+    Link as LinkIcon, PlusCircle, Check
+} from 'lucide-react';
+import { format, addDays, addMonths } from 'date-fns';
 import { th } from 'date-fns/locale';
 
 interface AppointmentFormProps {
@@ -33,17 +38,27 @@ interface AppointmentFormProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
-    initialData?: any; // Should be stricter type if possible
+    initialData?: any;
 }
 
 export function AppointmentForm({ elderlyId, isOpen, onClose, onSuccess, initialData }: AppointmentFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [suggestions, setSuggestions] = useState<{ locations: string[], doctors: string[] }>({ locations: [], doctors: [] });
 
-    // If initialData exists, format date for input
+    useEffect(() => {
+        if (isOpen) {
+            getDistinctAppointmentOptions().then(res => {
+                if (res.success && res.data) {
+                    setSuggestions(res.data);
+                }
+            });
+        }
+    }, [isOpen]);
+
     const defaultValues: Partial<AppointmentInput> = initialData
         ? {
             ...initialData,
-            date: new Date(initialData.date), // Ensure it's a Date object
+            date: new Date(initialData.date),
         }
         : {
             title: '',
@@ -54,12 +69,22 @@ export function AppointmentForm({ elderlyId, isOpen, onClose, onSuccess, initial
             notes: '',
             remindDaysBefore: 1,
             isCompleted: false,
+            attachmentUrl: '',
+            notifyCoordinator: true,
+            notifyGuardian: true,
         };
 
     const form = useForm<AppointmentInput>({
         resolver: zodResolver(appointmentSchema) as any,
         defaultValues: defaultValues as any,
     });
+
+    const setDatePreset = (days: number, months: number = 0) => {
+        const currentDate = new Date();
+        let newDate = addDays(currentDate, days);
+        if (months > 0) newDate = addMonths(newDate, months);
+        form.setValue('date', newDate);
+    };
 
     const onSubmit: any = async (data: AppointmentInput) => {
         setIsSubmitting(true);
@@ -77,7 +102,6 @@ export function AppointmentForm({ elderlyId, isOpen, onClose, onSuccess, initial
                 onClose();
             } else {
                 console.error(result.error);
-                // Handle error (could add toast notification here)
             }
         } catch (error) {
             console.error(error);
@@ -88,7 +112,7 @@ export function AppointmentForm({ elderlyId, isOpen, onClose, onSuccess, initial
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{initialData ? 'แก้ไขนัดหมาย' : 'เพิ่มการนัดหมาย'}</DialogTitle>
                     <DialogDescription>
@@ -120,7 +144,7 @@ export function AppointmentForm({ elderlyId, isOpen, onClose, onSuccess, initial
                                 control={form.control}
                                 name="date"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="flex flex-col">
                                         <FormLabel>วันที่ *</FormLabel>
                                         <FormControl>
                                             <div className="relative">
@@ -133,6 +157,20 @@ export function AppointmentForm({ elderlyId, isOpen, onClose, onSuccess, initial
                                                 />
                                             </div>
                                         </FormControl>
+                                        <div className="flex gap-2 mt-1 overflow-x-auto pb-2">
+                                            <Button type="button" variant="outline" size="sm" onClick={() => setDatePreset(7)} className="text-xs h-7 px-2">
+                                                +1 สัปดาห์
+                                            </Button>
+                                            <Button type="button" variant="outline" size="sm" onClick={() => setDatePreset(14)} className="text-xs h-7 px-2">
+                                                +2 สัปดาห์
+                                            </Button>
+                                            <Button type="button" variant="outline" size="sm" onClick={() => setDatePreset(0, 1)} className="text-xs h-7 px-2">
+                                                +1 เดือน
+                                            </Button>
+                                            <Button type="button" variant="outline" size="sm" onClick={() => setDatePreset(0, 3)} className="text-xs h-7 px-2">
+                                                +3 เดือน
+                                            </Button>
+                                        </div>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -156,63 +194,146 @@ export function AppointmentForm({ elderlyId, isOpen, onClose, onSuccess, initial
                             />
                         </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="location"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>สถานที่</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                <Input list="location-suggestions" placeholder="โรงพยาบาล/คลินิก" className="pl-9" {...field} />
+                                                <datalist id="location-suggestions">
+                                                    {suggestions.locations.map((loc, i) => (
+                                                        <option key={i} value={loc} />
+                                                    ))}
+                                                </datalist>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="doctorName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>แพทย์ผู้ตรวจ</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                <Input list="doctor-suggestions" placeholder="ชื่อแพทย์ (ถ้าทราบ)" className="pl-9" {...field} />
+                                                <datalist id="doctor-suggestions">
+                                                    {suggestions.doctors.map((doc, i) => (
+                                                        <option key={i} value={doc} />
+                                                    ))}
+                                                </datalist>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
                         <FormField
                             control={form.control}
-                            name="location"
+                            name="attachmentUrl"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>สถานที่</FormLabel>
+                                    <FormLabel>แนบลิงก์เอกสาร/รูปภาพ (ถ้ามี)</FormLabel>
                                     <FormControl>
                                         <div className="relative">
-                                            <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            <Input placeholder="โรงพยาบาล/คลินิก" className="pl-9" {...field} />
+                                            <LinkIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                            <Input
+                                                placeholder="https://example.com/file.pdf"
+                                                className="pl-9"
+                                                {...field}
+                                                value={field.value || ''}
+                                                onChange={(e) => field.onChange(e.target.value)}
+                                            />
                                         </div>
                                     </FormControl>
+                                    <FormDescription className="text-xs">
+                                        ใส่ URL ของไฟล์รูปภาพหรือเอกสารใบนัดหมาย (รองรับ Google Drive, Dropbox ฯลฯ)
+                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        <FormField
-                            control={form.control}
-                            name="doctorName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>แพทย์ผู้ตรวจ</FormLabel>
-                                    <FormControl>
-                                        <div className="relative">
-                                            <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            <Input placeholder="ชื่อแพทย์ (ถ้าทราบ)" className="pl-9" {...field} />
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        <div className="bg-muted/30 p-3 rounded-lg border border-border space-y-3">
+                            <h4 className="text-sm font-medium flex items-center gap-2">
+                                <Bell className="w-4 h-4" /> การแจ้งเตือน (Notifications)
+                            </h4>
 
-                        <FormField
-                            control={form.control}
-                            name="remindDaysBefore"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>เตือนล่วงหน้า (วัน)</FormLabel>
-                                    <FormControl>
-                                        <div className="relative">
-                                            <Bell className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <FormField
+                                control={form.control}
+                                name="remindDaysBefore"
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center gap-2 space-y-0">
+                                        <FormLabel className="font-normal min-w-[100px]">เตือนล่วงหน้า:</FormLabel>
+                                        <FormControl>
                                             <Input
                                                 type="number"
                                                 min="0"
                                                 max="30"
-                                                className="pl-9"
+                                                className="w-20 h-8"
                                                 {...field}
                                                 onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
                                             />
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                        </FormControl>
+                                        <span className="text-sm text-muted-foreground">วัน</span>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <div className="flex flex-col gap-2 pt-2">
+                                <FormField
+                                    control={form.control}
+                                    name="notifyCoordinator"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <div className="space-y-1 leading-none">
+                                                <FormLabel className="font-normal">
+                                                    แจ้งเตือนผู้ประสานงานหลัก (Key Coordinator)
+                                                </FormLabel>
+                                            </div>
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="notifyGuardian"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <div className="space-y-1 leading-none">
+                                                <FormLabel className="font-normal">
+                                                    แจ้งเตือนผู้มีอำนาจตัดสินใจ (Guardian)
+                                                </FormLabel>
+                                            </div>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
 
                         <FormField
                             control={form.control}

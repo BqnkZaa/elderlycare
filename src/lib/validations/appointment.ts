@@ -9,6 +9,11 @@ export const appointmentSchema = z.object({
     notes: z.string().optional(),
     remindDaysBefore: z.number().min(0).max(30).optional().default(1),
     isCompleted: z.boolean().optional().default(false),
+
+    // New Fields
+    attachmentUrl: z.string().optional().nullable(),
+    notifyCoordinator: z.boolean().optional().default(true),
+    notifyGuardian: z.boolean().optional().default(true),
 });
 
 export type AppointmentInput = z.infer<typeof appointmentSchema>;

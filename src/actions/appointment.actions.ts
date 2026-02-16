@@ -78,3 +78,35 @@ export async function deleteAppointment(id: string, elderlyId: string) {
         return { success: false, error: 'Failed to delete appointment' };
     }
 }
+
+// New action for Autocomplete
+export async function getDistinctAppointmentOptions() {
+    try {
+        await requireRole(['ADMIN', 'STAFF', 'NURSE']);
+
+        // Parallel fetch for distinct locations and doctor names
+        const [locations, doctors] = await Promise.all([
+            prisma.appointment.findMany({
+                distinct: ['location'],
+                select: { location: true },
+                where: { location: { not: null } },
+            }),
+            prisma.appointment.findMany({
+                distinct: ['doctorName'],
+                select: { doctorName: true },
+                where: { doctorName: { not: null } },
+            })
+        ]);
+
+        return {
+            success: true,
+            data: {
+                locations: locations.map(l => l.location).filter(Boolean) as string[],
+                doctors: doctors.map(d => d.doctorName).filter(Boolean) as string[],
+            }
+        };
+    } catch (error) {
+        console.error('Failed to fetch options:', error);
+        return { success: false, error: 'Failed to fetch options' };
+    }
+}
