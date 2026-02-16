@@ -4,9 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { elderlyProfileSchema, type ElderlyProfileInput } from "@/lib/validations";
 import { Prisma } from "@prisma/client";
+import { requireRole } from "@/lib/auth-utils";
+
 
 export async function createElderlyProfile(data: ElderlyProfileInput) {
     try {
+        await requireRole(['ADMIN', 'STAFF']);
         console.log("Server Action Received:", data);
 
         // Validate data server-side
@@ -166,6 +169,7 @@ export async function getElderlyProfile(id: string) {
 
 export async function updateElderlyProfile(id: string, data: ElderlyProfileInput) {
     try {
+        await requireRole(['ADMIN', 'STAFF']);
         const validatedFields = elderlyProfileSchema.safeParse(data);
 
         if (!validatedFields.success) {

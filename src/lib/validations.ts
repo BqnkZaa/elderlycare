@@ -3,16 +3,22 @@ import { z } from "zod";
 
 export const elderlyProfileSchema = z.object({
     // Header
-    admissionDate: z.coerce.date(),
-    admissionTime: z.string().min(1, "Required"),
-    safeId: z.string().min(1, "Required"),
+    admissionDate: z.preprocess((val) => {
+        if (!val) return undefined;
+        if (typeof val === 'string') return new Date(val);
+        return val;
+    }, z.date({
+        message: "กรุณาระบุวันที่ให้ถูกต้อง"
+    })),
+    admissionTime: z.string().min(1, "กรุณาระบุเวลา"),
+    safeId: z.string().min(1, "กรุณาระบุรหัสผู้ป่วย"),
     partnerId: z.string().optional(),
 
     // 1. Identification
-    firstName: z.string().min(1, "Required"),
-    lastName: z.string().min(1, "Required"),
+    firstName: z.string().min(1, "กรุณาระบุชื่อ"),
+    lastName: z.string().min(1, "กรุณาระบุนามสกุล"),
     nickname: z.string().optional(),
-    age: z.coerce.number().min(1, "Required"),
+    age: z.coerce.number().min(1, "กรุณาระบุอายุ"),
     gender: z.enum(["MALE", "FEMALE", "OTHER"]),
     preferredPronouns: z.string().optional(),
     education: z.string().optional(),

@@ -7,6 +7,8 @@
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { userSchema, type UserInput } from '@/lib/validations';
+import { requireRole } from '@/lib/auth-utils';
+
 
 export async function createUser(data: UserInput) {
     try {
@@ -144,6 +146,7 @@ export async function registerNurse(data: UserInput) {
 
 export async function getPendingUsers() {
     try {
+        await requireRole(['ADMIN']);
         const users = await prisma.user.findMany({
             where: {
                 status: 'PENDING',
@@ -169,6 +172,7 @@ export async function getPendingUsers() {
 
 export async function approveUser(userId: string) {
     try {
+        await requireRole(['ADMIN']);
         await prisma.user.update({
             where: { id: userId },
             data: { status: 'APPROVED' },
@@ -183,6 +187,7 @@ export async function approveUser(userId: string) {
 
 export async function rejectUser(userId: string) {
     try {
+        await requireRole(['ADMIN']);
         await prisma.user.update({
             where: { id: userId },
             data: { status: 'REJECTED' },
@@ -201,6 +206,7 @@ export async function rejectUser(userId: string) {
  */
 export async function getAllUsers() {
     try {
+        await requireRole(['ADMIN']);
         const users = await prisma.user.findMany({
             orderBy: { createdAt: 'desc' },
             select: {
@@ -225,6 +231,7 @@ export async function getAllUsers() {
  */
 export async function createUserByAdmin(data: UserInput) {
     try {
+        await requireRole(['ADMIN']);
         const validated = userSchema.parse(data);
 
         // Check existing
@@ -258,6 +265,7 @@ export async function createUserByAdmin(data: UserInput) {
  */
 export async function updateUser(userId: string, data: Partial<UserInput> & { status?: string, isActive?: boolean }) {
     try {
+        await requireRole(['ADMIN']);
         // Prepare update data
         const updateData: any = { ...data };
 
@@ -286,6 +294,7 @@ export async function updateUser(userId: string, data: Partial<UserInput> & { st
  */
 export async function deleteUser(userId: string) {
     try {
+        await requireRole(['ADMIN']);
         await prisma.user.delete({
             where: { id: userId },
         });

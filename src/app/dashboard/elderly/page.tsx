@@ -8,7 +8,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { getElderlyProfiles } from '@/actions/elderly.actions';
+
 import { calculateAge, formatDate } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -67,12 +69,15 @@ const mobilityLabels: Record<string, string> = {
 };
 
 export default function ElderlyListPage() {
+    const { data: session } = useSession();
     const [profiles, setProfiles] = useState<ElderlyProfile[]>([]);
     const [pagination, setPagination] = useState<PaginationMeta | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [partnerId, setPartnerId] = useState('');
     const [page, setPage] = useState(1);
+
+    const canCreate = session?.user?.role !== 'NURSE';
 
     const fetchProfiles = useCallback(async () => {
         setIsLoading(true);
@@ -117,12 +122,14 @@ export default function ElderlyListPage() {
                         (จัดการข้อมูลผู้สูงอายุทั้งหมดในระบบ)
                     </p>
                 </div>
-                <Link href="/dashboard/elderly/new">
-                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20">
-                        <Plus className="w-4 h-4 mr-2" />
-                        ลงทะเบียนผู้สูงอายุในระบบ (PID)
-                    </Button>
-                </Link>
+                {canCreate && (
+                    <Link href="/dashboard/elderly/new">
+                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20">
+                            <Plus className="w-4 h-4 mr-2" />
+                            ลงทะเบียนผู้สูงอายุในระบบ (PID)
+                        </Button>
+                    </Link>
+                )}
             </div>
 
             <Card className="bg-card/50 backdrop-blur-sm border-border">

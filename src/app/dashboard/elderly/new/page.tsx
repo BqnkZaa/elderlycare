@@ -142,13 +142,17 @@ export default function NewElderlyPage() {
             )}
 
             {Object.keys(errors).length > 0 && (
-                <div className="bg-destructive/10 text-destructive p-4 rounded-lg border border-destructive/20">
-                    <p className="font-bold flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4" /> พบข้อผิดพลาดในข้อมูล (Validation Errors):
+                <div className="bg-destructive/10 text-destructive p-4 rounded-lg border border-destructive/20 mb-6">
+                    <p className="font-bold flex items-center gap-2 text-lg">
+                        <AlertCircle className="w-5 h-5" /> พบข้อผิดพลาดในข้อมูล (Validation Errors):
                     </p>
-                    <ul className="list-disc pl-5 mt-2 text-sm">
+                    <p className="text-sm mt-1 mb-3 opacity-90">กรุณาตรวจสอบและแก้ไขข้อมูลในช่องดังต่อไปนี้:</p>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm pl-2">
                         {Object.entries(errors).map(([key, error]) => (
-                            <li key={key}>{key}: {error?.message}</li>
+                            <li key={key} className="flex items-start gap-2">
+                                <span className="text-destructive/70 mt-1.5 w-1.5 h-1.5 rounded-full bg-current shrink-0" />
+                                <span>{error?.message}</span>
+                            </li>
                         ))}
                     </ul>
                 </div>

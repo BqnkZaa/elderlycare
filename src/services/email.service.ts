@@ -116,9 +116,9 @@ export const emailService = {
                 console.warn('📧 [EMAIL] No EMAIL_TEMPLATE_ID configured. API send likely to fail.');
             }
 
-            const recipientEmails = Array.isArray(options.to)
-                ? options.to.map(e => e.trim())
-                : [options.to.trim()];
+            const recipientEmail = Array.isArray(options.to)
+                ? options.to[0].trim()
+                : options.to.trim();
 
             const url = 'https://email-api.thaibulksms.com/email/v1/send_template';
 
@@ -129,14 +129,14 @@ export const emailService = {
                     name: fromName,
                     email: fromAddress
                 },
-                mail_to: recipientEmails.map(email => ({ email })),
+                mail_to: { email: recipientEmail },
                 payload: {
                     message: options.html || options.text,
                     title: options.subject
                 }
             };
 
-            console.log(`📧 [EMAIL] API Request body:`, JSON.stringify(body, null, 2));
+            console.log(`📧 [EMAIL] Sending via API to: ${recipientEmail}`);
 
             const response = await fetch(url, {
                 method: 'POST',

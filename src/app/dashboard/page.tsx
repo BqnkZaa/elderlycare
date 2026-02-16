@@ -7,9 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { getCurrentUser } from '@/lib/auth-utils';
+
 
 export default async function DashboardPage() {
     const stats = await getDashboardStats();
+    const user = await getCurrentUser();
+    const canCreate = user?.role !== 'NURSE';
+
 
     return (
         <div className="space-y-6">
@@ -22,13 +27,15 @@ export default async function DashboardPage() {
                         ยินดีต้อนรับสู่ระบบจัดการข้อมูลผู้สูงอายุ
                     </p>
                 </div>
-                <div className="flex gap-2">
-                    <Link href="/dashboard/elderly/new">
-                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20">
-                            ลงทะเบียนผู้สูงอายุใหม่
-                        </Button>
-                    </Link>
-                </div>
+                {canCreate && (
+                    <div className="flex gap-2">
+                        <Link href="/dashboard/elderly/new">
+                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20">
+                                ลงทะเบียนผู้สูงอายุใหม่
+                            </Button>
+                        </Link>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -77,10 +84,12 @@ export default async function DashboardPage() {
                             <Users className="w-8 h-8 mx-auto mb-2 text-primary group-hover:scale-110 transition-transform" />
                             <span className="font-medium text-sm text-foreground">รายชื่อผู้สูงอายุทั้งหมด</span>
                         </Link>
-                        <Link href="/dashboard/elderly/new" className="block p-4 border border-border rounded-lg hover:bg-accent transition-colors text-center group">
-                            <Activity className="w-8 h-8 mx-auto mb-2 text-secondary group-hover:scale-110 transition-transform" />
-                            <span className="font-medium text-sm text-foreground">เพิ่มข้อมูลรายละเอียดเพิ่มในปัจจุบัน</span>
-                        </Link>
+                        {canCreate && (
+                            <Link href="/dashboard/elderly/new" className="block p-4 border border-border rounded-lg hover:bg-accent transition-colors text-center group">
+                                <Activity className="w-8 h-8 mx-auto mb-2 text-secondary group-hover:scale-110 transition-transform" />
+                                <span className="font-medium text-sm text-foreground">เพิ่มข้อมูลรายละเอียดเพิ่มในปัจจุบัน</span>
+                            </Link>
+                        )}
                     </CardContent>
                 </Card>
             </div>

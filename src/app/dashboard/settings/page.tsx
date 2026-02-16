@@ -1,9 +1,7 @@
-/**
- * Settings Page
- */
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings, Shield, Bell, Database } from 'lucide-react';
+import { Settings, Shield, Bell } from 'lucide-react';
+import ExportDataCard from '@/components/dashboard/ExportDataCard';
 
 export default function SettingsPage() {
     return (
@@ -14,6 +12,8 @@ export default function SettingsPage() {
             </h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ExportDataCard />
+
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -43,22 +43,8 @@ export default function SettingsPage() {
                         </p>
                     </CardContent>
                 </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Database className="w-5 h-5 text-emerald-600" />
-                            ฐานข้อมูลทั้งหมด (Database)
-                        </CardTitle>
-                        <CardDescription>สถานะการเชื่อมต่อ</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">
-                            MySQL Database - เชื่อมต่อสำเร็จ
-                        </p>
-                    </CardContent>
-                </Card>
             </div>
         </div>
     );
 }
+

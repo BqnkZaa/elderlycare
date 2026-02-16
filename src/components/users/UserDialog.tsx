@@ -36,12 +36,19 @@ import { useRouter } from 'next/navigation';
 
 interface UserDialogProps {
     user?: any; // If provided, it's edit mode
-    trigger: React.ReactNode;
+    trigger?: React.ReactNode;
     onSuccess?: () => void;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
-export function UserDialog({ user, trigger, onSuccess }: UserDialogProps) {
-    const [open, setOpen] = useState(false);
+export function UserDialog({ user, trigger, onSuccess, open: openProp, onOpenChange: onOpenChangeProp }: UserDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
+
+    // Determine if controlled or uncontrolled
+    const isControlled = openProp !== undefined;
+    const open = isControlled ? openProp : internalOpen;
+    const setOpen = isControlled ? onOpenChangeProp! : setInternalOpen;
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
@@ -128,7 +135,7 @@ export function UserDialog({ user, trigger, onSuccess }: UserDialogProps) {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{trigger}</DialogTrigger>
+            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>{isEdit ? 'แก้ไขข้อมูลผู้ใช้' : 'เพิ่มผู้ใช้งานใหม่'}</DialogTitle>

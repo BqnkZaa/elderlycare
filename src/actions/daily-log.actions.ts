@@ -11,6 +11,8 @@ import { prisma } from '@/lib/prisma';
 import { dailyLogSchema, dailyLogFilterSchema, type DailyLogInput, type DailyLogFilter } from '@/lib/validations';
 import { getPaginationMeta } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
+import { requireRole } from '@/lib/auth-utils';
+
 
 // ============================================
 // CREATE
@@ -18,6 +20,7 @@ import { revalidatePath } from 'next/cache';
 
 export async function createDailyLog(data: DailyLogInput) {
     try {
+        await requireRole(['ADMIN', 'STAFF', 'NURSE']);
         // Validate input
         const validated = dailyLogSchema.parse(data);
 
@@ -210,6 +213,7 @@ export async function getElderlyDailyLogs(elderlyId: string, page: number = 1, p
 
 export async function updateDailyLog(id: string, data: Partial<DailyLogInput>) {
     try {
+        await requireRole(['ADMIN', 'STAFF', 'NURSE']);
         const validated = dailyLogSchema.partial().parse(data);
 
         const log = await prisma.dailyLog.update({
@@ -244,6 +248,7 @@ export async function updateDailyLog(id: string, data: Partial<DailyLogInput>) {
 
 export async function deleteDailyLog(id: string) {
     try {
+        await requireRole(['ADMIN', 'STAFF', 'NURSE']);
         const log = await prisma.dailyLog.delete({
             where: { id },
         });

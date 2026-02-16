@@ -32,13 +32,13 @@ interface DashboardLayoutProps {
 }
 
 const navigation = [
-    { name: 'แดชบอร์ดผู้บริหาร', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'ฐานข้อมูลประชากร', href: '/dashboard/elderly', icon: Users },
-    { name: 'บันทึกอาการประจำวัน', href: '/dashboard/logs', icon: FileText },
-    { name: 'จัดการผู้ใช้งาน', href: '/dashboard/users', icon: Users },
-    { name: 'บันทึกการแจ้งเตือนต่างๆ', href: '/dashboard/alerts', icon: Bell },
-    { name: 'ตั้งค่าระบบ', href: '/dashboard/settings', icon: Settings },
-    { name: 'ศูนย์สั่งการ (Command Center)', href: '/dashboard/command', icon: Grip },
+    { name: 'แดชบอร์ดผู้บริหาร', href: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'STAFF', 'NURSE'] },
+    { name: 'ฐานข้อมูลประชากร', href: '/dashboard/elderly', icon: Users, roles: ['ADMIN', 'STAFF', 'NURSE'] },
+    { name: 'บันทึกอาการประจำวัน', href: '/dashboard/logs', icon: FileText, roles: ['ADMIN', 'STAFF', 'NURSE'] },
+    { name: 'จัดการผู้ใช้งาน', href: '/dashboard/users', icon: Users, roles: ['ADMIN'] },
+    { name: 'บันทึกการแจ้งเตือนต่างๆ', href: '/dashboard/alerts', icon: Bell, roles: ['ADMIN', 'STAFF', 'NURSE'] },
+    { name: 'ตั้งค่าระบบ', href: '/dashboard/settings', icon: Settings, roles: ['ADMIN'] },
+    { name: 'ศูนย์สั่งการ (Command Center)', href: '/dashboard/command', icon: Grip, roles: ['ADMIN'] },
 ];
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
@@ -102,7 +102,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
                 {/* Navigation */}
                 <nav className="p-4 space-y-1">
-                    {navigation.map((item) => {
+                    {navigation.filter(item => !session?.user?.role || item.roles.includes(session.user.role)).map((item) => {
                         const isExactMatch = pathname === item.href;
                         const isSubPathMatch = item.href !== '/dashboard' && pathname.startsWith(item.href + '/');
                         const isActive = isExactMatch || isSubPathMatch;

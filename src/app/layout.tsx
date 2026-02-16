@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   keywords: ["elderly", "care", "management", "health", "Thailand"],
 };
 
+import { Toaster } from "sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,8 +33,10 @@ export default function RootLayout({
       >
         <Providers>
           {children}
+          <Toaster position="top-center" richColors />
         </Providers>
       </body>
     </html>
   );
 }
+

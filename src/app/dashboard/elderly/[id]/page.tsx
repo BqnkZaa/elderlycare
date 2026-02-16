@@ -7,11 +7,14 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { elderlyProfileSchema, type ElderlyProfileInput } from '@/lib/validations';
 import { getElderlyProfile, updateElderlyProfile } from '@/actions/elderly.actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AppointmentList } from '@/components/lists/AppointmentList';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NativeSelect as Select } from '@/components/ui/select';
@@ -70,6 +73,9 @@ function FormField({
 export default function EditElderlyPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
+    const { data: session } = useSession();
+    const isReadOnly = session?.user?.role === 'NURSE';
+
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitResult, setSubmitResult] = useState<{ success: boolean; message: string } | null>(null);
@@ -161,11 +167,20 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
                 </Link>
                 <div>
                     <h1 className="text-2xl font-bold text-foreground">
-                        แก้ไขข้อมูลผู้สูงอายุ (Edit Profile)
+                        {isReadOnly ? 'รายละเอียดผู้สูงอายุ (Elderly Profile)' : 'แก้ไขข้อมูลผู้สูงอายุ (Edit Profile)'}
                     </h1>
                     <p className="text-muted-foreground">ID: {id}</p>
                 </div>
             </div>
+
+            {isReadOnly && (
+                <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg flex items-center gap-2">
+                    <Eye className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm font-medium">
+                        คุณกำลังดูข้อมูลในโหมด "ดูอย่างเดียว" (View Only) - คุณไม่สามารถแก้ไขข้อมูลส่วนตัวได้
+                    </p>
+                </div>
+            )}
 
             {/* Alert Messages */}
             {submitResult && (
@@ -505,6 +520,9 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
                     </CardContent>
                 </Card>
 
+                {/* Medical Appointments */}
+                <AppointmentList elderlyId={id} />
+
                 {/* 9. Allergies */}
                 <Card className="bg-card/50 backdrop-blur-sm border-border">
                     <CardHeader>
@@ -669,29 +687,31 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
                 </Card>
 
                 {/* Action Buttons */}
-                <div className="sticky bottom-4 z-10 flex justify-end gap-4 bg-background/80 p-4 backdrop-blur-sm rounded-xl border border-border shadow-lg">
-                    <Link href="/dashboard/elderly">
-                        <Button variant="outline" type="button" size="lg" className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50">
-                            ยกเลิก (Cancel)
+                {!isReadOnly && (
+                    <div className="sticky bottom-4 z-10 flex justify-end gap-4 bg-background/80 p-4 backdrop-blur-sm rounded-xl border border-border shadow-lg">
+                        <Link href="/dashboard/elderly">
+                            <Button variant="outline" type="button" size="lg" className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50">
+                                ยกเลิก (Cancel)
+                            </Button>
+                        </Link>
+                        <Button type="submit" disabled={isSubmitting} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[200px] shadow-lg shadow-primary/20">
+                            {isSubmitting ? (
+                                <>
+                                    <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                    </svg>
+                                    กำลังบันทึก...
+                                </>
+                            ) : (
+                                <>
+                                    <Save className="w-5 h-5 mr-2" />
+                                    บันทึกการแก้ไข (Update)
+                                </>
+                            )}
                         </Button>
-                    </Link>
-                    <Button type="submit" disabled={isSubmitting} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[200px] shadow-lg shadow-primary/20">
-                        {isSubmitting ? (
-                            <>
-                                <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                </svg>
-                                กำลังบันทึก...
-                            </>
-                        ) : (
-                            <>
-                                <Save className="w-5 h-5 mr-2" />
-                                บันทึกการแก้ไข (Update)
-                            </>
-                        )}
-                    </Button>
-                </div>
+                    </div>
+                )}
             </form>
         </div>
     );

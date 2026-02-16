@@ -54,6 +54,8 @@ export default function UsersPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const { toast } = useToast();
     const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -191,15 +193,14 @@ export default function UsersPage() {
                                                     <DropdownMenuSeparator />
                                                 </>
                                             )}
-                                            <UserDialog
-                                                user={user}
-                                                trigger={
-                                                    <div className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground w-full">
-                                                        <Pencil className="mr-2 h-4 w-4" /> แก้ไขข้อมูล
-                                                    </div>
-                                                }
-                                                onSuccess={fetchUsers}
-                                            />
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    setSelectedUser(user);
+                                                    setIsEditDialogOpen(true);
+                                                }}
+                                            >
+                                                <Pencil className="mr-2 h-4 w-4" /> แก้ไขข้อมูล
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => setDeleteId(user.id)} className="text-red-600 focus:text-red-600">
                                                 <Trash className="mr-2 h-4 w-4" /> ลบผู้ใช้
                                             </DropdownMenuItem>
@@ -282,6 +283,16 @@ export default function UsersPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <UserDialog
+                user={selectedUser}
+                open={isEditDialogOpen}
+                onOpenChange={(open) => {
+                    setIsEditDialogOpen(open);
+                    if (!open) setTimeout(() => setSelectedUser(null), 300); // Clear user after animation
+                }}
+                onSuccess={fetchUsers}
+            />
         </div>
     );
 }
