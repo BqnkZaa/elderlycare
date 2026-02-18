@@ -16,6 +16,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
         '/dashboard/logs',
         '/dashboard/users',
         '/dashboard/alerts',
+        '/dashboard/chat',
         '/dashboard/settings',
         '/dashboard/command',
     ],
@@ -24,12 +25,14 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
         '/dashboard/elderly',
         '/dashboard/logs',
         '/dashboard/alerts',
+        '/dashboard/chat',
     ],
     NURSE: [
         '/dashboard',
         '/dashboard/elderly', // View only (enforced by UI/Actions)
         '/dashboard/logs',
         '/dashboard/alerts',
+        '/dashboard/chat',
     ],
 };
 

@@ -25,6 +25,7 @@ import {
     X,
     ChevronRight,
     Grip,
+    MessageCircle,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -33,10 +34,11 @@ interface DashboardLayoutProps {
 
 const navigation = [
     { name: 'แดชบอร์ดผู้บริหาร', href: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'STAFF', 'NURSE'] },
-    { name: 'ฐานข้อมูลประชากร', href: '/dashboard/elderly', icon: Users, roles: ['ADMIN', 'STAFF', 'NURSE'] },
-    { name: 'บันทึกอาการประจำวัน', href: '/dashboard/logs', icon: FileText, roles: ['ADMIN', 'STAFF', 'NURSE'] },
-    { name: 'จัดการผู้ใช้งาน', href: '/dashboard/users', icon: Users, roles: ['ADMIN'] },
-    { name: 'บันทึกการแจ้งเตือนต่างๆ', href: '/dashboard/alerts', icon: Bell, roles: ['ADMIN', 'STAFF', 'NURSE'] },
+    { name: 'ข้อมูลผู้สูงอายุ', href: '/dashboard/elderly', icon: Users, roles: ['ADMIN', 'STAFF', 'NURSE'] },
+    { name: 'บันทึกประจำวัน', href: '/dashboard/logs', icon: FileText, roles: ['ADMIN', 'STAFF', 'NURSE'] },
+    { name: 'ระบบแจ้งเตือน', href: '/dashboard/alerts', icon: Bell, roles: ['ADMIN', 'STAFF', 'NURSE'] },
+    { name: 'แชท', href: '/dashboard/chat', icon: MessageCircle, roles: ['ADMIN', 'STAFF', 'NURSE'] },
+    { name: 'จัดการผู้ใช้', href: '/dashboard/users', icon: Users, roles: ['ADMIN'] },
     { name: 'ตั้งค่าระบบ', href: '/dashboard/settings', icon: Settings, roles: ['ADMIN'] },
     { name: 'ศูนย์สั่งการ (Command Center)', href: '/dashboard/command', icon: Grip, roles: ['ADMIN'] },
 ];
@@ -188,7 +190,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </header>
 
                 {/* Page content */}
-                <main className="p-10 lg:p-6 space-y-6 flex-1 relative">
+                <main className={cn(
+                    "relative flex-1",
+                    pathname === '/dashboard/chat' ? 'p-1' : 'p-10 lg:p-6 space-y-6'
+                )}>
                     {/* Background Image */}
                     {pathname !== '/dashboard/elderly/new' && (
                         <div className="fixed inset-0 z-0 lg:left-72 pointer-events-none">
