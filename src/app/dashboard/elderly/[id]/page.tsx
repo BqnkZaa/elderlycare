@@ -580,6 +580,337 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
                             </CardContent>
                         </Card>
 
+                        {/* ส่วนที่ 3 ข้อมูลสุขภาพและการประเมินความเสี่ยง */}
+                        <Card className="bg-card/50 backdrop-blur-sm border-border">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-primary">
+                                    <ClipboardList className="w-5 h-5" />
+                                    ส่วนที่ 3 ข้อมูลสุขภาพและการประเมินความเสี่ยง
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-8">
+                                {/* 3.1 ADL */}
+                                <div>
+                                    <h3 className="text-xl font-bold text-primary flex items-center gap-2 mb-4">
+                                        <ClipboardList className="w-5 h-5" />
+                                        3.1 การประเมินความสามารถในการทำกิจวัตรประจำวัน (ADL - Barthel Index)
+                                    </h3>
+                                    <div className="space-y-6">
+                                        <RadioGroupField
+                                            label="การรับประทานอาหาร"
+                                            name="adlEating"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'ทำไม่ได้', value: 'CANNOT_EAT' },
+                                                { label: 'ใส่สายยาง', value: 'TUBE_FED' },
+                                                { label: 'ต้องการคนช่วยหรือป้อน', value: 'NEEDS_HELP' },
+                                                { label: 'ทำได้ด้วยตนเอง', value: 'INDEPENDENT' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การล้างหน้า หวีผม แปรงฟัน"
+                                            name="adlGrooming"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'ต้องการความช่วยเหลือ', value: 'NEEDS_HELP' },
+                                                { label: 'ทำได้ด้วยตนเอง', value: 'INDEPENDENT' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การอาบน้ำ"
+                                            name="adlBathing"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'ต้องการความช่วยเหลือ', value: 'NEEDS_HELP' },
+                                                { label: 'ทำได้ด้วยตนเอง', value: 'INDEPENDENT' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การแต่งตัว"
+                                            name="adlDressing"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'ทำไม่ได้', value: 'CANNOT_DRESS' },
+                                                { label: 'ต้องการคนช่วย', value: 'NEEDS_HELP' },
+                                                { label: 'ทำได้ด้วยตนเอง', value: 'INDEPENDENT' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การกลั้นอุจจาระ (ใน 1 สัปดาห์)"
+                                            name="adlBowel"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'กลั้นไม่ได้', value: 'INCONTINENT' },
+                                                { label: 'สวนอุจจาระ', value: 'ENEMA' },
+                                                { label: 'กลั้นไม่ได้บางครั้ง', value: 'OCCASIONAL_INCONTINENCE' },
+                                                { label: 'กลั้นได้ปกติ', value: 'CONTINENT' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การกลั้นปัสสาวะ (ใน 1 สัปดาห์)"
+                                            name="adlBladder"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'กลั้นไม่ได้', value: 'INCONTINENT' },
+                                                { label: 'ใส่สายสวน', value: 'CATHETER' },
+                                                { label: 'กลั้นไม่ได้บางครั้ง', value: 'OCCASIONAL_INCONTINENCE' },
+                                                { label: 'กลั้นได้ปกติ', value: 'CONTINENT' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การใช้ห้องน้ำ"
+                                            name="adlToilet"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'ทำไม่ได้', value: 'CANNOT_USE' },
+                                                { label: 'ต้องการคนช่วย', value: 'NEEDS_HELP' },
+                                                { label: 'ทำได้ด้วยตนเอง', value: 'INDEPENDENT' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การเคลื่อนย้ายตัว (เตียง-รถเข็น)"
+                                            name="adlTransfer"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'ทำไม่ได้', value: 'CANNOT_TRANSFER' },
+                                                { label: 'นั่งได้ต้องมีคนช่วย', value: 'NEEDS_HELP_SITTING' },
+                                                { label: 'ต้องการคนช่วย', value: 'NEEDS_HELP' },
+                                                { label: 'ทำได้ด้วยตนเอง', value: 'INDEPENDENT' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การเคลื่อนที่ (เดิน/รถเข็น)"
+                                            name="adlMobility"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'เคลื่อนที่ไม่ได้', value: 'IMMOBILE' },
+                                                { label: 'ใช้รถเข็นได้เอง', value: 'WHEELCHAIR_INDEPENDENT' },
+                                                { label: 'เดินได้ต้องมีคนช่วย', value: 'NEEDS_HELP_WALKING' },
+                                                { label: 'เดินได้ด้วยตนเอง', value: 'INDEPENDENT' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การขึ้นลงบันได (1 ชั้น)"
+                                            name="adlStairs"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'ทำไม่ได้', value: 'CANNOT_CLIMB' },
+                                                { label: 'ต้องการคนช่วย', value: 'NEEDS_HELP' },
+                                                { label: 'ทำได้เอง', value: 'INDEPENDENT' },
+                                            ]}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* 3.2 Medical Complexity */}
+                                <div className="pt-8 border-t border-border/50">
+                                    <h3 className="text-xl font-bold text-primary flex items-center gap-2 mb-4">
+                                        <ClipboardList className="w-5 h-5" />
+                                        3.2 ความซับซ้อนทางการแพทย์แบบเบื้องต้น (Medical Complexity)
+                                    </h3>
+                                    <div className="space-y-6">
+                                        <div className="space-y-4">
+                                            <label className="block text-md font-bold text-foreground">ระบบทางเดินอาหารและขับถ่าย</label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('hasNgt')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>สายให้อาหารทางจมูก (NGT)</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('hasPeg')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>สายให้อาหารทางหน้าท้อง (PEG)</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('hasFoleyCatheter')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>สายสวนปัสสาวะ (Foley Catheter)</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('hasColostomy')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ทวารเทียม (Colostomy)</span></label>
+                                        </div>
+
+                                        <div className="space-y-4 pt-4 border-t">
+                                            <label className="block text-md font-bold text-foreground">ระบบทางเดินหายใจ</label>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <FormField label="ให้ออกซิเจน (O2 Cannula - ระบุลิตร/นาที)">
+                                                    <Input placeholder="ลิตร/นาที" {...register('oxygenCannulaLiters')} disabled={isReadOnly} className="bg-background/50" />
+                                                </FormField>
+                                                <FormField label="ให้ออกซิเจน (O2 Mask - ระบุลิตร/นาที)">
+                                                    <Input placeholder="ลิตร/นาที" {...register('oxygenMaskLiters')} disabled={isReadOnly} className="bg-background/50" />
+                                                </FormField>
+                                                <FormField label="เครื่องช่วยหายใจ (Ventilator - ระบุโหมด)">
+                                                    <Input placeholder="โหมด..." {...register('ventilatorMode')} disabled={isReadOnly} className="bg-background/50" />
+                                                </FormField>
+                                            </div>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('needSuction')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ต้องดูดเสมหะ (Suction)</span></label>
+                                        </div>
+
+                                        <div className="space-y-4 pt-4 border-t">
+                                            <label className="block text-md font-bold text-foreground">แผลและผิวหนัง</label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('woundsNone')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ไม่มีแผล</span></label>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <FormField label="แผลกดทับ ระดับ 1 (ตำแหน่ง)">
+                                                    <Input placeholder="ตำแหน่ง..." {...register('bedsoreStage1Location')} disabled={isReadOnly} className="bg-background/50" />
+                                                </FormField>
+                                                <FormField label="แผลกดทับ ระดับ 2 (ตำแหน่ง)">
+                                                    <Input placeholder="ตำแหน่ง..." {...register('bedsoreStage2Location')} disabled={isReadOnly} className="bg-background/50" />
+                                                </FormField>
+                                                <FormField label="แผลกดทับ ระดับ 3 (ตำแหน่ง)">
+                                                    <Input placeholder="ตำแหน่ง..." {...register('bedsoreStage3Location')} disabled={isReadOnly} className="bg-background/50" />
+                                                </FormField>
+                                                <FormField label="แผลกดทับ ระดับ 4 (ตำแหน่ง)">
+                                                    <Input placeholder="ตำแหน่ง..." {...register('bedsoreStage4Location')} disabled={isReadOnly} className="bg-background/50" />
+                                                </FormField>
+                                                <FormField label="แผลเบาหวาน (ตำแหน่ง)">
+                                                    <Input placeholder="ตำแหน่ง..." {...register('diabeticWoundLocation')} disabled={isReadOnly} className="bg-background/50" />
+                                                </FormField>
+                                                <FormField label="แผลผ่าตัด (ตำแหน่ง)">
+                                                    <Input placeholder="ตำแหน่ง..." {...register('surgicalWoundLocation')} disabled={isReadOnly} className="bg-background/50" />
+                                                </FormField>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4 pt-4 border-t">
+                                            <label className="block text-md font-bold text-foreground">การรักษาเฉพาะทาง</label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('hasCapd')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ล้างไตทางหน้าท้อง (CAPD)</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('hasHd')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ฟอกเลือดด้วยเครื่อง (HD)</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('hasIvSupport')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ให้สารน้ำ/ยาทางหลอดเลือด (IV)</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('requireBloodSugarCheck')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>เจาะค่าน้ำตาล/เบาหวาน</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 3.3 Cognitive & Behavioral Status */}
+                                <div className="pt-8 border-t border-border/50">
+                                    <h3 className="text-xl font-bold text-primary flex items-center gap-2 mb-4">
+                                        <ClipboardList className="w-5 h-5" />
+                                        3.3 อารมณ์และพฤติกรรม (Cognitive & Behavioral Status)
+                                    </h3>
+                                    <div className="space-y-6">
+                                        <RadioGroupField
+                                            label="กลุ่มอาการทางสมอง"
+                                            name="cognitiveStatus"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'อัลไซเมอร์ / สมองเสื่อม (เดินได้ - เสี่ยงพลัดหลง)', value: 'ALZHEIMERS_MOBILE_WANDERING' },
+                                                { label: 'อัลไซเมอร์ / สมองเสื่อม (เดินไม่ได้)', value: 'ALZHEIMERS_IMMOBILE' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="พฤติกรรมก้าวร้าว/โวยวาย"
+                                            name="aggressiveStatus"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'โวยวาย/ก้าวร้าว (มีประวัติใช้ยาควบคุมอาการ)', value: 'AGGRESSIVE_WITH_MEDS' },
+                                                { label: 'โวยวาย/ก้าวร้าว (ไม่มีประวัติใช้ยาควบคุมอาการ)', value: 'AGGRESSIVE_NO_MEDS' },
+                                            ]}
+                                        />
+                                        <div className="space-y-4 pt-4 border-t">
+                                            <label className="block text-md font-bold text-foreground">พฤติกรรมเสี่ยงอื่นๆ</label>
+                                            <FormField label="อาการสับสนวุ่นวายเสียงดัง (ระบุช่วงเวลา)">
+                                                <Input placeholder="เช่น ช่วงเย็น..." {...register('noisyConfusionTimeframe')} disabled={isReadOnly} className="bg-background/50 max-w-md" />
+                                            </FormField>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('talksToSelfQuietly')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>พูดคนเดียวเสียงไม่ดัง</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('psychiatricWithMeds')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>จิตเวช (มียารับประทาน)</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('psychiatricNoMeds')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>จิตเวช (ไม่มียารับประทาน)</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 3.4 Additional Safety Risks */}
+                                <div className="pt-8 border-t border-border/50">
+                                    <h3 className="text-xl font-bold text-primary flex items-center gap-2 mb-4">
+                                        <ClipboardList className="w-5 h-5" />
+                                        3.4 ความเสี่ยงเพิ่มเติม (Additional Safety Risks)
+                                    </h3>
+                                    <div className="space-y-6">
+                                        <RadioGroupField
+                                            label="ประวัติการหกล้ม (Fall History)"
+                                            name="fallHistoryLevel"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'ไม่เคยล้มใน 6 เดือนที่ผ่านมา', value: 'NONE_IN_6_MONTHS' },
+                                                { label: 'ล้ม 1-2 ครั้ง', value: 'ONCE_OR_TWICE' },
+                                                { label: 'ล้มบ่อยครั้ง (เสี่ยงสูง)', value: 'FREQUENT_HIGH_RISK' },
+                                            ]}
+                                        />
+                                        <RadioGroupField
+                                            label="การประเมินแผลกดทับ (Braden Scale)"
+                                            name="bradenScale"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: 'คะแนน > 12 (ความเสี่ยงต่ำ-ปานกลาง)', value: 'LOW_TO_MODERATE_RISK' },
+                                                { label: 'คะแนน ≤ 12 (ความเสี่ยงสูงมาก - ต้องมีที่นอนลม)', value: 'HIGH_RISK' },
+                                            ]}
+                                        />
+                                        <div className="space-y-4 pt-4 border-t">
+                                            <label className="block text-md font-bold text-foreground">ความเสี่ยงการติดเชื้อ (Infection)</label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('infectionNone')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ไม่มีโรคติดต่อ</span></label>
+                                            <FormField label="มีเชื้อดื้อยา / วัณโรค / อื่นๆ (ระบุ)">
+                                                <Input placeholder="ระบุ..." {...register('infectionDetails')} disabled={isReadOnly} className="bg-background/50 max-w-md" />
+                                            </FormField>
+                                        </div>
+                                        <RadioGroupField
+                                            label="ความเปราะบาง (Frailty Score)"
+                                            name="frailtyScore"
+                                            register={register}
+                                            disabled={isReadOnly}
+                                            options={[
+                                                { label: '0-1 (แข็งแรง)', value: 'ROBUST' },
+                                                { label: '2-3 (เริ่มเปราะบาง)', value: 'PRE_FRAIL' },
+                                                { label: '4-5 (เปราะบางสูง)', value: 'FRAIL' },
+                                            ]}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* 3.5 Hospitalization & Medications */}
+                                <div className="pt-8 border-t border-border/50">
+                                    <h3 className="text-xl font-bold text-primary flex items-center gap-2 mb-4">
+                                        <ClipboardList className="w-5 h-5" />
+                                        3.5 การไปโรงพยาบาลล่าสุด และยาในปัจจุบัน
+                                    </h3>
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField label="วันที่ออกจากโรงพยาบาล (DD/MM/YYYY)">
+                                                <Input placeholder="01/01/2026" {...register('recentDischargeDate')} disabled={isReadOnly} className="bg-background/50" />
+                                            </FormField>
+                                            <FormField label="โรงพยาบาลที่รักษา">
+                                                <Input placeholder="ระบุโรงพยาบาล" {...register('recentHospital')} disabled={isReadOnly} className="bg-background/50" />
+                                            </FormField>
+                                            <FormField label="สาเหตุที่เข้ารับการรักษา">
+                                                <Input placeholder="ระบุสาเหตุ" {...register('recentAdmissionReason')} disabled={isReadOnly} className="bg-background/50" />
+                                            </FormField>
+                                            <FormField label="การนัดหมายแพทย์ครั้งถัดไป (DD/MM/YYYY)">
+                                                <Input placeholder="01/02/2026" {...register('nextAppointmentDate')} disabled={isReadOnly} className="bg-background/50" />
+                                            </FormField>
+                                        </div>
+
+                                        <div className="space-y-4 pt-4 border-t">
+                                            <label className="block text-md font-bold text-foreground">การรับประทานยาในปัจจุบัน</label>
+                                            <RadioGroupField
+                                                label="จำนวนยาที่ทานประจำ (Polypharmacy)"
+                                                name="polypharmacy"
+                                                register={register}
+                                                disabled={isReadOnly}
+                                                options={[
+                                                    { label: 'น้อยกว่า 5 ชนิด', value: 'LESS_THAN_5' },
+                                                    { label: 'มากกว่า 5 ชนิดขึ้นไป', value: 'FIVE_OR_MORE' },
+                                                ]}
+                                            />
+                                            <label className="block text-sm font-medium text-foreground mt-4">กลุ่มยาที่มีความเสี่ยงสูง (High-alert meds)</label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('highAlertAnticoagulant')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ยาละลายลิ่มเลือด/ต้านเกล็ดเลือด (เลือดออกง่าย)</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('highAlertDiabetic')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ยาเบาหวาน/ฉีดอินซูลิน (เสี่ยงน้ำตาลตก)</span></label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}><input type="checkbox" {...register('highAlertPsychiatric')} disabled={isReadOnly} className="w-4 h-4 text-primary" /><span>ยาจิตเวช/ยานอนหลับ (เสี่ยงพลัดตกหกล้ม)</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
                         {/* Action Buttons inside Form */}
                         {!isReadOnly && (
                             <div className="sticky bottom-4 z-10 flex justify-end gap-4 bg-background/80 p-4 backdrop-blur-sm rounded-xl border border-border shadow-lg">

@@ -106,6 +106,71 @@ export async function createInquiry(data: PublicAdmissionInput) {
                 bedroomLocation: data.bedroomLocation,
                 familyGenogram: data.familyGenogram,
 
+                // ==========================================
+                // PART 3: OCM/ADL & Medical Complexity
+                // ==========================================
+
+                // ADL (Part 1)
+                adlEating: data.adlEating as any,
+                adlGrooming: data.adlGrooming as any,
+                adlBathing: data.adlBathing as any,
+                adlDressing: data.adlDressing as any,
+                adlBowel: data.adlBowel as any,
+                adlBladder: data.adlBladder as any,
+                adlToilet: data.adlToilet as any,
+                adlTransfer: data.adlTransfer as any,
+                adlMobility: data.adlMobility as any,
+                adlStairs: data.adlStairs as any,
+
+                // Medical Complexity (Part 2)
+                hasNgt: data.hasNgt,
+                hasPeg: data.hasPeg,
+                hasFoleyCatheter: data.hasFoleyCatheter,
+                hasColostomy: data.hasColostomy,
+                oxygenCannulaLiters: data.oxygenCannulaLiters,
+                oxygenMaskLiters: data.oxygenMaskLiters,
+                ventilatorMode: data.ventilatorMode,
+                needSuction: data.needSuction,
+
+                woundsNone: data.woundsNone,
+                bedsoreStage1Location: data.bedsoreStage1Location,
+                bedsoreStage2Location: data.bedsoreStage2Location,
+                bedsoreStage3Location: data.bedsoreStage3Location,
+                bedsoreStage4Location: data.bedsoreStage4Location,
+                diabeticWoundLocation: data.diabeticWoundLocation,
+                surgicalWoundLocation: data.surgicalWoundLocation,
+
+                hasCapd: data.hasCapd,
+                hasHd: data.hasHd,
+                hasIvSupport: data.hasIvSupport,
+                requireBloodSugarCheck: data.requireBloodSugarCheck,
+
+                // Cognitive & Behavioral (Part 3)
+                cognitiveStatus: data.cognitiveStatus as any,
+                aggressiveStatus: data.aggressiveStatus as any,
+                noisyConfusionTimeframe: data.noisyConfusionTimeframe,
+                talksToSelfQuietly: data.talksToSelfQuietly,
+                psychiatricWithMeds: data.psychiatricWithMeds,
+                psychiatricNoMeds: data.psychiatricNoMeds,
+
+                // Safety Risks (Part 4)
+                fallHistoryLevel: data.fallHistoryLevel as any,
+                bradenScale: data.bradenScale as any,
+                infectionNone: data.infectionNone,
+                infectionDetails: data.infectionDetails,
+                frailtyScore: data.frailtyScore as any,
+
+                // Hospital & Medications (Part 5)
+                recentDischargeDate: data.recentDischargeDate,
+                recentHospital: data.recentHospital,
+                recentAdmissionReason: data.recentAdmissionReason,
+                nextAppointmentDate: data.nextAppointmentDate,
+
+                polypharmacy: data.polypharmacy as any,
+                highAlertAnticoagulant: data.highAlertAnticoagulant,
+                highAlertDiabetic: data.highAlertDiabetic,
+                highAlertPsychiatric: data.highAlertPsychiatric,
+
                 status: "PENDING",
             },
         });

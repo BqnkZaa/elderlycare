@@ -133,6 +133,71 @@ export const elderlyProfileSchema = z.object({
     subDistrict: z.string().optional(),
     postalCode: z.string().optional(),
 
+    // ==========================================
+    // PART 3: ADL & Medical Complexity
+    // ==========================================
+
+    // ADL (Part 1)
+    adlEating: z.enum(["CANNOT_EAT", "TUBE_FED", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
+    adlGrooming: z.enum(["NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
+    adlBathing: z.enum(["NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
+    adlDressing: z.enum(["CANNOT_DRESS", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
+    adlBowel: z.enum(["INCONTINENT", "ENEMA", "OCCASIONAL_INCONTINENCE", "CONTINENT"]).optional().nullable(),
+    adlBladder: z.enum(["INCONTINENT", "CATHETER", "OCCASIONAL_INCONTINENCE", "CONTINENT"]).optional().nullable(),
+    adlToilet: z.enum(["CANNOT_USE", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
+    adlTransfer: z.enum(["CANNOT_TRANSFER", "NEEDS_HELP_SITTING", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
+    adlMobility: z.enum(["IMMOBILE", "WHEELCHAIR_INDEPENDENT", "NEEDS_HELP_WALKING", "INDEPENDENT"]).optional().nullable(),
+    adlStairs: z.enum(["CANNOT_CLIMB", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
+
+    // Medical Complexity (Part 2)
+    hasNgt: z.boolean().default(false),
+    hasPeg: z.boolean().default(false),
+    hasFoleyCatheter: z.boolean().default(false),
+    hasColostomy: z.boolean().default(false),
+    oxygenCannulaLiters: z.string().optional(),
+    oxygenMaskLiters: z.string().optional(),
+    ventilatorMode: z.string().optional(),
+    needSuction: z.boolean().default(false),
+
+    woundsNone: z.boolean().default(true),
+    bedsoreStage1Location: z.string().optional(),
+    bedsoreStage2Location: z.string().optional(),
+    bedsoreStage3Location: z.string().optional(),
+    bedsoreStage4Location: z.string().optional(),
+    diabeticWoundLocation: z.string().optional(),
+    surgicalWoundLocation: z.string().optional(),
+
+    hasCapd: z.boolean().default(false),
+    hasHd: z.boolean().default(false),
+    hasIvSupport: z.boolean().default(false),
+    requireBloodSugarCheck: z.boolean().default(false),
+
+    // Cognitive & Behavioral (Part 3)
+    cognitiveStatus: z.enum(["ALZHEIMERS_MOBILE_WANDERING", "ALZHEIMERS_IMMOBILE"]).optional().nullable(),
+    aggressiveStatus: z.enum(["AGGRESSIVE_WITH_MEDS", "AGGRESSIVE_NO_MEDS"]).optional().nullable(),
+    noisyConfusionTimeframe: z.string().optional(),
+    talksToSelfQuietly: z.boolean().default(false),
+    psychiatricWithMeds: z.boolean().default(false),
+    psychiatricNoMeds: z.boolean().default(false),
+
+    // Safety Risks (Part 4)
+    fallHistoryLevel: z.enum(["NONE_IN_6_MONTHS", "ONCE_OR_TWICE", "FREQUENT_HIGH_RISK"]).optional().nullable(),
+    bradenScale: z.enum(["LOW_TO_MODERATE_RISK", "HIGH_RISK"]).optional().nullable(),
+    infectionNone: z.boolean().default(true),
+    infectionDetails: z.string().optional(),
+    frailtyScore: z.enum(["ROBUST", "PRE_FRAIL", "FRAIL"]).optional().nullable(),
+
+    // Hospital & Medications (Part 5)
+    recentDischargeDate: z.string().optional(),
+    recentHospital: z.string().optional(),
+    recentAdmissionReason: z.string().optional(),
+    nextAppointmentDate: z.string().optional(),
+
+    polypharmacy: z.enum(["LESS_THAN_5", "FIVE_OR_MORE"]).optional().nullable(),
+    highAlertAnticoagulant: z.boolean().default(false),
+    highAlertDiabetic: z.boolean().default(false),
+    highAlertPsychiatric: z.boolean().default(false),
+
     // System
     isActive: z.boolean().default(true),
     bloodType: z.enum(["A_POSITIVE", "A_NEGATIVE", "B_POSITIVE", "B_NEGATIVE", "O_POSITIVE", "O_NEGATIVE", "AB_POSITIVE", "AB_NEGATIVE", "UNKNOWN"]).optional(),
@@ -225,3 +290,34 @@ export const dailyLogFilterSchema = z.object({
 });
 
 export type DailyLogFilter = z.infer<typeof dailyLogFilterSchema>;
+
+export const partnerCenterSchema = z.object({
+    pid: z.string().min(1, "กรุณาระบุรหัสศูนย์ (PID)"),
+    name: z.string().min(1, "กรุณาระบุชื่อศูนย์"),
+    contact: z.string().optional(),
+    address: z.string().optional(),
+
+    // Supported Patient Types
+    supportIndependentNonBedridden: z.boolean().default(true),
+    supportIndependentBedridden: z.boolean().default(false),
+    supportDependentBedridden: z.boolean().default(false),
+
+    supportNormalDiet: z.boolean().default(true),
+    supportSoftDiet: z.boolean().default(true),
+    supportNeedsFeeding: z.boolean().default(false),
+    supportTubeFeeding: z.boolean().default(false),
+
+    supportTracheostomy: z.boolean().default(false),
+    supportBedsore: z.boolean().default(false),
+    supportAirMattress: z.boolean().default(false),
+    supportOxygen: z.boolean().default(false),
+    supportVentilator: z.boolean().default(false),
+
+    supportPsychiatric: z.boolean().default(false),
+    supportAggressiveBehavior: z.boolean().default(false),
+    supportPsychiatricMedication: z.boolean().default(false),
+
+    isActive: z.boolean().default(true),
+});
+
+export type PartnerCenterInput = z.infer<typeof partnerCenterSchema>;

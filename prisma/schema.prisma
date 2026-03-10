@@ -217,6 +217,108 @@ enum PsychiatricStatus {
 }
 
 // ============================================
+// PART 3 ENUMS 
+// ============================================
+
+// ADL Enums
+enum AdlEatingStatus {
+  CANNOT_EAT
+  TUBE_FED
+  NEEDS_HELP
+  INDEPENDENT
+}
+
+enum AdlGroomingStatus {
+  NEEDS_HELP
+  INDEPENDENT
+}
+
+enum AdlBathingStatus {
+  NEEDS_HELP
+  INDEPENDENT
+}
+
+enum AdlDressingStatus {
+  CANNOT_DRESS
+  NEEDS_HELP
+  INDEPENDENT
+}
+
+enum AdlBowelStatus {
+  INCONTINENT
+  ENEMA
+  OCCASIONAL_INCONTINENCE
+  CONTINENT
+}
+
+enum AdlBladderStatus {
+  INCONTINENT
+  CATHETER
+  OCCASIONAL_INCONTINENCE
+  CONTINENT
+}
+
+enum AdlToiletStatus {
+  CANNOT_USE
+  NEEDS_HELP
+  INDEPENDENT
+}
+
+enum AdlTransferStatus {
+  CANNOT_TRANSFER
+  NEEDS_HELP_SITTING
+  NEEDS_HELP
+  INDEPENDENT
+}
+
+enum AdlMobilityStatus {
+  IMMOBILE
+  WHEELCHAIR_INDEPENDENT
+  NEEDS_HELP_WALKING
+  INDEPENDENT
+}
+
+enum AdlStairsStatus {
+  CANNOT_CLIMB
+  NEEDS_HELP
+  INDEPENDENT
+}
+
+// Cognitive & Behavioral Enums
+enum CognitiveStatus {
+  ALZHEIMERS_MOBILE_WANDERING
+  ALZHEIMERS_IMMOBILE
+}
+
+enum AggressiveStatus {
+  AGGRESSIVE_WITH_MEDS
+  AGGRESSIVE_NO_MEDS
+}
+
+// Safety Risk Enums
+enum FallHistoryLevel {
+  NONE_IN_6_MONTHS
+  ONCE_OR_TWICE
+  FREQUENT_HIGH_RISK
+}
+
+enum BradenScale {
+  LOW_TO_MODERATE_RISK
+  HIGH_RISK
+}
+
+enum FrailtyScore {
+  ROBUST
+  PRE_FRAIL
+  FRAIL
+}
+
+enum Polypharmacy {
+  LESS_THAN_5
+  FIVE_OR_MORE
+}
+
+// ============================================
 // MODELS
 // ============================================
 
@@ -357,6 +459,71 @@ model ElderlyProfile {
   homeType        HomeType?
   bedroomLocation String?   @db.VarChar(50)
   familyGenogram  String?   @db.Text
+
+  // ==========================================
+  // PART 3: ADL & Medical Complexity
+  // ==========================================
+  
+  // ADL (Part 1)
+  adlEating      AdlEatingStatus?
+  adlGrooming    AdlGroomingStatus?
+  adlBathing     AdlBathingStatus?
+  adlDressing    AdlDressingStatus?
+  adlBowel       AdlBowelStatus?
+  adlBladder     AdlBladderStatus?
+  adlToilet      AdlToiletStatus?
+  adlTransfer    AdlTransferStatus?
+  adlMobility    AdlMobilityStatus?
+  adlStairs      AdlStairsStatus?
+
+  // Medical Complexity (Part 2)
+  hasNgt                 Boolean @default(false)
+  hasPeg                 Boolean @default(false)
+  hasFoleyCatheter       Boolean @default(false)
+  hasColostomy           Boolean @default(false)
+  oxygenCannulaLiters    String? @db.VarChar(50)
+  oxygenMaskLiters       String? @db.VarChar(50)
+  ventilatorMode         String? @db.VarChar(50)
+  needSuction            Boolean @default(false)
+  
+  woundsNone             Boolean @default(true)
+  bedsoreStage1Location  String? @db.VarChar(100)
+  bedsoreStage2Location  String? @db.VarChar(100)
+  bedsoreStage3Location  String? @db.VarChar(100)
+  bedsoreStage4Location  String? @db.VarChar(100)
+  diabeticWoundLocation  String? @db.VarChar(100)
+  surgicalWoundLocation  String? @db.VarChar(100)
+
+  hasCapd                Boolean @default(false)
+  hasHd                  Boolean @default(false)
+  hasIvSupport           Boolean @default(false)
+  requireBloodSugarCheck Boolean @default(false)
+
+  // Cognitive & Behavioral (Part 3)
+  cognitiveStatus         CognitiveStatus?
+  aggressiveStatus        AggressiveStatus?
+  noisyConfusionTimeframe String? @db.VarChar(100)
+  talksToSelfQuietly      Boolean @default(false)
+  psychiatricWithMeds     Boolean @default(false)
+  psychiatricNoMeds       Boolean @default(false)
+
+  // Safety Risks (Part 4)
+  fallHistoryLevel FallHistoryLevel?
+  bradenScale      BradenScale?
+  infectionNone    Boolean          @default(true)
+  infectionDetails String?          @db.VarChar(200)
+  frailtyScore     FrailtyScore?
+
+  // Hospital & Medications (Part 5)
+  recentDischargeDate      String? @db.VarChar(50) 
+  recentHospital           String? @db.VarChar(150)
+  recentAdmissionReason    String? @db.Text
+  nextAppointmentDate      String? @db.VarChar(50)
+  
+  polypharmacy             Polypharmacy?
+  highAlertAnticoagulant   Boolean      @default(false)
+  highAlertDiabetic        Boolean      @default(false)
+  highAlertPsychiatric     Boolean      @default(false)
 
   // Address Information (Keep optional for backward compatibility/if needed)
   address     String? @db.VarChar(255)
@@ -648,12 +815,118 @@ model Inquiry {
   bedroomLocation String?   @db.VarChar(50)
   familyGenogram  String?   @db.Text
 
+  // ==========================================
+  // PART 3: ADL & Medical Complexity
+  // ==========================================
+  
+  // ADL (Part 1)
+  adlEating      AdlEatingStatus?
+  adlGrooming    AdlGroomingStatus?
+  adlBathing     AdlBathingStatus?
+  adlDressing    AdlDressingStatus?
+  adlBowel       AdlBowelStatus?
+  adlBladder     AdlBladderStatus?
+  adlToilet      AdlToiletStatus?
+  adlTransfer    AdlTransferStatus?
+  adlMobility    AdlMobilityStatus?
+  adlStairs      AdlStairsStatus?
+
+  // Medical Complexity (Part 2)
+  hasNgt                 Boolean @default(false)
+  hasPeg                 Boolean @default(false)
+  hasFoleyCatheter       Boolean @default(false)
+  hasColostomy           Boolean @default(false)
+  oxygenCannulaLiters    String? @db.VarChar(50)
+  oxygenMaskLiters       String? @db.VarChar(50)
+  ventilatorMode         String? @db.VarChar(50)
+  needSuction            Boolean @default(false)
+  
+  woundsNone             Boolean @default(true)
+  bedsoreStage1Location  String? @db.VarChar(100)
+  bedsoreStage2Location  String? @db.VarChar(100)
+  bedsoreStage3Location  String? @db.VarChar(100)
+  bedsoreStage4Location  String? @db.VarChar(100)
+  diabeticWoundLocation  String? @db.VarChar(100)
+  surgicalWoundLocation  String? @db.VarChar(100)
+
+  hasCapd                Boolean @default(false)
+  hasHd                  Boolean @default(false)
+  hasIvSupport           Boolean @default(false)
+  requireBloodSugarCheck Boolean @default(false)
+
+  // Cognitive & Behavioral (Part 3)
+  cognitiveStatus         CognitiveStatus?
+  aggressiveStatus        AggressiveStatus?
+  noisyConfusionTimeframe String? @db.VarChar(100)
+  talksToSelfQuietly      Boolean @default(false)
+  psychiatricWithMeds     Boolean @default(false)
+  psychiatricNoMeds       Boolean @default(false)
+
+  // Safety Risks (Part 4)
+  fallHistoryLevel FallHistoryLevel?
+  bradenScale      BradenScale?
+  infectionNone    Boolean          @default(true)
+  infectionDetails String?          @db.VarChar(200)
+  frailtyScore     FrailtyScore?
+
+  // Hospital & Medications (Part 5)
+  recentDischargeDate      String? @db.VarChar(50) 
+  recentHospital           String? @db.VarChar(150)
+  recentAdmissionReason    String? @db.Text
+  nextAppointmentDate      String? @db.VarChar(50)
+  
+  polypharmacy             Polypharmacy?
+  highAlertAnticoagulant   Boolean      @default(false)
+  highAlertDiabetic        Boolean      @default(false)
+  highAlertPsychiatric     Boolean      @default(false)
+
   message   String?  @db.Text
   status    String   @default("PENDING") @db.VarChar(20) // PENDING, CONTACTED
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("inquiries")
+}
+
+/// Model for managing partner centers (PID) and their supported patient types
+model PartnerCenter {
+  id          String   @id @default(uuid())
+  pid         String   @unique @db.VarChar(20) // Center Code e.g., PID001
+  name        String   @db.VarChar(200)        // Center Name
+  contact     String?  @db.VarChar(255)        // Contact Phone
+  address     String?  @db.Text                // Address
+  
+  // --- Supported Patient Types (Referencing Section 2 of Registration Form) ---
+  
+  // Self Help Capability (การช่วยเหลือตัวเอง)
+  supportIndependentNonBedridden Boolean @default(true)
+  supportIndependentBedridden    Boolean @default(false)
+  supportDependentBedridden      Boolean @default(false)
+  
+  // Diet Types (การทานอาหาร)
+  supportNormalDiet   Boolean @default(true)
+  supportSoftDiet     Boolean @default(true)
+  supportNeedsFeeding Boolean @default(false)
+  supportTubeFeeding  Boolean @default(false)
+
+  // Medical Support Needs (เครื่องมือ/การพยาบาลพิเศษ)
+  supportTracheostomy Boolean @default(false) // เจาะคอ
+  supportBedsore      Boolean @default(false) // แผลกดทับ
+  supportAirMattress  Boolean @default(false) // ที่นอนลม
+  supportOxygen       Boolean @default(false) // อ็อกซิเจน
+  supportVentilator   Boolean @default(false) // เครื่องช่วยหายใจ
+
+  // Psychiatric & Behavioral (จิตเวช/พฤติกรรม)
+  supportPsychiatric           Boolean @default(false) // จิตเวช/อัลไซเมอร์
+  supportAggressiveBehavior    Boolean @default(false) // โวยวาย/ด่าทอ
+  supportPsychiatricMedication Boolean @default(false) // ยาระงับอาการ
+
+  // System Metadata
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("partner_centers")
 }
 
 // ============================================
