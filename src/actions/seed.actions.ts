@@ -813,6 +813,60 @@ export async function seedScheduledActivities() {
     }
 }
 
+export async function seedPartnerCenters() {
+    try {
+        const partners = [];
+        for (let i = 1; i <= 300; i++) {
+            const pid = `PID${i.toString().padStart(3, '0')}`;
+            partners.push({
+                pid,
+                name: `ศูนย์ดูแลผู้สูงอายุสาขา ${i}`,
+                contact: `081-${Math.floor(100 + Math.random() * 900)}-${Math.floor(1000 + Math.random() * 9000)}`,
+                address: `${i}/${Math.floor(Math.random() * 100)} ถ.สุขุมวิท กรุงเทพฯ`,
+                isActive: true,
+                // Varied support types
+                supportIndependentNonBedridden: Math.random() > 0.2,
+                supportIndependentBedridden: Math.random() > 0.5,
+                supportDependentBedridden: Math.random() > 0.6,
+                supportNormalDiet: true,
+                supportSoftDiet: true,
+                supportNeedsFeeding: Math.random() > 0.4,
+                supportTubeFeeding: Math.random() > 0.7,
+                supportTracheostomy: Math.random() > 0.8,
+                supportBedsore: Math.random() > 0.6,
+                supportAirMattress: Math.random() > 0.5,
+                supportOxygen: Math.random() > 0.7,
+                supportVentilator: Math.random() > 0.9,
+                supportPsychiatric: Math.random() > 0.5,
+                supportAggressiveBehavior: Math.random() > 0.8,
+                supportPsychiatricMedication: Math.random() > 0.6,
+            });
+        }
+
+        // Using createMany for performance
+        // Note: upsert in a loop is safer but slower. 
+        // Given the requirement is specifically 300 new ones, and PID is unique, 
+        // we'll use createMany but check for existence first or just clear them.
+
+        // For a seed, often we clear or skip. Let's do a loop with upsert but in chunks if needed.
+        // Actually, createMany is fine if we are sure they don't exist, or we can use a loop for safety.
+
+        console.log('Seeding 300 partner centers...');
+        for (const p of partners) {
+            await prisma.partnerCenter.upsert({
+                where: { pid: p.pid },
+                update: p,
+                create: p,
+            });
+        }
+
+        return { success: true, message: 'Partner centers seeded successfully (300 centers)' };
+    } catch (error) {
+        console.error('Error seeding partner centers:', error);
+        return { success: false, error: 'Failed to seed partner centers' };
+    }
+}
+
 // Main seed function that calls all others
 export async function seedAll() {
     const results = {
@@ -820,7 +874,8 @@ export async function seedAll() {
         elderlyProfiles: await seedElderlyProfiles(),
         dailyLogs: await seedDailyLogs(),
         appointments: await seedAppointments(),
-        scheduledActivities: await seedScheduledActivities()
+        scheduledActivities: await seedScheduledActivities(),
+        partnerCenters: await seedPartnerCenters()
     };
 
     const allSuccess = Object.values(results).every(r => r.success);

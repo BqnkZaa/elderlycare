@@ -21,6 +21,7 @@ import {
     seedDailyLogs,
     seedAppointments,
     seedScheduledActivities,
+    seedPartnerCenters,
     seedAll
 } from '@/actions/seed.actions';
 
@@ -46,6 +47,9 @@ export async function GET(request: NextRequest) {
                 break;
             case 'activities':
                 result = await seedScheduledActivities();
+                break;
+            case 'partners':
+                result = await seedPartnerCenters();
                 break;
             case 'all':
             default:

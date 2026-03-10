@@ -26,6 +26,7 @@ import {
     ChevronRight,
     Grip,
     MessageCircle,
+    Building2,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -40,6 +41,7 @@ const navigation = [
     { name: 'แชท', href: '/dashboard/chat', icon: MessageCircle, roles: ['ADMIN', 'STAFF', 'NURSE'] },
     { name: 'จัดการผู้ใช้', href: '/dashboard/users', icon: Users, roles: ['ADMIN'] },
     { name: 'ตั้งค่าระบบ', href: '/dashboard/settings', icon: Settings, roles: ['ADMIN'] },
+    { name: 'จัดการข้อมูลศูนย์ (Centers)', href: '/dashboard/partners', icon: Building2, roles: ['ADMIN'] },
     { name: 'ศูนย์สั่งการ (Command Center)', href: '/dashboard/command', icon: Grip, roles: ['ADMIN'] },
 ];
 
