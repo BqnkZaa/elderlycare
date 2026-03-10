@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const appointmentSchema = z.object({
     title: z.string().min(1, "กรุณาระบุหัวข้อนัดหมาย"),
-    date: z.date({ message: "รูปแบบวันที่ไม่ถูกต้อง" }),
+    date: z.date({ message: "วันที่ไม่ถูกต้อง" }),
     time: z.string().optional(),
     location: z.string().optional(),
     doctorName: z.string().optional(),

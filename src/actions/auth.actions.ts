@@ -166,7 +166,7 @@ export async function getPendingUsers() {
         return { success: true, data: users };
     } catch (error) {
         console.error('Error fetching pending users:', error);
-        return { success: false, error: 'Failed to fetch pending users' };
+        return { success: false, error: 'ไม่สามารถดึงข้อมูลผู้รออนุมัติได้' };
     }
 }
 
@@ -181,7 +181,7 @@ export async function approveUser(userId: string) {
         return { success: true, message: 'User approved successfully' };
     } catch (error) {
         console.error('Error approving user:', error);
-        return { success: false, error: 'Failed to approve user' };
+        return { success: false, error: 'ไม่สามารถอนุมัติผู้ใช้งานได้' };
     }
 }
 
@@ -196,7 +196,7 @@ export async function rejectUser(userId: string) {
         return { success: true, message: 'User rejected successfully' };
     } catch (error) {
         console.error('Error rejecting user:', error);
-        return { success: false, error: 'Failed to reject user' };
+        return { success: false, error: 'ไม่สามารถปฏิเสธผู้ใช้งานได้' };
     }
 }
 // ... (existing exports)
@@ -222,7 +222,7 @@ export async function getAllUsers() {
         return { success: true, data: users };
     } catch (error) {
         console.error('Error fetching users:', error);
-        return { success: false, error: 'Failed to fetch users' };
+        return { success: false, error: 'ไม่สามารถดึงข้อมูลผู้ใช้งานได้' };
     }
 }
 
@@ -256,7 +256,7 @@ export async function createUserByAdmin(data: UserInput) {
         return { success: true, message: 'สร้างผู้ใช้งานสำเร็จ', data: user };
     } catch (error) {
         console.error('Error creating user:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Failed to create user' };
+        return { success: false, error: error instanceof Error ? error.message : 'ไม่สามารถสร้างผู้ใช้งานได้' };
     }
 }
 
@@ -285,7 +285,7 @@ export async function updateUser(userId: string, data: Partial<UserInput> & { st
         return { success: true, message: 'อัปเดตข้อมูลสำเร็จ' };
     } catch (error) {
         console.error('Error updating user:', error);
-        return { success: false, error: 'Failed to update user' };
+        return { success: false, error: 'ไม่สามารถอัปเดตข้อมูลผู้ใช้งานได้' };
     }
 }
 
@@ -301,6 +301,6 @@ export async function deleteUser(userId: string) {
         return { success: true, message: 'ลบผู้ใช้งานสำเร็จ' };
     } catch (error) {
         console.error('Error deleting user:', error);
-        return { success: false, error: 'Failed to delete user' };
+        return { success: false, error: 'ไม่สามารถลบผู้ใช้งานได้' };
     }
 }

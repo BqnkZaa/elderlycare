@@ -207,16 +207,16 @@ export const elderlyProfileSchema = z.object({
 export type ElderlyProfileInput = z.infer<typeof elderlyProfileSchema>;
 
 export const loginSchema = z.object({
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(1, "Password is required"),
+    email: z.string().email("อีเมลไม่ถูกต้อง"),
+    password: z.string().min(1, "กรุณาระบุรหัสผ่าน"),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
 
 export const userSchema = z.object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    name: z.string().min(1, "กรุณาระบุชื่อ"),
+    email: z.string().email("อีเมลไม่ถูกต้อง"),
+    password: z.string().min(6, "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"),
     role: z.enum(["ADMIN", "STAFF", "NURSE"]),
     status: z.enum(["APPROVED", "PENDING", "REJECTED"]).optional(),
 });
@@ -232,8 +232,8 @@ export const publicAdmissionSchema = elderlyProfileSchema.omit({
     isActive: true,
 }).extend({
     // Override/Add specific fields for public inquiry
-    name: z.string().min(1, "Contact name is required"), // Contact person name
-    phone: z.string().min(1, "Phone number is required"), // Contact person phone
+    name: z.string().min(1, "กรุณาระบุชื่อผู้ติดต่อ"), // Contact person name
+    phone: z.string().min(1, "กรุณาระบุเบอร์โทรศัพท์"), // Contact person phone
     lineId: z.string().optional(),
     // Make these mandatory for public form if needed, or keep optional matching schema
 });
@@ -243,7 +243,7 @@ export type PublicAdmissionInput = z.infer<typeof publicAdmissionSchema>;
 
 
 export const dailyLogSchema = z.object({
-    elderlyId: z.string().min(1, "Elderly ID is required"),
+    elderlyId: z.string().min(1, "กรุณาระบุรหัสผู้สูงอายุ"),
     date: z.coerce.date(),
 
     // Vitals (JSON)
@@ -273,7 +273,7 @@ export const dailyLogSchema = z.object({
     behavioralNotes: z.string().optional(),
     incidentsReported: z.string().optional(),
 
-    recordedBy: z.string().min(1, "Recorder ID is required"),
+    recordedBy: z.string().min(1, "กรุณาระบุรหัสผู้บันทึก"),
     recordedByName: z.string().optional(),
 });
 

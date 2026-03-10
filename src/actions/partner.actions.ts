@@ -98,3 +98,105 @@ export async function deletePartnerCenter(id: string) {
         return { success: false, error: 'Failed to delete partner center' };
     }
 }
+
+/**
+ * Get recommended partner centers based on elderly assessment
+ */
+export async function getRecommendations(elderlyId: string) {
+    try {
+        const elderly = await prisma.elderlyProfile.findUnique({
+            where: { id: elderlyId }
+        });
+
+        if (!elderly) return { success: false, error: 'Elderly profile not found' };
+
+        const partners = await prisma.partnerCenter.findMany({
+            where: { isActive: true }
+        });
+
+        const scoredPartners = partners.map(partner => {
+            let score = 0;
+            let matchCount = 0;
+            const reasons: string[] = [];
+
+            // 1. Mobility Matching
+            if (elderly.selfHelpStatus === 'INDEPENDENT_NON_BEDRIDDEN') {
+                if (partner.supportIndependentNonBedridden) { score += 10; matchCount++; reasons.push('รองรับผู้สูงอายุที่ช่วยเหลือตัวเองได้'); }
+            } else if (elderly.selfHelpStatus === 'INDEPENDENT_BEDRIDDEN') {
+                if (partner.supportIndependentBedridden) { score += 10; matchCount++; reasons.push('รองรับผู้สูงอายุที่ติดเตียงแต่ช่วยเหลือตัวเองได้'); }
+            } else if (elderly.selfHelpStatus === 'DEPENDENT_BEDRIDDEN') {
+                if (partner.supportDependentBedridden) { score += 10; matchCount++; reasons.push('รองรับผู้สูงอายุที่ติดเตียงและช่วยเหลือตัวเองไม่ได้'); }
+            }
+
+            // 2. Eating Matching
+            if (elderly.eatingStatus === 'EAT_NORMAL') {
+                if (partner.supportNormalDiet) { score += 5; matchCount++; reasons.push('รองรับอาหารปกติ'); }
+            } else if (elderly.eatingStatus === 'EAT_SOFT') {
+                if (partner.supportSoftDiet) { score += 5; matchCount++; reasons.push('รองรับอาหารอ่อน'); }
+            } else if (elderly.eatingStatus === 'NEEDS_FEEDING') {
+                if (partner.supportNeedsFeeding) { score += 8; matchCount++; reasons.push('มีบริการป้อนอาหาร'); }
+            } else if (elderly.eatingStatus === 'TUBE_FEEDING') {
+                if (partner.supportTubeFeeding) { score += 15; matchCount++; reasons.push('รองรับการให้อาหารทางสายยาง'); }
+            }
+
+            // 3. Medical Support (Critical if exists)
+            if (elderly.hasTracheostomy) {
+                if (partner.supportTracheostomy) { score += 20; matchCount++; reasons.push('รองรับผู้ป่วยเจาะคอ'); }
+                else { score -= 100; } // Major mismatch
+            }
+
+            if (elderly.bedsoreStatus !== 'NONE') {
+                if (partner.supportBedsore) { score += 10; matchCount++; reasons.push('รองรับการดูแลแผลกดทับ'); }
+                else { score -= 50; }
+            }
+
+            if (elderly.useAirMattress) {
+                if (partner.supportAirMattress) { score += 5; matchCount++; reasons.push('มีบริการที่นอนลม'); }
+            }
+
+            if (elderly.oxygenSupport !== 'NONE') {
+                if (partner.supportOxygen) { score += 15; matchCount++; reasons.push('รองรับการใช้ออกซิเจน'); }
+                else { score -= 80; }
+            }
+
+            if (elderly.useVentilator) {
+                if (partner.supportVentilator) { score += 30; matchCount++; reasons.push('รองรับเครื่องช่วยหายใจ'); }
+                else { score -= 200; }
+            }
+
+            // 4. Psychiatric
+            if (elderly.psychiatricStatus !== 'NONE') {
+                if (partner.supportPsychiatric) { score += 10; matchCount++; reasons.push('รองรับผู้ป่วยจิตเวช/อัลไซเมอร์'); }
+                else { score -= 50; }
+            }
+
+            if (elderly.hasAggressiveBehavior) {
+                if (partner.supportAggressiveBehavior) { score += 15; matchCount++; reasons.push('รองรับผู้ป่วยที่มีพฤติกรรมก้าวร้าว'); }
+                else { score -= 150; }
+            }
+
+            if (elderly.hasPsychiatricMedication) {
+                if (partner.supportPsychiatricMedication) { score += 10; matchCount++; reasons.push('รองรับการใช้ยาทางจิตเวช'); }
+            }
+
+            return {
+                ...partner,
+                matchScore: score,
+                matchReasons: reasons,
+                isCompatible: score > -50 // Threshold for basic compatibility
+            };
+        });
+
+        // Filter out incompatible ones and sort by score
+        const recommendations = scoredPartners
+            .filter(p => p.isCompatible)
+            .sort((a, b) => b.matchScore - a.matchScore)
+            .slice(0, 5); // Return top 5
+
+        return { success: true, data: recommendations };
+    } catch (error) {
+        console.error('getRecommendations error:', error);
+        return { success: false, error: 'Failed to generate recommendations' };
+    }
+}
+
