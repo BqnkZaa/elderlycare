@@ -1,5 +1,7 @@
 /**
  * Edit Elderly Profile Page
+ *
+ * 2-section form for elderly admission based on new requirements.
  */
 
 'use client';
@@ -9,7 +11,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { elderlyProfileSchema, type ElderlyProfileInput } from '@/lib/validations';
 import { getElderlyProfile, updateElderlyProfile } from '@/actions/elderly.actions';
@@ -18,34 +19,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppointmentList } from '@/components/lists/AppointmentList';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { NativeSelect as Select } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import {
     ArrowLeft,
     Save,
     User,
-    Phone,
-    Heart,
+    Eye,
     AlertCircle,
     Check,
-    FileText,
-    Activity,
-    Brain,
-    Eye,
-    Accessibility,
-    Utensils,
-    Cross,
-    Home,
+    ClipboardList,
 } from 'lucide-react';
 
-// Reusing TextareaField local component concept
 const TextareaField = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { error?: string }) => (
     <div className="space-y-1">
-        <Textarea
+        <textarea
             {...props}
-            className={`${props.className} ${props.error ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+            className={`flex min-h-[80px] w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${props.className} ${props.error ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
         />
-        {props.error && <p className="text-red-500 text-xs">{props.error}</p>}
     </div>
 );
 
@@ -62,11 +51,34 @@ function FormField({
 }) {
     return (
         <div className={className}>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
                 {label}
             </label>
             {children}
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            {error && <p className="text-destructive text-xs mt-1">{error}</p>}
+        </div>
+    );
+}
+
+function RadioGroupField({ label, name, options, register, error, disabled }: any) {
+    return (
+        <div className="space-y-2">
+            <label className="block text-sm font-medium text-foreground">{label}</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                {options.map((opt: any) => (
+                    <label key={opt.value} className={`flex items-center space-x-2 border border-border/50 p-2 rounded-md ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-accent/10'}`}>
+                        <input
+                            type="radio"
+                            value={opt.value}
+                            {...register(name)}
+                            disabled={disabled}
+                            className="w-4 h-4 text-primary focus:ring-primary border-gray-300 disabled:opacity-50"
+                        />
+                        <span className="text-sm font-medium">{opt.label}</span>
+                    </label>
+                ))}
+            </div>
+            {error && <p className="text-destructive text-xs mt-1">{error}</p>}
         </div>
     );
 }
@@ -97,12 +109,10 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
                 const result = await getElderlyProfile(id);
                 if (result.success && result.data) {
                     const data = result.data;
-                    // Format dates for input fields
                     const formattedData = {
                         ...data,
-                        admissionDate: data.admissionDate ? new Date(data.admissionDate) : new Date(),
+                        admissionDate: data.admissionDate ? new Date(data.admissionDate).toISOString().split('T')[0] : '', // Format for date input natively
                         dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString().split('T')[0] : '', // Hidden field
-                        // Ensure nulls are handled (Zod might expect optional strings, not nulls)
                         nickname: data.nickname || '',
                         education: data.education || '',
                         proudFormerOccupation: data.proudFormerOccupation || '',
@@ -132,7 +142,6 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
             if (result.success) {
                 setSubmitResult({ success: true, message: 'บันทึกการแก้ไขสำเร็จ! (Updated Successfully)' });
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                // Don't redirect immediately so they can see success message, or redirect back to list
                 setTimeout(() => {
                     router.push('/dashboard/elderly');
                 }, 1500);
@@ -149,20 +158,41 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
         }
     };
 
+    const watchGender = watch('gender');
+    const watchMaritalStatus = watch('maritalStatus');
+    const watchChildrenCount = watch('childrenCount');
+    const watchFormerOccupation = watch('formerOccupation');
+    const watchHealthPrivilege = watch('healthPrivilege');
+    const watchLifeInsurance = watch('hasLifeInsurance');
+    const watchCurrentLocation = watch('currentLocation');
+
+    // Part 2 Watches
+    const watchSelfHelp = watch('selfHelpStatus');
+    const watchEating = watch('eatingStatus');
+    const watchTrach = watch('hasTracheostomy');
+    const watchBedsore = watch('bedsoreStatus');
+    const watchAirMattress = watch('useAirMattress');
+    const watchOxygen = watch('oxygenSupport');
+    const watchVentilator = watch('useVentilator');
+    const watchPsych = watch('psychiatricStatus');
+    const watchAggressive = watch('hasAggressiveBehavior');
+    const watchPsychMed = watch('hasPsychiatricMedication');
+    const watchSpecialMed = watch('hasSpecialMedication');
+
     if (isLoading) {
         return (
             <div className="flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6 max-w-5xl mx-auto pb-20">
+        <div className="space-y-6 max-w-4xl mx-auto pb-20">
             {/* Top Navigation */}
             <div className="flex items-center gap-4">
                 <Link href="/dashboard/elderly">
-                    <Button variant="ghost" size="icon" className="hover:bg-accent hover:text-accent-foreground">
+                    <Button variant="ghost" size="icon">
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
                 </Link>
@@ -183,7 +213,6 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
                 </div>
             )}
 
-            {/* Alert Messages */}
             {submitResult && (
                 <div className={`flex items-center gap-2 p-4 rounded-lg border ${submitResult.success
                     ? 'bg-secondary/10 text-secondary border-secondary/20'
@@ -195,19 +224,23 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
             )}
 
             {Object.keys(errors).length > 0 && (
-                <div className="bg-destructive/10 text-destructive p-4 rounded-lg border border-destructive/20">
-                    <p className="font-bold flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4" /> พบข้อผิดพลาดในข้อมูล (Validation Errors):
+                <div className="bg-destructive/10 text-destructive p-4 rounded-lg border border-destructive/20 mb-6">
+                    <p className="font-bold flex items-center gap-2 text-lg">
+                        <AlertCircle className="w-5 h-5" /> พบข้อผิดพลาด กรุณากรอกข้อมูลให้ครบ:
                     </p>
-                    <ul className="list-disc pl-5 mt-2 text-sm">
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm pl-2 mt-2">
                         {Object.entries(errors).map(([key, error]) => (
-                            <li key={key}>{key}: {error?.message}</li>
+                            <li key={key} className="flex items-start gap-2">
+                                <span className="text-destructive/70 mt-1.5 w-1.5 h-1.5 rounded-full bg-current shrink-0" />
+                                <span>{error?.message}</span>
+                            </li>
                         ))}
                     </ul>
                 </div>
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+
                 <Tabs defaultValue="profile" className="w-full">
                     <TabsList className="grid w-full grid-cols-2 mb-8">
                         <TabsTrigger value="profile">ข้อมูลส่วนตัว (Profile)</TabsTrigger>
@@ -215,481 +248,335 @@ export default function EditElderlyPage({ params }: { params: Promise<{ id: stri
                     </TabsList>
 
                     <TabsContent value="profile" className="space-y-8">
-                        {/* Header Section */}
+
                         <Card className="border-border shadow-sm bg-card/50 backdrop-blur-sm">
                             <CardHeader className="bg-accent/20 border-b border-border pb-4">
-                                <CardTitle className="text-lg text-foreground">ส่วนหัว: ข้อมูลการรับเข้า (Admission Info)</CardTitle>
+                                <CardTitle className="text-lg text-foreground flex items-center gap-2">
+                                    <AlertCircle className="w-5 h-5" />
+                                    ข้อมูลที่จำเป็นของระบบ (System Fields)
+                                </CardTitle>
                             </CardHeader>
-                            <CardContent className="pt-6">
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                                    <FormField label="วันที่ลงทะเบียน *" error={errors.admissionDate?.message}>
-                                        <Input type="date" {...register('admissionDate')} error={errors.admissionDate?.message} className="bg-background/50 border-input" />
-                                    </FormField>
-                                    <FormField label="เวลา *" error={errors.admissionTime?.message}>
-                                        <Input type="time" {...register('admissionTime')} error={errors.admissionTime?.message} className="bg-background/50 border-input" />
-                                    </FormField>
-                                    <FormField label="รหัสผู้ป่วย (SAFE-ID) *" error={errors.safeId?.message}>
-                                        <Input placeholder="SIDxxx69xxx" {...register('safeId')} error={errors.safeId?.message} className="font-mono uppercase bg-background/50 border-input" />
-                                    </FormField>
-                                    <FormField label="รหัสพันธมิตร" error={errors.partnerId?.message}>
-                                        <Input placeholder="PID001-PID999" {...register('partnerId')} className="font-mono uppercase bg-background/50 border-input" />
-                                    </FormField>
-                                </div>
+                            <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <FormField label="รหัสผู้ป่วย (SAFE-ID) *" error={errors.safeId?.message}>
+                                    <Input placeholder="SIDxxx69xxx" {...register('safeId')} disabled={isReadOnly} className="font-mono uppercase bg-background/50" />
+                                </FormField>
+                                <FormField label="ชื่อจริงผู้สูงอายุ *" error={errors.firstName?.message}>
+                                    <Input placeholder="สมชาย" {...register('firstName')} disabled={isReadOnly} className="bg-background/50" />
+                                </FormField>
+                                <FormField label="นามสกุลผู้สูงอายุ *" error={errors.lastName?.message}>
+                                    <Input placeholder="ใจดี" {...register('lastName')} disabled={isReadOnly} className="bg-background/50" />
+                                </FormField>
                             </CardContent>
                         </Card>
 
-                        {/* 1. Identification */}
+                        {/* ส่วนที่ 1 ข้อมูลผู้ติดต่อ/ผู้สูงอายุ */}
                         <Card className="bg-card/50 backdrop-blur-sm border-border">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-primary">
                                     <User className="w-5 h-5" />
-                                    1. ข้อมูลทั่วไป (Identification)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <FormField label="ชื่อ *" error={errors.firstName?.message}>
-                                    <Input placeholder="สมชาย" {...register('firstName')} error={errors.firstName?.message} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="นามสกุล *" error={errors.lastName?.message}>
-                                    <Input placeholder="ใจดี" {...register('lastName')} error={errors.lastName?.message} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="ชื่อเล่น">
-                                    <Input placeholder="ลุงชาย" {...register('nickname')} className="bg-background/50 border-input" />
-                                </FormField>
-
-                                <FormField label="อายุ *" error={errors.age?.message}>
-                                    <Input type="number" placeholder="75" {...register('age')} error={errors.age?.message} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="เพศ *">
-                                    <Select {...register('gender')} className="bg-background/50 border-input">
-                                        <option value="MALE">ชาย (Male)</option>
-                                        <option value="FEMALE">หญิง (Female)</option>
-                                        <option value="OTHER">อื่นๆ (Other)</option>
-                                    </Select>
-                                </FormField>
-                                <FormField label="สรรพนามที่ชอบให้เรียก">
-                                    <Input placeholder="พ่อใหญ่, คุณตา" {...register('preferredPronouns')} className="bg-background/50 border-input" />
-                                </FormField>
-
-                                <FormField label="ระดับการศึกษาสูงสุด">
-                                    <Input placeholder="ปริญญาตรี" {...register('education')} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="อาชีพเดิมที่ภาคภูมิใจ" className="md:col-span-2">
-                                    <Input placeholder="ครูใหญ่, ข้าราชการ" {...register('proudFormerOccupation')} className="bg-background/50 border-input" />
-                                </FormField>
-
-                                {/* Hidden/Computed fields maintained for schema compatibility */}
-                                <input type="hidden" {...register('dateOfBirth')} />
-                            </CardContent>
-                        </Card>
-
-                        {/* 2. Marital & Contact */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Phone className="w-5 h-5" />
-                                    2. สถานภาพและผู้ติดต่อ (Marital Status & Contacts)
+                                    ส่วนที่ 1 ข้อมูลผู้สูงอายุ / ผู้ติดต่อ
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <FormField label="สถานภาพสมรส *">
-                                        <Select {...register('maritalStatus')} className="bg-background/50 border-input">
-                                            <option value="SINGLE">โสด (Single)</option>
-                                            <option value="MARRIED">สมรส (Married)</option>
-                                            <option value="WIDOWED">หม้าย (Widowed)</option>
-                                            <option value="DIVORCED_SEPARATED">หย่าร้าง/แยกกันอยู่</option>
-                                        </Select>
+                                    <FormField label="1. ชื่อผู้ติดต่อ" error={errors.keyCoordinatorName?.message}>
+                                        <Input placeholder="ชื่อ-นามสกุล" {...register('keyCoordinatorName')} disabled={isReadOnly} className="bg-background/50" />
+                                    </FormField>
+                                    <FormField label="2. เบอร์โทร" error={errors.keyCoordinatorPhone?.message}>
+                                        <Input placeholder="เบอร์โทรศัพท์" {...register('keyCoordinatorPhone')} disabled={isReadOnly} className="bg-background/50" />
+                                    </FormField>
+                                    <FormField label="3. วัน/เดือน/ปี ที่รับเข้า" error={errors.admissionDate?.message}>
+                                        <Input type="date" {...register('admissionDate')} disabled={isReadOnly} className="bg-background/50" />
+                                    </FormField>
+                                    <FormField label="เวลา" error={errors.admissionTime?.message}>
+                                        <Input type="time" {...register('admissionTime')} disabled={isReadOnly} className="bg-background/50" />
+                                    </FormField>
+                                    <FormField label="4. ชื่อเล่นผู้สูงอายุ" error={errors.nickname?.message}>
+                                        <Input placeholder="ชื่อเล่น" {...register('nickname')} disabled={isReadOnly} className="bg-background/50" />
+                                    </FormField>
+                                    <FormField label="5. สรรพนามที่เรียกท่านตอนอยู่ที่บ้าน" error={errors.preferredPronouns?.message}>
+                                        <Input placeholder="เช่น อาม่า, คุณตา" {...register('preferredPronouns')} disabled={isReadOnly} className="bg-background/50" />
+                                    </FormField>
+                                    <FormField label="6. อายุ" error={errors.age?.message}>
+                                        <Input type="number" placeholder="อายุ" {...register('age')} disabled={isReadOnly} className="bg-background/50" />
                                     </FormField>
                                 </div>
 
-                                <div className="border border-border p-4 rounded-md bg-accent/10 space-y-4">
-                                    <h3 className="font-semibold text-sm text-foreground">ผู้ประสานงานหลัก (Key Coordinator)</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <FormField label="ชื่อ-นามสกุล">
-                                            <Input {...register('keyCoordinatorName')} className="bg-background/50 border-input" />
+                                <div className="space-y-6 border-t pt-4">
+                                    <RadioGroupField
+                                        label="7. เพศ"
+                                        name="gender"
+                                        register={register}
+                                        disabled={isReadOnly}
+                                        options={[
+                                            { label: 'ชาย', value: 'MALE' },
+                                            { label: 'หญิง', value: 'FEMALE' },
+                                            { label: 'เพศทางเลือก', value: 'OTHER' },
+                                        ]}
+                                    />
+                                    {watchGender === 'OTHER' && (
+                                        <FormField label="ระบุเพศทางเลือก">
+                                            <Input placeholder="ระบุ..." {...register('genderOther')} disabled={isReadOnly} className="bg-background/50" />
                                         </FormField>
-                                        <FormField label="เบอร์โทรศัพท์">
-                                            <Input {...register('keyCoordinatorPhone')} className="bg-background/50 border-input" />
+                                    )}
+
+                                    <RadioGroupField
+                                        label="8. สถานภาพสมรส"
+                                        name="maritalStatus"
+                                        register={register}
+                                        disabled={isReadOnly}
+                                        options={[
+                                            { label: 'โสด', value: 'SINGLE' },
+                                            { label: 'มีคู่ครอง', value: 'PARTNERED' },
+                                            { label: 'สมรส', value: 'MARRIED' },
+                                            { label: 'หย่าร้าง', value: 'DIVORCED_SEPARATED' },
+                                        ]}
+                                    />
+
+                                    <RadioGroupField
+                                        label="9. บุตร"
+                                        name="childrenCount"
+                                        register={register}
+                                        disabled={isReadOnly}
+                                        options={[
+                                            { label: 'มี 1 ท่าน', value: 'ONE' },
+                                            { label: 'มี 2 ท่าน', value: 'TWO' },
+                                            { label: 'มี 3 ท่าน', value: 'THREE' },
+                                            { label: 'มี 4 ท่าน', value: 'FOUR' },
+                                            { label: 'มี 5 ท่านขึ้นไป', value: 'FIVE_OR_MORE' },
+                                            { label: 'ไม่มี', value: 'NONE' },
+                                        ]}
+                                    />
+
+                                    <RadioGroupField
+                                        label="10. ท่านเคยประกอบอาชีพอะไร"
+                                        name="formerOccupation"
+                                        register={register}
+                                        disabled={isReadOnly}
+                                        options={[
+                                            { label: 'ค้าขาย', value: 'COMMERCE' },
+                                            { label: 'บริการ', value: 'SERVICE' },
+                                            { label: 'อื่นๆ', value: 'OTHER' },
+                                        ]}
+                                    />
+                                    {watchFormerOccupation === 'OTHER' && (
+                                        <FormField label="ระบุอาชีพอื่นๆ">
+                                            <Input placeholder="ระบุ..." {...register('formerOccupationOther')} disabled={isReadOnly} className="bg-background/50" />
                                         </FormField>
-                                        <FormField label="ความสัมพันธ์">
-                                            <Input {...register('keyCoordinatorRelation')} className="bg-background/50 border-input" />
-                                        </FormField>
-                                    </div>
-                                </div>
+                                    )}
 
-                                <div className="border border-border p-4 rounded-md bg-accent/10 space-y-4">
-                                    <h3 className="font-semibold text-sm text-foreground">ผู้ทำสัญญา/ตัดสินใจ (Contract Signer)</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <FormField label="ชื่อ-นามสกุล">
-                                            <Input {...register('legalGuardianName')} className="bg-background/50 border-input" />
-                                        </FormField>
-                                        <FormField label="เบอร์โทรศัพท์">
-                                            <Input {...register('legalGuardianPhone')} className="bg-background/50 border-input" />
-                                        </FormField>
-                                        <FormField label="ความสัมพันธ์">
-                                            <Input {...register('legalGuardianRelation')} className="bg-background/50 border-input" />
-                                        </FormField>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                                    <RadioGroupField
+                                        label="11. ใช้สิทธิสุขภาพเบิกจ่ายที่ไหน"
+                                        name="healthPrivilege"
+                                        register={register}
+                                        disabled={isReadOnly}
+                                        options={[
+                                            { label: '30 บาท', value: 'GOLD_CARD' },
+                                            { label: 'ประกันสังคม', value: 'SOCIAL_SECURITY' },
+                                            { label: 'สิทธิ์ราชการ', value: 'GOVERNMENT_OFFICER' },
+                                            { label: 'จ่ายเอง', value: 'SELF_PAY' },
+                                        ]}
+                                    />
 
-                        {/* 3. Sensory */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Eye className="w-5 h-5" />
-                                    3. ประสาทสัมผัส (Sensory & Communication)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <FormField label="การได้ยิน (Hearing)">
-                                    <Select {...register('hearingStatus')} className="bg-background/50 border-input">
-                                        <option value="NORMAL">ปกติ</option>
-                                        <option value="HARD_OF_HEARING_LEFT">หูตึง (ซ้าย)</option>
-                                        <option value="HARD_OF_HEARING_RIGHT">หูตึง (ขวา)</option>
-                                        <option value="HARD_OF_HEARING_BOTH">หูตึง (2 ข้าง)</option>
-                                        <option value="DEAF">หูหนวก</option>
-                                        <option value="HEARING_AID">ใช้เครื่องช่วยฟัง</option>
-                                    </Select>
-                                </FormField>
-                                <FormField label="การมองเห็น (Vision)">
-                                    <Select {...register('visionStatus')} className="bg-background/50 border-input">
-                                        <option value="NORMAL">ปกติ</option>
-                                        <option value="NEARSIGHTED_FARSIGHTED">สายตาสั้น/ยาว</option>
-                                        <option value="CATARACT_GLAUCOMA">ต้อกระจก/ต้อหิน</option>
-                                        <option value="GLASSES">สวมแว่นตา</option>
-                                        <option value="CONTACT_LENS">คอนแทคเลนส์</option>
-                                    </Select>
-                                </FormField>
-                                <FormField label="การสื่อสาร (Speech)">
-                                    <Select {...register('speechStatus')} className="bg-background/50 border-input">
-                                        <option value="CLEAR">พูดชัดเจน</option>
-                                        <option value="DYSARTHRIA">พูดไม่ชัด (Dysarthria)</option>
-                                        <option value="APHASIA">บกพร่องการสื่อความ</option>
-                                        <option value="NON_VERBAL">ไม่พูด</option>
-                                    </Select>
-                                </FormField>
-                            </CardContent>
-                        </Card>
-
-                        {/* 4. Mobility */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Accessibility className="w-5 h-5" />
-                                    4. การเคลื่อนไหว (Mobility & Fall Risk)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex items-start gap-4 border border-border p-4 rounded bg-accent/20">
-                                    <div className="flex items-center h-5">
-                                        <input id="historyOfFalls" type="checkbox" {...register('historyOfFalls')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
-                                    </div>
-                                    <div className="flex-1 text-sm">
-                                        <label htmlFor="historyOfFalls" className="font-medium text-foreground">มีประวัติการหกล้ม (History of Falls)</label>
-                                        {watch('historyOfFalls') && (
-                                            <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <Input placeholder="ช่วงเวลา (เช่น 6 เดือนที่ผ่านมา)" {...register('fallsTimeframe')} className="bg-background/50 border-input" />
-                                                <Input placeholder="สาเหตุการหกล้ม" {...register('fallsCause')} className="bg-background/50 border-input" />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <FormField label="การเดิน (Gait)">
-                                        <Select {...register('gaitStatus')} className="bg-background/50 border-input">
-                                            <option value="INDEPENDENT">เดินเองได้</option>
-                                            <option value="UNSTEADY">เดินเซ</option>
-                                            <option value="NEEDS_SUPPORT">ต้องพยุงเดิน</option>
-                                            <option value="NON_AMBULATORY_BEDRIDDEN">เดินไม่ได้/ติดเตียง</option>
-                                        </Select>
-                                    </FormField>
-                                    <FormField label="อุปกรณ์ช่วย (ระบุ เช่น ไม้เท้า, วอล์คเกอร์)">
-                                        <Input placeholder="ไม้เท้า, วอล์คเกอร์, รถเข็น" {...register('assistiveDevices')} className="bg-background/50 border-input" />
-                                    </FormField>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* 5. Elimination */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Utensils className="w-5 h-5" />
-                                    5. การขับถ่าย (Elimination)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-4 border border-border p-4 rounded bg-accent/5">
-                                    <h3 className="font-semibold text-sm text-foreground">ปัสสาวะ (Bladder)</h3>
-                                    <Select {...register('bladderControl')} className="bg-background/50 border-input">
-                                        <option value="CONTINENT">กลั้นได้ปกติ</option>
-                                        <option value="OCCASIONAL_INCONTINENCE">กลั้นไม่ได้บางครั้ง</option>
-                                        <option value="TOTAL_INCONTINENCE_FOLEY">กลั้นไม่ได้เลย/ใส่สายสวน</option>
-                                    </Select>
-                                    <FormField label="ขนาดสายสวน (Foley Size) ถ้ามี">
-                                        <Input {...register('foleySize')} placeholder="เบอร์ 14/16" className="bg-background/50 border-input" />
-                                    </FormField>
-                                </div>
-                                <div className="space-y-4 border border-border p-4 rounded bg-accent/5">
-                                    <h3 className="font-semibold text-sm text-foreground">อุจจาระ (Bowel)</h3>
-                                    <Select {...register('bowelControl')} className="bg-background/50 border-input">
-                                        <option value="NORMAL">ขับถ่ายปกติ</option>
-                                        <option value="CONSTIPATION">ท้องผูก</option>
-                                        <option value="DIARRHEA">ท้องเสีย</option>
-                                        <option value="INCONTINENCE">กลั้นไม่ได้</option>
-                                    </Select>
-                                </div>
-                                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <FormField label="การใช้ผ้าอ้อม (Diaper)">
-                                        <Select {...register('diaperType')} className="bg-background/50 border-input">
-                                            <option value="NONE">ไม่ใช้</option>
-                                            <option value="TAPE">แบบเทป (Tape)</option>
-                                            <option value="PANTS">แบบกางเกง (Pants)</option>
-                                        </Select>
-                                    </FormField>
-                                    <FormField label="ไซส์ผ้าอ้อม">
-                                        <Input {...register('diaperSize')} placeholder="M, L, XL" className="bg-background/50 border-input" />
-                                    </FormField>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* 6. Cognitive */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Brain className="w-5 h-5" />
-                                    6. สภาวะสมองและพฤติกรรม (Cognitive)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex items-start gap-4">
-                                    <div className="flex items-center h-5">
-                                        <input id="hasConfusion" type="checkbox" {...register('hasConfusion')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
-                                    </div>
-                                    <div className="flex-1 text-sm">
-                                        <label htmlFor="hasConfusion" className="font-medium text-foreground">มีภาวะสับสน (Confusion)</label>
-                                        {watch('hasConfusion') && (
-                                            <Input className="mt-2 bg-background/50 border-input" placeholder="ระบุช่วงเวลาที่มีอาการ" {...register('confusionTimeframe')} />
-                                        )}
-                                    </div>
-                                </div>
-
-                                <FormField label="ความจำ (Memory) - เลือกได้หลายข้อ (ระบุเป็นข้อความ)">
-                                    <Input placeholder="เช่น ความจำสั้น, หลงลืม, จำญาติไม่ได้" {...register('memoryStatus')} className="bg-background/50 border-input" />
-                                </FormField>
-
-                                <FormField label="พฤติกรรม (Behavior) - (เช่น ก้าวร้าว, ซึมเศร้า, เดินไปเรื่อย)">
-                                    <Input placeholder="ระบุพฤติกรรม..." {...register('behaviorStatus')} className="bg-background/50 border-input" />
-                                </FormField>
-                            </CardContent>
-                        </Card>
-
-                        {/* 7. Chief Complaint */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <FileText className="w-5 h-5" />
-                                    7. อาการแรกรับ (Chief Complaint)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <FormField label="สาเหตุที่มา (Reason for Admission)">
-                                    <TextareaField rows={3} {...register('reasonForAdmission')} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="สภาพจิตใจแรกรับ (Initial Mental State)">
-                                    <Input placeholder="เช่น วิตกกังวล, นิ่งเฉย, ร่าเริง" {...register('initialMentalState')} className="bg-background/50 border-input" />
-                                </FormField>
-                            </CardContent>
-                        </Card>
-
-                        {/* 8. Medical History */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Activity className="w-5 h-5" />
-                                    8. ประวัติเจ็บป่วย (Medical History)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <FormField label="โรคประจำตัว (Underlying Diseases)">
-                                    <TextareaField rows={2} placeholder="ระบุโรคประจำตัวทั้งหมด" {...register('underlyingDiseases')} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="ยาประจำ (Current Medications)">
-                                    <TextareaField rows={2} placeholder="ระบุชื่อยาและขนาด" {...register('currentMedications')} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="ประวัติผ่าตัด (Surgical History)">
-                                    <Input placeholder="ระบุการผ่าตัดและปีที่ทำ" {...register('surgicalHistory')} className="bg-background/50 border-input" />
-                                </FormField>
-                            </CardContent>
-                        </Card>
-
-
-
-                        {/* 9. Allergies */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <AlertCircle className="w-5 h-5" />
-                                    9. ประวัติการแพ้ (Allergies)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2 border border-border p-3 rounded bg-accent/5">
-                                        <div className="flex items-center gap-2">
-                                            <input id="drugAllergy" type="checkbox" {...register('hasDrugAllergies')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
-                                            <label htmlFor="drugAllergy" className="font-medium text-foreground">แพ้ยา (Drug Allergy)</label>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-foreground">12. ประกันชีวิต</label>
+                                        <div className="flex gap-4">
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                                <input type="radio" value="true" {...register('hasLifeInsurance')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                                <span>มี</span>
+                                            </label>
+                                            <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                                <input type="radio" value="false" {...register('hasLifeInsurance')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                                <span>ไม่มี</span>
+                                            </label>
                                         </div>
-                                        {watch('hasDrugAllergies') && (
-                                            <Input placeholder="ระบุชื่อยาและอาการแพ้" {...register('drugAllergiesDetail')} className="bg-background/50 border-input" />
-                                        )}
                                     </div>
-                                    <div className="space-y-2 border border-border p-3 rounded bg-accent/5">
-                                        <div className="flex items-center gap-2">
-                                            <input id="foodAllergy" type="checkbox" {...register('hasFoodChemicalAllergies')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
-                                            <label htmlFor="foodAllergy" className="font-medium text-foreground">แพ้อาหาร/สารเคมี</label>
-                                        </div>
-                                        {watch('hasFoodChemicalAllergies') && (
-                                            <Input placeholder="ระบุสิ่งที่แพ้และอาการ" {...register('foodChemicalAllergiesDetail')} className="bg-background/50 border-input" />
-                                        )}
-                                    </div>
+
+                                    <FormField label="13. ต้นสังกัดโรงพยาบาล">
+                                        <Input placeholder="ระบุ..." {...register('hospitalAffiliation')} disabled={isReadOnly} className="bg-background/50 max-w-md" />
+                                    </FormField>
+
+                                    <RadioGroupField
+                                        label="14. ตอนนี้ผู้ป่วยอยู่ที่ไหน"
+                                        name="currentLocation"
+                                        register={register}
+                                        disabled={isReadOnly}
+                                        options={[
+                                            { label: 'บ้าน', value: 'HOME' },
+                                            { label: 'โรงพยาบาล', value: 'HOSPITAL' },
+                                            { label: 'ศูนย์ดูแลผู้สูงอายุ', value: 'CARE_CENTER' },
+                                        ]}
+                                    />
+
+                                    <FormField label="15. ภาวะ อาการ เบื้องต้นตอนนี้อย่างไรบ้าง">
+                                        <TextareaField placeholder="ระบุ..." rows={3} {...register('initialSymptoms')} disabled={isReadOnly} />
+                                    </FormField>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        {/* 10. Physical & Devices */}
+                        {/* ส่วนที่ 2 ข้อมูลประเมินผู้สูงอายุและศูนย์ดูแล */}
                         <Card className="bg-card/50 backdrop-blur-sm border-border">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Activity className="w-5 h-5" />
-                                    10. สภาพร่างกายและอุปกรณ์ (Physical & Devices)
+                                    <ClipboardList className="w-5 h-5" />
+                                    ส่วนที่ 2 ข้อมูลประเมินผู้สูงอายุและศูนย์ดูแล
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <FormField label="สภาพผิวหนัง (Skin)">
-                                    <Input placeholder="ปกติ, แห้ง, คัน, มีรอยฟกช้ำ" {...register('skinCondition')} className="bg-background/50 border-input" />
-                                </FormField>
+                            <CardContent className="space-y-6">
 
-                                <div className="flex items-start gap-4 border border-border p-4 rounded bg-accent/20">
-                                    <div className="flex items-center h-5">
-                                        <input id="pressureUlcer" type="checkbox" {...register('hasPressureUlcer')} className="w-4 h-4 rounded border-input text-primary focus:ring-primary bg-background" />
-                                    </div>
-                                    <div className="flex-1 space-y-2">
-                                        <label htmlFor="pressureUlcer" className="font-medium text-foreground">มีแผลกดทับ (Pressure Ulcer)</label>
-                                        {watch('hasPressureUlcer') && (
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <Input placeholder="ตำแหน่ง (Location)" {...register('pressureUlcerLocation')} className="bg-background/50 border-input" />
-                                                <Input placeholder="ระดับ (Stage)" {...register('pressureUlcerStage')} className="bg-background/50 border-input" />
-                                            </div>
-                                        )}
+                                <RadioGroupField
+                                    label="การช่วยเหลือตัวเอง"
+                                    name="selfHelpStatus"
+                                    register={register}
+                                    disabled={isReadOnly}
+                                    options={[
+                                        { label: 'ได้ด้วยตัวเอง ไม่ติดเตียง', value: 'INDEPENDENT_NON_BEDRIDDEN' },
+                                        { label: 'ได้ด้วยตัวเอง ติดเตียง', value: 'INDEPENDENT_BEDRIDDEN' },
+                                        { label: 'ช่วยเหลือตัวเองไม่ได้และติดเตียง', value: 'DEPENDENT_BEDRIDDEN' },
+                                    ]}
+                                />
+
+                                <RadioGroupField
+                                    label="การทานอาหาร"
+                                    name="eatingStatus"
+                                    register={register}
+                                    disabled={isReadOnly}
+                                    options={[
+                                        { label: 'ทานเองได้ อาหารปกติ', value: 'EAT_NORMAL' },
+                                        { label: 'ทานเองได้ อาหารอ่อน/ต้ม', value: 'EAT_SOFT' },
+                                        { label: 'ต้องมีคนป้อน', value: 'NEEDS_FEEDING' },
+                                        { label: 'อาหารฟีด', value: 'TUBE_FEEDING' },
+                                    ]}
+                                />
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-foreground">เจาะคอ</label>
+                                    <div className="flex gap-4">
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="true" {...register('hasTracheostomy')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>เจาะ</span>
+                                        </label>
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="false" {...register('hasTracheostomy')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>ไม่เจาะ</span>
+                                        </label>
                                     </div>
                                 </div>
 
-                                <FormField label="อุปกรณ์การแพทย์ (Medical Devices)">
-                                    <Input placeholder="NG Tube, Tracheostomy, Oxygen, etc." {...register('medicalDevices')} className="bg-background/50 border-input" />
-                                </FormField>
-                            </CardContent>
-                        </Card>
+                                <RadioGroupField
+                                    label="แผลกดทับ"
+                                    name="bedsoreStatus"
+                                    register={register}
+                                    disabled={isReadOnly}
+                                    options={[
+                                        { label: 'ไม่มี', value: 'NONE' },
+                                        { label: 'มี 1 จุด', value: 'ONE' },
+                                        { label: 'มี 2 จุด', value: 'TWO' },
+                                        { label: 'มีมากกว่า 3 จุด', value: 'MORE_THAN_THREE' },
+                                    ]}
+                                />
 
-                        {/* 11. Social & Financial */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <User className="w-5 h-5" />
-                                    11. สังคมและเศรษฐกิจ (Social & Financial)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormField label="ผู้ดูแลหลักเดิม (Primary Caregiver)">
-                                    <Input placeholder="ชื่อผู้ดูแล" {...register('primaryCaregiverName')} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="ความสัมพันธ์">
-                                    <Input placeholder="เช่น บุตร, คู่สมรส, จ้างผู้ดูแล" {...register('primaryCaregiverRelation')} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="สิทธิการรักษา (Privilege)">
-                                    <Select {...register('healthPrivilege')} className="bg-background/50 border-input">
-                                        <option value="SELF_PAY">ชำระเอง (Self-pay)</option>
-                                        <option value="SOCIAL_SECURITY">ประกันสังคม</option>
-                                        <option value="GOLD_CARD">บัตรทอง (30 บาท)</option>
-                                        <option value="GOVERNMENT_OFFICER">ข้าราชการ/เบิกตรง</option>
-                                    </Select>
-                                </FormField>
-                                <FormField label="ผู้รับผิดชอบค่าใช้จ่าย (Sponsor)">
-                                    <Input placeholder="ระบุชื่อผู้จ่ายเงิน" {...register('sponsor')} className="bg-background/50 border-input" />
-                                </FormField>
-                            </CardContent>
-                        </Card>
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-foreground">ที่นอนลม</label>
+                                    <div className="flex gap-4">
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="true" {...register('useAirMattress')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>ใช้</span>
+                                        </label>
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="false" {...register('useAirMattress')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>ไม่ใช้</span>
+                                        </label>
+                                    </div>
+                                </div>
 
-                        {/* 12. Religion */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Heart className="w-5 h-5" />
-                                    12. ศาสนาและความเชื่อ (Religion)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormField label="ศาสนา">
-                                    <Input placeholder="พุทธ, คริสต์, อิสลาม" {...register('religion')} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="สิ่งยึดเหนี่ยวจิตใจ">
-                                    <Input placeholder="" {...register('spiritualNeeds')} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="ข้อห้าม/ข้อปฏิบัติ" className="md:col-span-2">
-                                    <Input placeholder="เช่น ไม่ทานหมู, สวดมนต์ก่อนนอน" {...register('religiousRestrictions')} className="bg-background/50 border-input" />
-                                </FormField>
-                            </CardContent>
-                        </Card>
+                                <RadioGroupField
+                                    label="อ็อกซิเจน"
+                                    name="oxygenSupport"
+                                    register={register}
+                                    disabled={isReadOnly}
+                                    options={[
+                                        { label: 'ไม่ใช้', value: 'NONE' },
+                                        { label: 'ใช้ 5 ลิตร', value: 'LITERS_5' },
+                                        { label: 'ใช้ 10 ลิตร', value: 'LITERS_10' },
+                                        { label: 'ใช้ถังสำรองชั่วคราว', value: 'TEMPORARY_CYLINDER' },
+                                    ]}
+                                />
 
-                        {/* 13. Goals */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Cross className="w-5 h-5" />
-                                    13. ความคาดหวัง (Goals & Expectations)
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <FormField label="เป้าหมายการดูแล (Goal of Care)">
-                                    <Select {...register('goalOfCare')} className="bg-background/50 border-input">
-                                        <option value="REHABILITATION">ฟื้นฟูสภาพ (Rehabilitation)</option>
-                                        <option value="LONG_TERM_CARE">ดูแลระยะยาว (Long-term)</option>
-                                        <option value="PALLIATIVE">ประคับประคอง (Palliative)</option>
-                                    </Select>
-                                </FormField>
-                                <FormField label="รายละเอียดความคาดหวัง">
-                                    <TextareaField rows={3} placeholder="สิ่งที่ญาติคาดหวังจากการดูแล" {...register('expectationDetails')} className="bg-background/50 border-input" />
-                                </FormField>
-                            </CardContent>
-                        </Card>
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-foreground">เครื่องช่วยหายใจ</label>
+                                    <div className="flex gap-4">
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="true" {...register('useVentilator')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>ใช้</span>
+                                        </label>
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="false" {...register('useVentilator')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>ไม่ใช้</span>
+                                        </label>
+                                    </div>
+                                </div>
 
-                        {/* 14. Environment */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-border">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-primary">
-                                    <Home className="w-5 h-5" />
-                                    14. สภาพแวดล้อมและผังครอบครัว
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormField label="ที่พักอาศัยเดิม">
-                                    <Select {...register('homeType')} className="bg-background/50 border-input">
-                                        <option value="">ไม่ได้ระบุ</option>
-                                        <option value="SINGLE_HOUSE">บ้านเดี่ยว</option>
-                                        <option value="TOWNHOUSE">ตึกแถว/ทาวน์เฮาส์</option>
-                                    </Select>
-                                </FormField>
-                                <FormField label="ห้องนอนอยู่ชั้นไหน">
-                                    <Input placeholder="ชั้นล่าง / ชั้นบน" {...register('bedroomLocation')} className="bg-background/50 border-input" />
-                                </FormField>
-                                <FormField label="ผังครอบครัว (Genogram Summary)" className="md:col-span-2">
-                                    <TextareaField rows={3} placeholder="อธิบายผังครอบครัวโดยสังเขป" {...register('familyGenogram')} className="bg-background/50 border-input" />
-                                </FormField>
+                                <RadioGroupField
+                                    label="จิตเวช/อัลไซเมอร์/สมองเสื่อม"
+                                    name="psychiatricStatus"
+                                    register={register}
+                                    disabled={isReadOnly}
+                                    options={[
+                                        { label: 'ไม่มี', value: 'NONE' },
+                                        { label: 'มีอาการใดอาการหนึ่ง (ไม่มียา)', value: 'SYMPTOMS_NO_MEDS' },
+                                        { label: 'มีอาการใดอาการหนึ่ง (มียา)', value: 'SYMPTOMS_WITH_MEDS' },
+                                    ]}
+                                />
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-foreground">โวยวาย/ด่าทอ/เสียงดัง</label>
+                                    <div className="flex gap-4">
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="true" {...register('hasAggressiveBehavior')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>มี</span>
+                                        </label>
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="false" {...register('hasAggressiveBehavior')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>ไม่มี</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-foreground">ยาคลายกังวล/ระงับอาการ/ปรับอารมณ์</label>
+                                    <div className="flex gap-4">
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="true" {...register('hasPsychiatricMedication')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>มี</span>
+                                        </label>
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="false" {...register('hasPsychiatricMedication')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>ไม่มี</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-foreground">การให้ยาพิเศษ (เปิดเส้น/ทำหัตการพิเศษ)</label>
+                                    <div className="flex gap-4 mb-2">
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="false" {...register('hasSpecialMedication')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>ไม่มี</span>
+                                        </label>
+                                        <label className={`flex items-center space-x-2 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                            <input type="radio" value="true" {...register('hasSpecialMedication')} disabled={isReadOnly} className="w-4 h-4 text-primary" />
+                                            <span>มี</span>
+                                        </label>
+                                    </div>
+                                    {String(watchSpecialMed) === "true" && (
+                                        <FormField label="ระบุ">
+                                            <Input placeholder="ระบุการให้ยา/หัตถการ..." {...register('specialMedicationDetail')} disabled={isReadOnly} className="bg-background/50 max-w-md" />
+                                        </FormField>
+                                    )}
+                                </div>
+
                             </CardContent>
                         </Card>
 

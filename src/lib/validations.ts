@@ -28,9 +28,13 @@ export const elderlyProfileSchema = z.object({
         if (typeof val === 'string') return val === '' ? undefined : new Date(val);
         return val;
     }), // Handle both string (from form) and Date (from internal/transformed data)
+    genderOther: z.string().optional(),
+    childrenCount: z.enum(["NONE", "ONE", "TWO", "THREE", "FOUR", "FIVE_OR_MORE"]).default("NONE"),
+    formerOccupation: z.enum(["COMMERCE", "SERVICE", "OTHER"]).default("OTHER"),
+    formerOccupationOther: z.string().optional(),
 
     // 2. Marital & Status
-    maritalStatus: z.enum(["SINGLE", "MARRIED", "WIDOWED", "DIVORCED_SEPARATED"]),
+    maritalStatus: z.enum(["SINGLE", "MARRIED", "WIDOWED", "DIVORCED_SEPARATED", "PARTNERED"]),
     keyCoordinatorName: z.string().optional(),
     keyCoordinatorPhone: z.string().optional(),
     keyCoordinatorRelation: z.string().optional(),
@@ -49,6 +53,7 @@ export const elderlyProfileSchema = z.object({
     fallsCause: z.string().optional(),
     gaitStatus: z.enum(["INDEPENDENT", "UNSTEADY", "NEEDS_SUPPORT", "NON_AMBULATORY_BEDRIDDEN"]),
     assistiveDevices: z.string().optional(),
+    selfHelpStatus: z.enum(["INDEPENDENT_NON_BEDRIDDEN", "INDEPENDENT_BEDRIDDEN", "DEPENDENT_BEDRIDDEN"]).default("INDEPENDENT_NON_BEDRIDDEN"),
 
     // 5. Elimination
     bladderControl: z.enum(["CONTINENT", "OCCASIONAL_INCONTINENCE", "TOTAL_INCONTINENCE_FOLEY"]),
@@ -56,16 +61,24 @@ export const elderlyProfileSchema = z.object({
     bowelControl: z.enum(["NORMAL", "CONSTIPATION", "DIARRHEA", "INCONTINENCE"]),
     diaperType: z.enum(["NONE", "TAPE", "PANTS"]),
     diaperSize: z.string().optional(),
+    eatingStatus: z.enum(["EAT_NORMAL", "EAT_SOFT", "NEEDS_FEEDING", "TUBE_FEEDING"]).default("EAT_NORMAL"),
 
     // 6. Cognitive
     hasConfusion: z.boolean().default(false),
     confusionTimeframe: z.string().optional(),
     memoryStatus: z.string().optional(),
     behaviorStatus: z.string().optional(),
+    psychiatricStatus: z.enum(["NONE", "SYMPTOMS_NO_MEDS", "SYMPTOMS_WITH_MEDS"]).default("NONE"),
+    hasAggressiveBehavior: z.boolean().default(false),
+    hasPsychiatricMedication: z.boolean().default(false),
+    hasSpecialMedication: z.boolean().default(false),
+    specialMedicationDetail: z.string().optional(),
 
     // 7. Chief Complaint
     reasonForAdmission: z.string().optional(),
     initialMentalState: z.string().optional(),
+    currentLocation: z.enum(["HOME", "HOSPITAL", "CARE_CENTER"]).default("HOME"),
+    initialSymptoms: z.string().optional(),
 
     // 8. Medical History
     underlyingDiseases: z.string().optional(),
@@ -83,6 +96,11 @@ export const elderlyProfileSchema = z.object({
     hasPressureUlcer: z.boolean().default(false),
     pressureUlcerLocation: z.string().optional(),
     pressureUlcerStage: z.string().optional(),
+    bedsoreStatus: z.enum(["NONE", "ONE", "TWO", "MORE_THAN_THREE"]).default("NONE"),
+    useAirMattress: z.boolean().default(false),
+    oxygenSupport: z.enum(["NONE", "LITERS_5", "LITERS_10", "TEMPORARY_CYLINDER"]).default("NONE"),
+    useVentilator: z.boolean().default(false),
+    hasTracheostomy: z.boolean().default(false),
     medicalDevices: z.string().optional(),
 
     // 11. Social
@@ -90,6 +108,8 @@ export const elderlyProfileSchema = z.object({
     primaryCaregiverRelation: z.string().optional(),
     healthPrivilege: z.enum(["SELF_PAY", "SOCIAL_SECURITY", "GOLD_CARD", "GOVERNMENT_OFFICER", "INSURANCE", "OTHER"]),
     sponsor: z.string().optional(),
+    hasLifeInsurance: z.boolean().default(false),
+    hospitalAffiliation: z.string().optional(),
 
     // 12. Religion
     religion: z.string().optional(),

@@ -45,6 +45,14 @@ export async function createElderlyProfile(data: ElderlyProfileInput) {
                 careLevel: profileData.careLevel as any || 'LEVEL_1',
                 homeType: profileData.homeType as any || null,
                 bloodType: profileData.bloodType as any || 'UNKNOWN',
+                childrenCount: profileData.childrenCount as any || 'NONE',
+                formerOccupation: profileData.formerOccupation as any || 'OTHER',
+                currentLocation: profileData.currentLocation as any || 'HOME',
+                selfHelpStatus: profileData.selfHelpStatus as any || 'INDEPENDENT_NON_BEDRIDDEN',
+                eatingStatus: profileData.eatingStatus as any || 'EAT_NORMAL',
+                bedsoreStatus: profileData.bedsoreStatus as any || 'NONE',
+                oxygenSupport: profileData.oxygenSupport as any || 'NONE',
+                psychiatricStatus: profileData.psychiatricStatus as any || 'NONE',
             },
         });
 
@@ -200,6 +208,14 @@ export async function updateElderlyProfile(id: string, data: ElderlyProfileInput
                 careLevel: profileData.careLevel as any || 'LEVEL_1',
                 homeType: profileData.homeType as any || null,
                 bloodType: profileData.bloodType as any || 'UNKNOWN',
+                childrenCount: profileData.childrenCount as any || 'NONE',
+                formerOccupation: profileData.formerOccupation as any || 'OTHER',
+                currentLocation: profileData.currentLocation as any || 'HOME',
+                selfHelpStatus: profileData.selfHelpStatus as any || 'INDEPENDENT_NON_BEDRIDDEN',
+                eatingStatus: profileData.eatingStatus as any || 'EAT_NORMAL',
+                bedsoreStatus: profileData.bedsoreStatus as any || 'NONE',
+                oxygenSupport: profileData.oxygenSupport as any || 'NONE',
+                psychiatricStatus: profileData.psychiatricStatus as any || 'NONE',
             },
         });
 
