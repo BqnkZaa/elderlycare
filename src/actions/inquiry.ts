@@ -40,22 +40,22 @@ export async function createInquiry(data: PublicAdmissionInput) {
                 legalGuardianRelation: data.legalGuardianRelation,
 
                 // Section 3: Sensory
-                hearingStatus: data.hearingStatus,
-                visionStatus: data.visionStatus,
-                speechStatus: data.speechStatus,
+                hearingStatus: data.hearingStatus ?? undefined,
+                visionStatus: data.visionStatus ?? undefined,
+                speechStatus: data.speechStatus ?? undefined,
 
                 // Section 4: Mobility
                 historyOfFalls: data.historyOfFalls,
                 fallsTimeframe: data.fallsTimeframe,
                 fallsCause: data.fallsCause,
-                gaitStatus: data.gaitStatus,
+                gaitStatus: data.gaitStatus ?? undefined,
                 assistiveDevices: data.assistiveDevices, // JSON string or text
 
                 // Section 5: Elimination
-                bladderControl: data.bladderControl,
+                bladderControl: data.bladderControl ?? undefined,
                 foleySize: data.foleySize,
-                bowelControl: data.bowelControl,
-                diaperType: data.diaperType,
+                bowelControl: data.bowelControl ?? undefined,
+                diaperType: data.diaperType ?? undefined,
                 diaperSize: data.diaperSize,
 
                 // Section 6: Cognitive
@@ -98,7 +98,7 @@ export async function createInquiry(data: PublicAdmissionInput) {
                 religiousRestrictions: data.religiousRestrictions,
 
                 // Section 13: Goals
-                goalOfCare: data.goalOfCare,
+                goalOfCare: data.goalOfCare ?? undefined,
                 expectationDetails: data.expectationDetails,
 
                 // Section 14: Environment

@@ -125,7 +125,7 @@ export default function NewElderlyPage() {
         try {
             const result = await createElderlyProfile(data);
 
-            if (result.success) {
+            if (result.success && result.data) {
                 setSubmitResult({
                     success: true,
                     message: 'บันทึกข้อมูลสำเร็จ! ระบบได้ทำการค้นหาศูนย์ที่เหมาะสมให้คุณแล้ว',
