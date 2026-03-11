@@ -15,7 +15,7 @@ export async function getPartnerCenters() {
         return { success: true, data: partners };
     } catch (error) {
         console.error('getPartnerCenters error:', error);
-        return { success: false, error: 'Failed to fetch partner centers' };
+        return { success: false, error: 'ไม่สามารถดึงข้อมูลศูนย์ดูแลได้' };
     }
 }
 
@@ -27,11 +27,11 @@ export async function getPartnerCenterById(id: string) {
         const partner = await prisma.partnerCenter.findUnique({
             where: { id },
         });
-        if (!partner) return { success: false, error: 'Partner center not found' };
+        if (!partner) return { success: false, error: 'ไม่พบข้อมูลศูนย์ดูแลนี้' };
         return { success: true, data: partner };
     } catch (error) {
         console.error('getPartnerCenterById error:', error);
-        return { success: false, error: 'Failed to fetch partner center' };
+        return { success: false, error: 'ไม่สามารถดึงข้อมูลศูนย์ดูแลได้' };
     }
 }
 
@@ -59,7 +59,7 @@ export async function createPartnerCenter(data: PartnerCenterInput) {
         return { success: true, data: partner };
     } catch (error: any) {
         console.error('createPartnerCenter error:', error);
-        return { success: false, error: error.message || 'Failed to create partner center' };
+        return { success: false, error: error.message || 'ไม่สามารถบันทึกข้อมูลศูนย์ดูแลได้' };
     }
 }
 
@@ -79,7 +79,7 @@ export async function updatePartnerCenter(id: string, data: Partial<PartnerCente
         return { success: true, data: partner };
     } catch (error: any) {
         console.error('updatePartnerCenter error:', error);
-        return { success: false, error: error.message || 'Failed to update partner center' };
+        return { success: false, error: error.message || 'ไม่สามารถแก้ไขข้อมูลศูนย์ดูแลได้' };
     }
 }
 
@@ -95,7 +95,7 @@ export async function deletePartnerCenter(id: string) {
         return { success: true };
     } catch (error) {
         console.error('deletePartnerCenter error:', error);
-        return { success: false, error: 'Failed to delete partner center' };
+        return { success: false, error: 'ไม่สามารถลบข้อมูลศูนย์ดูแลได้' };
     }
 }
 
@@ -108,7 +108,7 @@ export async function getRecommendations(elderlyId: string) {
             where: { id: elderlyId }
         });
 
-        if (!elderly) return { success: false, error: 'Elderly profile not found' };
+        if (!elderly) return { success: false, error: 'ไม่พบข้อมูลผู้สูงอายุ' };
 
         const partners = await prisma.partnerCenter.findMany({
             where: { isActive: true }
@@ -196,7 +196,7 @@ export async function getRecommendations(elderlyId: string) {
         return { success: true, data: recommendations };
     } catch (error) {
         console.error('getRecommendations error:', error);
-        return { success: false, error: 'Failed to generate recommendations' };
+        return { success: false, error: 'เกิดข้อผิดพลาดในการประมวลผลคำแนะนำ' };
     }
 }
 

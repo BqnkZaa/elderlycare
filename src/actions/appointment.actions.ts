@@ -21,8 +21,7 @@ export async function createAppointment(elderlyId: string, data: AppointmentInpu
         revalidatePath(`/dashboard/elderly/${elderlyId}`);
         return { success: true, data: appointment };
     } catch (error) {
-        console.error('Failed to create appointment:', error);
-        return { success: false, error: 'Failed to create appointment' };
+        return { success: false, error: 'ไม่สามารถบันทึกข้อมูลการนัดหมายได้' };
     }
 }
 
@@ -35,8 +34,7 @@ export async function getAppointments(elderlyId: string) {
         });
         return { success: true, data: appointments };
     } catch (error) {
-        console.error('Failed to fetch appointments:', error);
-        return { success: false, error: 'Failed to fetch appointments' };
+        return { success: false, error: 'ไม่สามารถดึงข้อมูลการนัดหมายได้' };
     }
 }
 
@@ -59,8 +57,7 @@ export async function updateAppointment(id: string, data: Partial<AppointmentInp
         revalidatePath(`/dashboard/elderly/${appointment.elderlyId}`);
         return { success: true, data: appointment };
     } catch (error) {
-        console.error('Failed to update appointment:', error);
-        return { success: false, error: 'Failed to update appointment' };
+        return { success: false, error: 'ไม่สามารถแก้ไขข้อมูลการนัดหมายได้' };
     }
 }
 
@@ -74,8 +71,7 @@ export async function deleteAppointment(id: string, elderlyId: string) {
         revalidatePath(`/dashboard/elderly/${elderlyId}`);
         return { success: true };
     } catch (error) {
-        console.error('Failed to delete appointment:', error);
-        return { success: false, error: 'Failed to delete appointment' };
+        return { success: false, error: 'ไม่สามารถลบข้อมูลการนัดหมายได้' };
     }
 }
 
@@ -106,7 +102,6 @@ export async function getDistinctAppointmentOptions() {
             }
         };
     } catch (error) {
-        console.error('Failed to fetch options:', error);
-        return { success: false, error: 'Failed to fetch options' };
+        return { success: false, error: 'ไม่สามารถดึงข้อมูลตัวเลือกได้' };
     }
 }

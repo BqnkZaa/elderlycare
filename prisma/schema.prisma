@@ -411,6 +411,7 @@ model ElderlyProfile {
   // Section 7: Chief Complaint
   reasonForAdmission String? @db.Text
   initialMentalState String? @db.Text
+  initialSymptoms    String? @db.Text
 
   // Section 8: Medical History
   underlyingDiseases String? @db.Text
@@ -768,6 +769,7 @@ model Inquiry {
   // Section 7: Chief Complaint
   reasonForAdmission String? @db.Text
   initialMentalState String? @db.Text
+  initialSymptoms    String? @db.Text
 
   // Section 8: Medical History
   underlyingDiseases String? @db.Text

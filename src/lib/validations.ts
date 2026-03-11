@@ -19,7 +19,7 @@ export const elderlyProfileSchema = z.object({
     lastName: z.string().min(1, "กรุณาระบุนามสกุล"),
     nickname: z.string().optional(),
     age: z.coerce.number().min(1, "กรุณาระบุอายุ"),
-    gender: z.enum(["MALE", "FEMALE", "OTHER"]),
+    gender: z.enum(["MALE", "FEMALE", "OTHER"], { message: "กรุณาเลือกเพศ" }).optional(),
     preferredPronouns: z.string().optional(),
     education: z.string().optional(),
     proudFormerOccupation: z.string().optional(),
@@ -29,12 +29,12 @@ export const elderlyProfileSchema = z.object({
         return val;
     }), // Handle both string (from form) and Date (from internal/transformed data)
     genderOther: z.string().optional(),
-    childrenCount: z.enum(["NONE", "ONE", "TWO", "THREE", "FOUR", "FIVE_OR_MORE"]).default("NONE"),
-    formerOccupation: z.enum(["COMMERCE", "SERVICE", "OTHER"]).default("OTHER"),
+    childrenCount: z.enum(["NONE", "ONE", "TWO", "THREE", "FOUR", "FIVE_OR_MORE"], { message: "กรุณาเลือกจำนวนบุตร" }).default("NONE"),
+    formerOccupation: z.enum(["COMMERCE", "SERVICE", "OTHER"], { message: "กรุณาเลือกอาชีพ" }).default("OTHER"),
     formerOccupationOther: z.string().optional(),
 
     // 2. Marital & Status
-    maritalStatus: z.enum(["SINGLE", "MARRIED", "WIDOWED", "DIVORCED_SEPARATED", "PARTNERED"]),
+    maritalStatus: z.enum(["SINGLE", "MARRIED", "WIDOWED", "DIVORCED_SEPARATED", "PARTNERED"], { message: "กรุณาเลือกสถานภาพ" }).optional(),
     keyCoordinatorName: z.string().optional(),
     keyCoordinatorPhone: z.string().optional(),
     keyCoordinatorRelation: z.string().optional(),
@@ -43,41 +43,41 @@ export const elderlyProfileSchema = z.object({
     legalGuardianRelation: z.string().optional(),
 
     // 3. Sensory
-    hearingStatus: z.enum(["NORMAL", "HARD_OF_HEARING_LEFT", "HARD_OF_HEARING_RIGHT", "HARD_OF_HEARING_BOTH", "DEAF", "HEARING_AID"]),
-    visionStatus: z.enum(["NORMAL", "NEARSIGHTED_FARSIGHTED", "CATARACT_GLAUCOMA", "GLASSES", "CONTACT_LENS"]),
-    speechStatus: z.enum(["CLEAR", "DYSARTHRIA", "APHASIA", "NON_VERBAL"]),
+    hearingStatus: z.enum(["NORMAL", "HARD_OF_HEARING_LEFT", "HARD_OF_HEARING_RIGHT", "HARD_OF_HEARING_BOTH", "DEAF", "HEARING_AID"], { message: "กรุณาเลือกสถานะการได้ยิน" }).optional().nullable(),
+    visionStatus: z.enum(["NORMAL", "NEARSIGHTED_FARSIGHTED", "CATARACT_GLAUCOMA", "GLASSES", "CONTACT_LENS"], { message: "กรุณาเลือกสถานะการมองเห็น" }).optional().nullable(),
+    speechStatus: z.enum(["CLEAR", "DYSARTHRIA", "APHASIA", "NON_VERBAL"], { message: "กรุณาเลือกสถานะการพูด" }).optional().nullable(),
 
     // 4. Mobility
-    historyOfFalls: z.boolean().default(false),
+    historyOfFalls: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
     fallsTimeframe: z.string().optional(),
     fallsCause: z.string().optional(),
-    gaitStatus: z.enum(["INDEPENDENT", "UNSTEADY", "NEEDS_SUPPORT", "NON_AMBULATORY_BEDRIDDEN"]),
+    gaitStatus: z.enum(["INDEPENDENT", "UNSTEADY", "NEEDS_SUPPORT", "NON_AMBULATORY_BEDRIDDEN"], { message: "กรุณาเลือกการเดิน" }).optional().nullable(),
     assistiveDevices: z.string().optional(),
-    selfHelpStatus: z.enum(["INDEPENDENT_NON_BEDRIDDEN", "INDEPENDENT_BEDRIDDEN", "DEPENDENT_BEDRIDDEN"]).default("INDEPENDENT_NON_BEDRIDDEN"),
+    selfHelpStatus: z.enum(["INDEPENDENT_NON_BEDRIDDEN", "INDEPENDENT_BEDRIDDEN", "DEPENDENT_BEDRIDDEN"], { message: "กรุณาเลือกกลุ่มงาน" }).default("INDEPENDENT_NON_BEDRIDDEN"),
 
     // 5. Elimination
-    bladderControl: z.enum(["CONTINENT", "OCCASIONAL_INCONTINENCE", "TOTAL_INCONTINENCE_FOLEY"]),
+    bladderControl: z.enum(["CONTINENT", "OCCASIONAL_INCONTINENCE", "TOTAL_INCONTINENCE_FOLEY"], { message: "กรุณาเลือกการขับถ่ายปัสสาวะ" }).optional().nullable(),
     foleySize: z.string().optional(),
-    bowelControl: z.enum(["NORMAL", "CONSTIPATION", "DIARRHEA", "INCONTINENCE"]),
-    diaperType: z.enum(["NONE", "TAPE", "PANTS"]),
+    bowelControl: z.enum(["NORMAL", "CONSTIPATION", "DIARRHEA", "INCONTINENCE"], { message: "กรุณาเลือกการขับถ่ายอุจจาระ" }).optional().nullable(),
+    diaperType: z.enum(["NONE", "TAPE", "PANTS"], { message: "กรุณาเลือกประเภทผ้าอ้อม" }).optional().nullable(),
     diaperSize: z.string().optional(),
-    eatingStatus: z.enum(["EAT_NORMAL", "EAT_SOFT", "NEEDS_FEEDING", "TUBE_FEEDING"]).default("EAT_NORMAL"),
+    eatingStatus: z.enum(["EAT_NORMAL", "EAT_SOFT", "NEEDS_FEEDING", "TUBE_FEEDING"], { message: "กรุณาเลือกการรับประทานอาหาร" }).default("EAT_NORMAL"),
 
     // 6. Cognitive
-    hasConfusion: z.boolean().default(false),
+    hasConfusion: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
     confusionTimeframe: z.string().optional(),
     memoryStatus: z.string().optional(),
     behaviorStatus: z.string().optional(),
-    psychiatricStatus: z.enum(["NONE", "SYMPTOMS_NO_MEDS", "SYMPTOMS_WITH_MEDS"]).default("NONE"),
-    hasAggressiveBehavior: z.boolean().default(false),
-    hasPsychiatricMedication: z.boolean().default(false),
-    hasSpecialMedication: z.boolean().default(false),
+    psychiatricStatus: z.enum(["NONE", "SYMPTOMS_NO_MEDS", "SYMPTOMS_WITH_MEDS"], { message: "กรุณาเลือกอาการทางจิต" }).default("NONE"),
+    hasAggressiveBehavior: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    hasPsychiatricMedication: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    hasSpecialMedication: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
     specialMedicationDetail: z.string().optional(),
 
     // 7. Chief Complaint
     reasonForAdmission: z.string().optional(),
     initialMentalState: z.string().optional(),
-    currentLocation: z.enum(["HOME", "HOSPITAL", "CARE_CENTER"]).default("HOME"),
+    currentLocation: z.enum(["HOME", "HOSPITAL", "CARE_CENTER"], { message: "กรุณาเลือกสถานที่พำนัก" }).default("HOME"),
     initialSymptoms: z.string().optional(),
 
     // 8. Medical History
@@ -86,29 +86,29 @@ export const elderlyProfileSchema = z.object({
     surgicalHistory: z.string().optional(),
 
     // 9. Allergies
-    hasDrugAllergies: z.boolean().default(false),
+    hasDrugAllergies: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
     drugAllergiesDetail: z.string().optional(),
-    hasFoodChemicalAllergies: z.boolean().default(false),
+    hasFoodChemicalAllergies: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
     foodChemicalAllergiesDetail: z.string().optional(),
 
     // 10. Physical
     skinCondition: z.string().optional(),
-    hasPressureUlcer: z.boolean().default(false),
+    hasPressureUlcer: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
     pressureUlcerLocation: z.string().optional(),
     pressureUlcerStage: z.string().optional(),
-    bedsoreStatus: z.enum(["NONE", "ONE", "TWO", "MORE_THAN_THREE"]).default("NONE"),
-    useAirMattress: z.boolean().default(false),
-    oxygenSupport: z.enum(["NONE", "LITERS_5", "LITERS_10", "TEMPORARY_CYLINDER"]).default("NONE"),
-    useVentilator: z.boolean().default(false),
-    hasTracheostomy: z.boolean().default(false),
+    bedsoreStatus: z.enum(["NONE", "ONE", "TWO", "MORE_THAN_THREE"], { message: "กรุณาเลือกจำนวนแผลกดทับ" }).default("NONE"),
+    useAirMattress: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    oxygenSupport: z.enum(["NONE", "LITERS_5", "LITERS_10", "TEMPORARY_CYLINDER"], { message: "กรุณาเลือกการให้ออกซิเจน" }).default("NONE"),
+    useVentilator: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    hasTracheostomy: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
     medicalDevices: z.string().optional(),
 
     // 11. Social
     primaryCaregiverName: z.string().optional(),
     primaryCaregiverRelation: z.string().optional(),
-    healthPrivilege: z.enum(["SELF_PAY", "SOCIAL_SECURITY", "GOLD_CARD", "GOVERNMENT_OFFICER", "INSURANCE", "OTHER"]),
+    healthPrivilege: z.enum(["SELF_PAY", "SOCIAL_SECURITY", "GOLD_CARD", "GOVERNMENT_OFFICER", "INSURANCE", "OTHER"], { message: "กรุณาเลือกสิทธิการรักษา" }).optional(),
     sponsor: z.string().optional(),
-    hasLifeInsurance: z.boolean().default(false),
+    hasLifeInsurance: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
     hospitalAffiliation: z.string().optional(),
 
     // 12. Religion
@@ -117,7 +117,7 @@ export const elderlyProfileSchema = z.object({
     religiousRestrictions: z.string().optional(),
 
     // 13. Goals
-    goalOfCare: z.enum(["REHABILITATION", "LONG_TERM_CARE", "PALLIATIVE"]),
+    goalOfCare: z.enum(["REHABILITATION", "LONG_TERM_CARE", "PALLIATIVE"], { message: "กรุณาเลือกเป้าหมายการดูแล" }).optional(),
     expectationDetails: z.string().optional(),
     careLevel: z.string().default("LEVEL_1"), // Default from form
 
@@ -138,28 +138,28 @@ export const elderlyProfileSchema = z.object({
     // ==========================================
 
     // ADL (Part 1)
-    adlEating: z.enum(["CANNOT_EAT", "TUBE_FED", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
-    adlGrooming: z.enum(["NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
-    adlBathing: z.enum(["NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
-    adlDressing: z.enum(["CANNOT_DRESS", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
-    adlBowel: z.enum(["INCONTINENT", "ENEMA", "OCCASIONAL_INCONTINENCE", "CONTINENT"]).optional().nullable(),
-    adlBladder: z.enum(["INCONTINENT", "CATHETER", "OCCASIONAL_INCONTINENCE", "CONTINENT"]).optional().nullable(),
-    adlToilet: z.enum(["CANNOT_USE", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
-    adlTransfer: z.enum(["CANNOT_TRANSFER", "NEEDS_HELP_SITTING", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
-    adlMobility: z.enum(["IMMOBILE", "WHEELCHAIR_INDEPENDENT", "NEEDS_HELP_WALKING", "INDEPENDENT"]).optional().nullable(),
-    adlStairs: z.enum(["CANNOT_CLIMB", "NEEDS_HELP", "INDEPENDENT"]).optional().nullable(),
+    adlEating: z.enum(["CANNOT_EAT", "TUBE_FED", "NEEDS_HELP", "INDEPENDENT"], { message: "กรุณาเลือกสถานะการรับประทานอาหาร" }).optional().nullable(),
+    adlGrooming: z.enum(["NEEDS_HELP", "INDEPENDENT"], { message: "กรุณาเลือกสถานะการดูแลความสะอาด" }).optional().nullable(),
+    adlBathing: z.enum(["NEEDS_HELP", "INDEPENDENT"], { message: "กรุณาเลือกสถานะการอาบน้ำ" }).optional().nullable(),
+    adlDressing: z.enum(["CANNOT_DRESS", "NEEDS_HELP", "INDEPENDENT"], { message: "กรุณาเลือกสถานะการแต่งตัว" }).optional().nullable(),
+    adlBowel: z.enum(["INCONTINENT", "ENEMA", "OCCASIONAL_INCONTINENCE", "CONTINENT"], { message: "กรุณาเลือกสถานะการควบคุมอุจจาระ" }).optional().nullable(),
+    adlBladder: z.enum(["INCONTINENT", "CATHETER", "OCCASIONAL_INCONTINENCE", "CONTINENT"], { message: "กรุณาเลือกสถานะการควบคุมปัสสาวะ" }).optional().nullable(),
+    adlToilet: z.enum(["CANNOT_USE", "NEEDS_HELP", "INDEPENDENT"], { message: "กรุณาเลือกสถานะการใช้ห้องน้ำ" }).optional().nullable(),
+    adlTransfer: z.enum(["CANNOT_TRANSFER", "NEEDS_HELP_SITTING", "NEEDS_HELP", "INDEPENDENT"], { message: "กรุณาเลือกสถานะการเคลื่อนย้าย" }).optional().nullable(),
+    adlMobility: z.enum(["IMMOBILE", "WHEELCHAIR_INDEPENDENT", "NEEDS_HELP_WALKING", "INDEPENDENT"], { message: "กรุณาเลือกสถานะการเคลื่อนที่" }).optional().nullable(),
+    adlStairs: z.enum(["CANNOT_CLIMB", "NEEDS_HELP", "INDEPENDENT"], { message: "กรุณาเลือกสถานะการขึ้นลงบันได" }).optional().nullable(),
 
     // Medical Complexity (Part 2)
-    hasNgt: z.boolean().default(false),
-    hasPeg: z.boolean().default(false),
-    hasFoleyCatheter: z.boolean().default(false),
-    hasColostomy: z.boolean().default(false),
+    hasNgt: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    hasPeg: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    hasFoleyCatheter: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    hasColostomy: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
     oxygenCannulaLiters: z.string().optional(),
     oxygenMaskLiters: z.string().optional(),
     ventilatorMode: z.string().optional(),
-    needSuction: z.boolean().default(false),
+    needSuction: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
 
-    woundsNone: z.boolean().default(true),
+    woundsNone: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(true)),
     bedsoreStage1Location: z.string().optional(),
     bedsoreStage2Location: z.string().optional(),
     bedsoreStage3Location: z.string().optional(),
@@ -167,25 +167,25 @@ export const elderlyProfileSchema = z.object({
     diabeticWoundLocation: z.string().optional(),
     surgicalWoundLocation: z.string().optional(),
 
-    hasCapd: z.boolean().default(false),
-    hasHd: z.boolean().default(false),
-    hasIvSupport: z.boolean().default(false),
-    requireBloodSugarCheck: z.boolean().default(false),
+    hasCapd: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    hasHd: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    hasIvSupport: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    requireBloodSugarCheck: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
 
     // Cognitive & Behavioral (Part 3)
-    cognitiveStatus: z.enum(["ALZHEIMERS_MOBILE_WANDERING", "ALZHEIMERS_IMMOBILE"]).optional().nullable(),
-    aggressiveStatus: z.enum(["AGGRESSIVE_WITH_MEDS", "AGGRESSIVE_NO_MEDS"]).optional().nullable(),
+    cognitiveStatus: z.enum(["ALZHEIMERS_MOBILE_WANDERING", "ALZHEIMERS_IMMOBILE"], { message: "กรุณาเลือกสภาวะทางความคิด" }).optional().nullable(),
+    aggressiveStatus: z.enum(["AGGRESSIVE_WITH_MEDS", "AGGRESSIVE_NO_MEDS"], { message: "กรุณาเลือกพฤติกรรมก้าวร้าว" }).optional().nullable(),
     noisyConfusionTimeframe: z.string().optional(),
-    talksToSelfQuietly: z.boolean().default(false),
-    psychiatricWithMeds: z.boolean().default(false),
-    psychiatricNoMeds: z.boolean().default(false),
+    talksToSelfQuietly: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    psychiatricWithMeds: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    psychiatricNoMeds: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
 
     // Safety Risks (Part 4)
-    fallHistoryLevel: z.enum(["NONE_IN_6_MONTHS", "ONCE_OR_TWICE", "FREQUENT_HIGH_RISK"]).optional().nullable(),
-    bradenScale: z.enum(["LOW_TO_MODERATE_RISK", "HIGH_RISK"]).optional().nullable(),
-    infectionNone: z.boolean().default(true),
+    fallHistoryLevel: z.enum(["NONE_IN_6_MONTHS", "ONCE_OR_TWICE", "FREQUENT_HIGH_RISK"], { message: "กรุณาเลือกประวัติการล้ม" }).optional().nullable(),
+    bradenScale: z.enum(["LOW_TO_MODERATE_RISK", "HIGH_RISK"], { message: "กรุณาเลือก Braden Scale" }).optional().nullable(),
+    infectionNone: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(true)),
     infectionDetails: z.string().optional(),
-    frailtyScore: z.enum(["ROBUST", "PRE_FRAIL", "FRAIL"]).optional().nullable(),
+    frailtyScore: z.enum(["ROBUST", "PRE_FRAIL", "FRAIL"], { message: "กรุณาเลือก Frailty Score" }).optional().nullable(),
 
     // Hospital & Medications (Part 5)
     recentDischargeDate: z.string().optional(),
@@ -193,15 +193,15 @@ export const elderlyProfileSchema = z.object({
     recentAdmissionReason: z.string().optional(),
     nextAppointmentDate: z.string().optional(),
 
-    polypharmacy: z.enum(["LESS_THAN_5", "FIVE_OR_MORE"]).optional().nullable(),
-    highAlertAnticoagulant: z.boolean().default(false),
-    highAlertDiabetic: z.boolean().default(false),
-    highAlertPsychiatric: z.boolean().default(false),
+    polypharmacy: z.enum(["LESS_THAN_5", "FIVE_OR_MORE"], { message: "กรุณาเลือกจำนวนยา" }).optional().nullable(),
+    highAlertAnticoagulant: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    highAlertDiabetic: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
+    highAlertPsychiatric: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(false)),
 
     // System
-    isActive: z.boolean().default(true),
-    bloodType: z.enum(["A_POSITIVE", "A_NEGATIVE", "B_POSITIVE", "B_NEGATIVE", "O_POSITIVE", "O_NEGATIVE", "AB_POSITIVE", "AB_NEGATIVE", "UNKNOWN"]).optional(),
-    mobilityStatus: z.enum(["INDEPENDENT", "NEEDS_ASSISTANCE", "WHEELCHAIR", "BEDRIDDEN"]).optional(),
+    isActive: z.preprocess((v) => v === 'true' || v === true, z.boolean().default(true)),
+    bloodType: z.enum(["A_POSITIVE", "A_NEGATIVE", "B_POSITIVE", "B_NEGATIVE", "O_POSITIVE", "O_NEGATIVE", "AB_POSITIVE", "AB_NEGATIVE", "UNKNOWN"], { message: "กรุณาเลือกหมู่เลือด" }).optional(),
+    mobilityStatus: z.enum(["INDEPENDENT", "NEEDS_ASSISTANCE", "WHEELCHAIR", "BEDRIDDEN"], { message: "กรุณาเลือกสถานะการเคลื่อนไหว" }).optional(),
 });
 
 export type ElderlyProfileInput = z.infer<typeof elderlyProfileSchema>;

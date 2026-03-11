@@ -18,7 +18,7 @@ export async function createElderlyProfile(data: ElderlyProfileInput) {
         if (!validatedFields.success) {
             return {
                 success: false,
-                error: "Invalid fields: " + validatedFields.error.issues.map((e: any) => e.message).join(", "),
+                error: "ข้อมูลไม่ถูกต้อง: " + validatedFields.error.issues.map((e: any) => e.message).join(", "),
             };
         }
 
@@ -120,9 +120,18 @@ export async function createElderlyProfile(data: ElderlyProfileInput) {
 
     } catch (error: any) {
         console.error("Failed to create elderly profile:", error);
+
+        // Handle Prisma Unique Constraint Error (P2002)
+        if (error.code === 'P2002' && error.meta?.target?.includes('safeId')) {
+            return {
+                success: false,
+                error: "รหัสผู้ป่วย (SAFE-ID) นี้ถูกใช้ลงทะเบียนไปแล้ว กรุณาระบุรหัสใหม่ครับ",
+            };
+        }
+
         return {
             success: false,
-            error: error.message || "Failed to create profile",
+            error: error.message || "เกิดข้อผิดพลาดในการสร้างโปรไฟล์",
         };
     }
 }
@@ -210,7 +219,7 @@ export async function getElderlyProfiles({
         console.error("Failed to fetch elderly profiles:", error);
         return {
             success: false,
-            error: error.message || "Failed to fetch profiles",
+            error: error.message || "เกิดข้อผิดพลาดในการดึงข้อมูล",
         };
     }
 }
@@ -222,13 +231,13 @@ export async function getElderlyProfile(id: string) {
         });
 
         if (!profile) {
-            return { success: false, error: "Profile not found" };
+            return { success: false, error: "ไม่พบข้อมูลโปรไฟล์ผู้สูงอายุ" };
         }
 
         return { success: true, data: profile };
     } catch (error: any) {
         console.error("Failed to fetch profile:", error);
-        return { success: false, error: error.message || "Failed to fetch profile" };
+        return { success: false, error: error.message || "เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์" };
     }
 }
 
@@ -240,7 +249,7 @@ export async function updateElderlyProfile(id: string, data: ElderlyProfileInput
         if (!validatedFields.success) {
             return {
                 success: false,
-                error: "Invalid fields: " + validatedFields.error.issues.map((e: any) => e.message).join(", "),
+                error: "ข้อมูลไม่ถูกต้อง: " + validatedFields.error.issues.map((e: any) => e.message).join(", "),
             };
         }
 
@@ -339,7 +348,7 @@ export async function updateElderlyProfile(id: string, data: ElderlyProfileInput
         return { success: true, data: updatedProfile };
     } catch (error: any) {
         console.error("Failed to update profile:", error);
-        return { success: false, error: error.message || "Failed to update profile" };
+        return { success: false, error: error.message || "เกิดข้อผิดพลาดในการอัปเดตโปรไฟล์" };
     }
 }
 
