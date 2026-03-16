@@ -17,8 +17,22 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Format date for display
  */
-export function formatDate(date: Date | string, locale: string = 'th-TH'): string {
-    const d = typeof date === 'string' ? new Date(date) : date;
+function parseDate(input: Date | string | null | undefined): Date | null {
+    if (!input) return null;
+
+    const date = typeof input === 'string' ? new Date(input) : input;
+
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    return date;
+}
+
+export function formatDate(date: Date | string | null | undefined, locale: string = 'th-TH'): string {
+    const d = parseDate(date);
+    if (!d) return '';
+
     return d.toLocaleDateString(locale, {
         year: 'numeric',
         month: 'long',
@@ -29,16 +43,18 @@ export function formatDate(date: Date | string, locale: string = 'th-TH'): strin
 /**
  * Format date for input fields (YYYY-MM-DD)
  */
-export function formatDateForInput(date: Date | string): string {
-    const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toISOString().split('T')[0];
+export function formatDateForInput(date: Date | string | null | undefined): string {
+    const d = parseDate(date);
+    return d ? d.toISOString().split('T')[0] : '';
 }
 
 /**
  * Calculate age from date of birth
  */
-export function calculateAge(dateOfBirth: Date | string): number {
-    const dob = typeof dateOfBirth === 'string' ? new Date(dateOfBirth) : dateOfBirth;
+export function calculateAge(dateOfBirth: Date | string | null | undefined): number {
+    const dob = parseDate(dateOfBirth);
+    if (!dob) return 0;
+
     const today = new Date();
     let age = today.getFullYear() - dob.getFullYear();
     const monthDiff = today.getMonth() - dob.getMonth();
@@ -53,8 +69,10 @@ export function calculateAge(dateOfBirth: Date | string): number {
 /**
  * Check if today is a birthday
  */
-export function isBirthdayToday(dateOfBirth: Date | string): boolean {
-    const dob = typeof dateOfBirth === 'string' ? new Date(dateOfBirth) : dateOfBirth;
+export function isBirthdayToday(dateOfBirth: Date | string | null | undefined): boolean {
+    const dob = parseDate(dateOfBirth);
+    if (!dob) return false;
+
     const today = new Date();
 
     return dob.getMonth() === today.getMonth() && dob.getDate() === today.getDate();
@@ -63,8 +81,10 @@ export function isBirthdayToday(dateOfBirth: Date | string): boolean {
 /**
  * Check if today is registration anniversary
  */
-export function isAnniversaryToday(registrationDate: Date | string): boolean {
-    const regDate = typeof registrationDate === 'string' ? new Date(registrationDate) : registrationDate;
+export function isAnniversaryToday(registrationDate: Date | string | null | undefined): boolean {
+    const regDate = parseDate(registrationDate);
+    if (!regDate) return false;
+
     const today = new Date();
 
     // Only count if at least 1 year has passed
@@ -77,8 +97,10 @@ export function isAnniversaryToday(registrationDate: Date | string): boolean {
 /**
  * Get years since registration
  */
-export function getYearsSinceRegistration(registrationDate: Date | string): number {
-    const regDate = typeof registrationDate === 'string' ? new Date(registrationDate) : registrationDate;
+export function getYearsSinceRegistration(registrationDate: Date | string | null | undefined): number {
+    const regDate = parseDate(registrationDate);
+    if (!regDate) return 0;
+
     const today = new Date();
 
     let years = today.getFullYear() - regDate.getFullYear();
