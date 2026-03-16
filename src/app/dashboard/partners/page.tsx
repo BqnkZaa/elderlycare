@@ -57,7 +57,7 @@ export default async function PartnersPage() {
                                 {partners && partners.length > 0 ? (
                                     partners.map((partner: PartnerCenter) => (
                                         <tr key={partner.id} className="hover:bg-accent/10 transition-colors group">
-                                            <td className="px-6 py-4 font-mono text-sm text-primary font-bold">{partner.pid}</td>
+                                            <td className="px-6 py-4 font-mono text-sm text-foreground font-bold">{partner.pid}</td>
                                             <td className="px-6 py-4">
                                                 <div className="font-semibold text-foreground">{partner.name}</div>
                                                 <div className="text-xs text-muted-foreground flex items-center mt-0.5">

@@ -126,7 +126,7 @@ export default function UsersPage() {
     };
 
     const UserTable = ({ data }: { data: User[] }) => (
-        <div className="rounded-md border">
+        <div className="">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -234,38 +234,46 @@ export default function UsersPage() {
                 />
             </div>
 
-            <div className="flex items-center space-x-2">
-                <Input
-                    placeholder="ค้นหาชื่อ หรือ อีเมล..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="max-w-sm"
-                />
-            </div>
+            <Card className="bg-card/50 backdrop-blur-sm border-border">
+                <CardContent className="p-4">
+                    <div className="flex items-center space-x-2">
+                        <Input
+                            placeholder="ค้นหาชื่อ หรือ อีเมล..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="max-w-sm bg-background/50 border-input"
+                        />
+                    </div>
+                </CardContent>
+            </Card>
 
-            <Tabs defaultValue="all" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="all">ทั้งหมด ({users.length})</TabsTrigger>
-                    <TabsTrigger value="active">ใช้งานอยู่ ({activeUsers.length})</TabsTrigger>
-                    <TabsTrigger value="pending" className="relative">
-                        รอตรวจสอบ
-                        {pendingUsers.length > 0 && (
-                            <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-                                {pendingUsers.length}
-                            </span>
-                        )}
-                    </TabsTrigger>
-                </TabsList>
-                <TabsContent value="all" className="space-y-4">
-                    <UserTable data={filteredUsers} />
-                </TabsContent>
-                <TabsContent value="active" className="space-y-4">
-                    <UserTable data={activeUsers} />
-                </TabsContent>
-                <TabsContent value="pending" className="space-y-4">
-                    <UserTable data={pendingUsers} />
-                </TabsContent>
-            </Tabs>
+            <Card className="bg-card/50 backdrop-blur-sm border-border">
+                <CardContent className="p-6">
+                    <Tabs defaultValue="all" className="space-y-4">
+                        <TabsList className="bg-background/50 border border-border">
+                            <TabsTrigger value="all">ทั้งหมด ({users.length})</TabsTrigger>
+                            <TabsTrigger value="active">ใช้งานอยู่ ({activeUsers.length})</TabsTrigger>
+                            <TabsTrigger value="pending" className="relative">
+                                รอตรวจสอบ
+                                {pendingUsers.length > 0 && (
+                                    <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+                                        {pendingUsers.length}
+                                    </span>
+                                )}
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="all" className="space-y-4">
+                            <UserTable data={filteredUsers} />
+                        </TabsContent>
+                        <TabsContent value="active" className="space-y-4">
+                            <UserTable data={activeUsers} />
+                        </TabsContent>
+                        <TabsContent value="pending" className="space-y-4">
+                            <UserTable data={pendingUsers} />
+                        </TabsContent>
+                    </Tabs>
+                </CardContent>
+            </Card>
 
             <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
                 <AlertDialogContent>
